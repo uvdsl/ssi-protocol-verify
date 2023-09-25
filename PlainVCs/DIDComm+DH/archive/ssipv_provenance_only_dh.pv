@@ -1,0 +1,363 @@
+(* This is a ProVerif description of the Protocol Flow. *)
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* Start Definitions *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(* START keys *)
+type SymmetricKey.
+type SecretKey.
+type PublicKey.
+fun pk(SecretKey):PublicKey.
+
+fun pk_b(PublicKey):bitstring.
+fun b_pk(bitstring):PublicKey.
+(* END keys *)
+
+(* START group *)
+type G.
+type exponent.
+
+fun exp(G, exponent): G.
+fun g(exponent): G.
+equation forall x: exponent, y: exponent; exp(g(x),y) = exp(g(y),x).
+
+fun GtoSymK(G): SymmetricKey.
+(* END group *)
+
+(* START symmetric encryption *)
+fun enc(bitstring(*the message*), SymmetricKey):bitstring (*symmetric encrypt input msg*).
+reduc forall msg:bitstring,symk:SymmetricKey; dec(enc(msg,symk),symk)=msg (*symmetric decrypt*).
+(* END symmetric encryption *)
+
+(* START asymmetric encryption *)
+fun aenc(bitstring(*the message*), PublicKey):bitstring (*asymmetric encrypt input msg*).
+reduc forall msg:bitstring,sk:SecretKey; adec(aenc(msg,pk(sk)),sk)=msg (*asymmetric decrypt*).
+(* END Asymmetric encryption *)
+
+(* START digital signature *)
+fun sign(bitstring(*the message*), SecretKey):bitstring (*sign the input msg*).
+reduc forall msg:bitstring,sk:SecretKey; auth(sign(msg,sk),pk(sk))=msg (*check signature, and get msg*).
+reduc forall msg:bitstring,sk:SecretKey; getMsg(sign(msg,sk))=msg (*just get msg*).
+(* END digital signature *)
+
+(* ALTERNATIVE model authcrypt directly as a set of corresponding funcs and reducs...*)
+letfun authcrypt(msg:bitstring,sk:SecretKey,pk:PublicKey) = aenc(sign(msg,sk),pk).
+letfun authdecrypt(cipher:bitstring,sk:SecretKey,pk:PublicKey) = auth(adec(cipher,sk),pk).
+(* ALTERNATIVE model authcrypt directly as a set of corresponding funcs and reducs...*)
+
+(* START DID *)
+type DID.
+fun genDID(PublicKey,SecretKey(*such that DID can not be inferred by others*)):DID.
+reduc forall sk:SecretKey; getPubKey(genDID(pk(sk),sk)) = pk(sk). (* as of page 129 of manual *)
+(* this implies that a DID may only be associated to only one pubKey, which is not true => model as table*)
+(* but tables do not seem to be publically available? as of page 41 of manual *)
+(* END DID *)
+
+(* START credential *)
+type VC.
+fun issueVC(DID(*the subject*),bitstring(*the attribute*),SecretKey(*for issuer DID and signing*)):VC.
+reduc forall subject:DID,attr:bitstring,issuerSk:SecretKey; verify(issueVC(subject,attr,issuerSk),pk(issuerSk))=(subject,attr,genDID(pk(issuerSk),issuerSk)).
+reduc forall subject:DID,attr:bitstring,issuerSk:SecretKey; getIssuerFromVC(issueVC(subject,attr,issuerSk))=genDID(pk(issuerSk),issuerSk).
+reduc forall subject:DID,attr:bitstring,issuerSk:SecretKey; getAttrFromVC(issueVC(subject,attr,issuerSk))=attr.
+reduc forall subject:DID,attr:bitstring,issuerSk:SecretKey; getSubjectFromVC(issueVC(subject,attr,issuerSk))=subject.
+reduc forall subject:DID,attr:bitstring,issuerSk:SecretKey; getVcAsTuple(issueVC(subject,attr,issuerSk))= (subject,attr,genDID(pk(issuerSk),issuerSk)).
+(* do table for (attr,isserDID) lookup*)
+(* for now use if then *)
+(* END credential *)
+
+(* START access control rule (ACR) *)
+type ACR. (*access control rule*)
+fun makeRule(DID(*the subject*),bitstring(*the attribute*),DID(*the issuer*)):ACR. (* technically, the subject is dynamically injected or when unknown an implicit placeholder in the rule; but for the sake of simplicity we omit that technical detail.*)
+reduc forall subject:DID,attr:bitstring,issuer:DID; getIssuerFromRule(makeRule(subject,attr,issuer))=issuer.
+reduc forall subject:DID,attr:bitstring,issuer:DID; getAttrFromRule(makeRule(subject,attr,issuer))=attr.
+reduc forall subject:DID,attr:bitstring,issuer:DID; getSubjectFromRule(makeRule(subject,attr,issuer))=subject.
+reduc forall subject:DID,attr:bitstring,issuer:DID; getRuleAsTuple(makeRule(subject,attr,issuer))=(subject,attr,issuer).
+(* END access control rule *)
+
+(*DEFS*)
+free h:channel.
+const attr:bitstring.
+const uri:bitstring.
+
+fun ch(bitstring): channel.
+fun chC(VC): channel.
+fun chR(ACR): channel.
+fun chS(SymmetricKey):channel.
+
+(* Used to model two secrecy claims. Each should not be revealed *)
+
+free rule_fromProver: bitstring [private].
+free unsigned_vp_fromProver: bitstring [private].
+free vp_fromProver: bitstring [private].
+free cred_fromProver: bitstring [private].
+free access_token_fromProver: bitstring [private].
+free K_private_fromProver:bitstring [private].
+
+free rule_fromVerifier: bitstring [private].
+free credRequest_fromVerifier: bitstring [private].
+free unauth_vp_fromVerifier: bitstring [private].
+free vp_fromVerifier: bitstring [private].
+free cred_fromVerifier: bitstring [private].
+free access_token_fromVerifier: bitstring [private].
+free K_private_fromVerifier:bitstring [private].
+
+(* Authentication *)
+event auth_VerifierSendsLastMessageToProver(G,bitstring,bitstring,bitstring,bitstring, bitstring).
+event auth_ProverCompletesProtocol(G,bitstring,bitstring,bitstring,bitstring, bitstring).
+event auth_ProverSendsLastMessageToVerifier(G,bitstring,bitstring,bitstring, bitstring).
+event auth_VerifierCompletesProtocol(G,bitstring,bitstring,bitstring, bitstring).
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Definitions *)
+(* Start Agents *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(** START Prover **)
+let prover(sk:SecretKey, cred:VC, verifierDID:DID, talksOnlyToHonest:bool) (* input ~ what the agent starts with in private*) =
+    
+    (* Treatment *)
+    new x:exponent;
+    let gx = g(x) in
+    let msg_handshakeReq = gx in
+
+    (* === Message 1 [->] *)
+    out(h,msg_handshakeReq);
+
+    (**)
+    (**)
+    (**)
+    (* === Message 2 [<-] *)
+    in(h,(gy:G,m:bitstring));
+
+    (* Treatment *)
+    let msg_handshakeResp = (gy,m) in
+    let K = GtoSymK(exp(gy,x)) in
+    let pk_v = getPubKey(verifierDID) in
+    let (gy':G, gx':G) = auth(dec(m, K),pk_v) in
+    if (gy', gx') = (gy,gx) then
+    let msg_uri = (enc((sign((gx,gy,uri),sk),pk(sk)),K)) in
+
+    (* === Message 3 [->] *)
+    out(h,msg_uri);
+
+    (**)
+    (**)
+    (**)
+    (* === Message 4 [<-] *)
+    in(h,x:bitstring); (* receive msg *)
+
+    (* Treatment *)
+    let msg_rule = x in
+    let msg = dec(x,K) in (* authdecrypt msg *)
+    let (n_c:bitstring,rule:ACR) = msg in (* deconstruct msg=(n_c,r) *)
+    if getVcAsTuple(cred) = getRuleAsTuple(rule) then (* TODO lookup *) (* lookup credential *)
+    let vp = sign((n_c,verifierDID,cred),sk) in (* create Verifiable Presentation *)
+    let msg_vp = enc(vp,K) in (* send authcrypt msg /w VP *)
+    event auth_ProverSendsLastMessageToVerifier(msg_handshakeReq,msg_handshakeResp,msg_uri,msg_rule,msg_vp); (* event_just_before_the_last_send_message_of_S  *)
+
+    (* === Message 5 [->] *) 
+    out(h, msg_vp);
+
+    (**)
+    (**)
+    (**)
+    (* === Message 6 [<-] *)
+    in(h,x:bitstring);
+
+    (* Treatment *)
+    let msg_accessToken = x in
+    let (access_token:bitstring, recipientDID:DID) = dec(x,K) in 
+    if recipientDID = genDID(pk(sk),sk) then
+    
+    (* event received_access_token; and I am the recipient, Prover about to complete protocol! *)
+
+    (* --------------------------------------------------------------------------------------- *)
+    (* Dishonest Agent *)
+
+    if talksOnlyToHonest then
+    (* event_at_the_very_end_of_role_R_in_parallel_with_secrecy_checks *)
+    event auth_ProverCompletesProtocol(msg_handshakeReq,msg_handshakeResp,msg_uri,msg_rule,msg_vp, msg_accessToken) |
+    (* checks if m is secret where the second argument is the dummy the query looks for*)
+    out(chR(rule),rule_fromProver) |
+    out(ch((n_c,verifierDID,cred)), unsigned_vp_fromProver) |
+    out(ch(vp), vp_fromProver) |
+    out(chC(cred),cred_fromProver) |
+    out(ch(access_token),access_token_fromProver);
+    out(chS(K),K_private_fromProver);
+    0.
+(** END Prover **)
+
+(** START Verifier **)
+let verifier(sk:SecretKey, rule:ACR, talksOnlyToHonest:bool) (* input ~ what the agent starts with in private*) =
+
+    (**)
+    (**)
+    (**)
+    (* === Message 1 [<-] *)
+    in(h,gx:G);
+
+    (* Treatment *)
+    let msg_handshakeReq = gx in
+    new y:exponent;
+    let gy = g(y) in
+    let K = GtoSymK(exp(gx,y)) in
+    let msg_handshakeResp = (gy,enc(sign((gy,gx),sk),K)) in
+
+    (* === Message 2 [->] *)
+    out(h,msg_handshakeResp);
+
+    (**)
+    (**)
+    (**)
+    (* === Message 3 [<-] *)
+    in(h,(m:bitstring));
+
+    (* Treatment sign((gx,gy,uri),sk),pk(sk)*)
+    let msg_uri = (m) in
+    let (sign_g:bitstring, pk_p:PublicKey) = dec(m, K) in
+    if (auth(sign_g,pk_p)) = (gx,gy,uri) then
+    new n_c:bitstring;
+    let msg = (n_c,rule) in
+    let msg_rule = enc(msg,K) in
+
+    (* === Message 4 [->] *)
+    out(h, msg_rule);
+
+    (**)
+    (**)
+    (**)
+    (* === Message 5 [<-] *)
+    in(h,x:bitstring);
+
+    (* Treatment *)
+    let msg_vp = x in
+    let unauth_vp = dec(x,K) in 
+    let (unauth_n'_c:bitstring,unauth_recipient:DID,unauth_cred:VC) = getMsg(unauth_vp) in (* deconstruct vp=(n_c,cred) *)
+    let cred_subject = getSubjectFromVC(unauth_cred) in (*get subject *)
+    if cred_subject = getSubjectFromRule(rule) then (* check if subject match from cred and rule *) (* delete if you do not want the specificy*) (* where prover p is the expected type of agent, i.e. honest*)
+    let pk_subject = getPubKey(cred_subject) in (* get subject pubkey *)
+    let (n'_c:bitstring,recipientDID:DID,cred:VC) = auth(unauth_vp,pk_subject) in (* authenticate VP *)
+    if recipientDID = genDID(pk(sk),sk) then (* check if verifier is actual recipient*)
+    if n'_c = n_c then (* check nonce *)
+    if getIssuerFromVC(cred) = getIssuerFromRule(rule) then (* check if issuers match from cred and rule *)
+    let (subjectDID:DID,asserted_attr:bitstring,issuerDID:DID) = verify(cred,getPubKey(getIssuerFromVC(cred))) in (* check cred integrity *)
+    if asserted_attr = getAttrFromRule(rule) then (* check if attribute match from cred and rule *)
+    new access_token:bitstring; (* mint new access token *)
+    let msg = (access_token,subjectDID) in
+    let msg_accessToken = enc(msg,K) in
+    event auth_VerifierSendsLastMessageToProver(msg_handshakeReq,msg_handshakeResp,msg_uri,msg_rule,msg_vp, msg_accessToken); (* event_just_before_the_last_send_message_of_S  *)
+
+    (* === Message 6 [->] *)
+    out(h, msg_accessToken);
+
+    (* --------------------------------------------------------------------------------------- *)
+    (* Dishonest Agent *)
+
+    if talksOnlyToHonest then
+    (* event_at_the_very_end_of_role_R_in_parallel_with_secrecy_checks *)
+    event auth_VerifierCompletesProtocol(msg_handshakeReq,msg_handshakeResp,msg_uri,msg_rule,msg_vp) |
+    (* checks if m is secret where the second argument is the dummy the query looks for*)
+    out(chR(rule), rule_fromVerifier) |
+    out(ch((n_c,rule)), credRequest_fromVerifier) |
+    out(ch(unauth_vp),unauth_vp_fromVerifier) |
+    out(ch((n'_c,recipientDID,cred)),vp_fromVerifier) |
+    out(chC(cred),cred_fromVerifier) |
+    out(ch(access_token),access_token_fromVerifier);
+    out(chS(K),K_private_fromVerifier);
+    0.
+(** END Verifier **)
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Agents *)
+(* Start Assumptions *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(* SECRECY *)
+
+query attacker(unsigned_vp_fromProver).
+query attacker(vp_fromProver).
+query attacker(cred_fromProver).
+query attacker(access_token_fromProver).
+query attacker(K_private_fromProver).
+
+query attacker(rule_fromVerifier).
+query attacker(credRequest_fromVerifier).
+query attacker(unauth_vp_fromVerifier).
+query attacker(vp_fromVerifier).
+query attacker(cred_fromVerifier).
+query attacker(access_token_fromVerifier).
+query attacker(K_private_fromVerifier).
+
+(* AUTHETNICATION *)
+
+(* event_at_the_very_end_of_role_R_in_parallel_with_secrecy_checks
+==> 
+event_just_before_the_last_send_message_of_S *)
+
+(* query msg_handshakeReq:G, msg_handshakeResp:bitstring, msg_uri:bitstring, msg_rule:bitstring, msg_vp:bitstring; *)
+(* event (auth_VerifierCompletesProtocol(msg_handshakeReq,msg_handshakeResp,msg_uri,msg_rule,msg_vp)). *)
+
+query  m_handshakeReq:G, m_handshakeResp:bitstring, m_uri:bitstring, m_rule:bitstring, m_vp:bitstring, m_accessToken:bitstring; 
+    inj-event(auth_ProverCompletesProtocol(m_handshakeReq, m_handshakeResp, m_uri, m_rule, m_vp, m_accessToken))
+    ==>
+    inj-event(auth_VerifierSendsLastMessageToProver(m_handshakeReq, m_handshakeResp, m_uri, m_rule, m_vp, m_accessToken)) .
+
+
+query  m_handshakeReq:G, m_handshakeResp:bitstring, m_uri:bitstring, m_rule:bitstring, m_vp:bitstring; 
+    inj-event(auth_VerifierCompletesProtocol(m_handshakeReq, m_handshakeResp, m_uri, m_rule, m_vp))
+    ==>
+    inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq, m_handshakeResp, m_uri, m_rule, m_vp)) .
+
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Assumptions *)
+(* Start Main *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+free sk_otherAgent:SecretKey. (*other agent may or may not be honest, but we don't know*)
+process (*use root process for setup *)
+    (*declare secret keys*)
+    new sk_prover:SecretKey;
+    new sk_verifier:SecretKey;
+    new sk_issuer:SecretKey;
+    (*advertise public keys*)
+    out(h,pk(sk_issuer));
+    out(h,pk(sk_verifier));
+    out(h,pk(sk_prover));
+    (*advertise DIDs*)
+    out(h,genDID(pk(sk_prover),sk_prover));
+    out(h,genDID(pk(sk_verifier),sk_verifier));
+    out(h,genDID(pk(sk_issuer),sk_issuer));
+    
+    (*assume issuer verified prover for attribute*)
+    (* credential = ( (DID_prover, attriubte, DID_issuer), signature_issuer ) *)
+    let cred = issueVC(  genDID(pk(sk_prover),sk_prover),   attr,    sk_issuer   ) in (*this is the issuer*)
+    let cred_otherAgent = issueVC(  genDID(pk(sk_otherAgent),sk_otherAgent),   attr,    sk_issuer   ) in 
+    out(h,cred_otherAgent);
+
+    (*assume verifier trusts issuer for asserting attribute*)
+    (* rule = (DID_prover , attribute , DID_issuer) *)
+    let acr = makeRule(  genDID(pk(sk_prover),sk_prover),   attr,   genDID(pk(sk_issuer),sk_issuer)  ) in (* where prover p is honest agent*)
+    let acr_otherAgent = makeRule(  genDID(pk(sk_otherAgent),sk_otherAgent),   attr,   genDID(pk(sk_issuer),sk_issuer)  ) in (* where other agent may or may not be dishonest*)
+    
+    (*let agents dance*)
+    (
+        !prover(sk_prover, cred, genDID(pk(sk_verifier),sk_verifier), true)
+    |
+        !prover(sk_prover, cred, genDID(pk(sk_otherAgent),sk_otherAgent), false) (* comment out to remove dishonest verifiers*)
+    |
+        !verifier(sk_verifier, acr, true) 
+        (* this verifier v needs to talk to prover p (defined as honest) AND NO other agent*)
+        (* In this way, we actively distinguish the prover p from an attacker. *)
+    | 
+        !verifier(sk_verifier, acr_otherAgent, false) (* comment out to remove dishonest provers*)
+        (*talk to honest and dishonest alike*) (*actually does not matter! dishonest provers not needed*)
+        (* Here, we do not distinguish. *)
+    ) 
+    (* And by the distinction made, we allow an authorized (with valid credential) attacker
+       to proceed successfully through the protocol, and yet, learn nothing from the honest-honest sessions.*)
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* End Main *)
+(* --------------------------------------------------------------------------------------------------------- *)

@@ -1,0 +1,128 @@
+(* This is a ProVerif description of the Protocol Flow using a Diffie Hellman handshake and symmetric encryption. *)
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* Definitions *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+(* START keys *)
+type SymmetricKey.
+type SecretKey.
+type PublicKey.
+fun pk(SecretKey):PublicKey.
+(* END keys *)
+
+(* START group *)
+type G.
+type exponent.
+
+fun exp(G, exponent): G.
+fun g(exponent): G.
+equation forall x: exponent, y: exponent; exp(g(x),y) = exp(g(y),x).
+
+fun GtoSymK(G): SymmetricKey.
+(* END group *)
+
+(* START symmetric encryption *)
+fun enc(bitstring(*the message*), SymmetricKey):bitstring (*symmetric encrypt input msg*).
+reduc forall msg:bitstring,symk:SymmetricKey; dec(enc(msg,symk),symk)=msg (*symmetric decrypt*).
+(* END symmetric encryption *)
+
+(* START asymmetric encryption *)
+fun aenc(bitstring(*the message*), PublicKey):bitstring (*asymmetric encrypt input msg*).
+reduc forall msg:bitstring,sk:SecretKey; adec(aenc(msg,pk(sk)),sk)=msg (*asymmetric decrypt*).
+(* END Asymmetric encryption *)
+
+(* START digital signature *)
+fun sign(bitstring(*the message*), SecretKey):bitstring (*sign the input msg*).
+reduc forall msg:bitstring,sk:SecretKey; auth(sign(msg,sk),pk(sk))=msg (*check signature, and get msg*).
+reduc forall msg:bitstring,sk:SecretKey; getMsg(sign(msg,sk))=msg (*just get msg*).
+(* END digital signature *)
+
+(* ALTERNATIVE model authcrypt directly as a set of corresponding funcs and reducs...*)
+(* letfun authcrypt(msg:bitstring,sk:SecretKey,symk:SymmetricKey) = enc(sign(msg,sk),symk). *)
+(* letfun authdecrypt(cipher:bitstring,pk:PublicKey,symk:SymmetricKey) = auth(dec(cipher,symk),pk). *)
+(* ALTERNATIVE model authcrypt directly as a set of corresponding funcs and reducs... *)
+
+(*DEFS*)
+free h:channel.
+
+fun ch(G):channel.
+fun chS(SymmetricKey):channel.
+free gx_from_Alice:bitstring [private].
+free gy_from_Bob:bitstring [private].
+free K_private:bitstring [private].
+
+free gx: G [private].
+free gy: G [private].
+free K: SymmetricKey [private].
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* Agents *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+let Alice(skA:SecretKey, pkB:PublicKey) =
+    new x:exponent;
+    let gx = g(x) in
+    out(h,gx);
+    out(ch(gx),gx_from_Alice);
+    in(h,(gy:G,m:bitstring));
+    let gx = g(x) in
+    let K = GtoSymK(exp(gy,x)) in
+    if (dec(auth(m,pkB),K)) = (gy,gx) then
+    out(h,enc(sign((gx,gy),skA),K));
+    0.
+
+
+let Bob(skB:SecretKey, pkA:PublicKey) =
+    in(h,gx:G);
+    new y:exponent;
+    let gy = g(y) in
+    let K = GtoSymK(exp(gx,y)) in
+    out(h,(gy,enc(sign((gy,gx),skB),K)));
+    out(ch(gy),gy_from_Bob);
+    in(h,m:bitstring);
+    if (dec(auth(m,pkA),K)) = (gx,gy) then
+    (*  *)
+    out(chS(K),K_private);
+    0.
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* Assumptions *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+
+
+(* SECRECY *)
+
+(* 
+These variables are rebound!ss
+query attacker(gx).
+query attacker(gy).
+query attacker(K). 
+*)
+
+query attacker(gx_from_Alice).
+query attacker(gy_from_Bob).
+query attacker(K_private).
+
+(* AUTHENTICATION *)
+
+(* ... *)
+
+
+
+(* --------------------------------------------------------------------------------------------------------- *)
+(* MAIN *)
+(* --------------------------------------------------------------------------------------------------------- *)
+
+process (*use root process for setup *)
+
+    new skA: SecretKey;
+    new skB: SecretKey;
+
+    out(h, pk(skA));
+    out(h, pk(skB));
+
+    (Alice(skA, pk(skB)) | Bob(skB, pk(skA)))
+
+

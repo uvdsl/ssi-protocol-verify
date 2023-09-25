@@ -1,0 +1,2686 @@
+File "ssipv_multiparty_agreement.pv", line 175, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 181, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 191, character 10:
+Warning: identifier x rebound.
+File "ssipv_multiparty_agreement.pv", line 194, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 218, character 10:
+Warning: identifier x rebound.
+File "ssipv_multiparty_agreement.pv", line 268, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 278, character 10:
+Warning: identifier x rebound.
+File "ssipv_multiparty_agreement.pv", line 281, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 291, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 301, character 10:
+Warning: identifier x rebound.
+File "ssipv_multiparty_agreement.pv", line 339, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 396, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 402, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 415, character 10:
+Warning: identifier x rebound.
+File "ssipv_multiparty_agreement.pv", line 475, character 10:
+Warning: identifier x rebound.
+File "ssipv_multiparty_agreement.pv", line 478, characters 9-11:
+Warning: identifier msg rebound.
+File "ssipv_multiparty_agreement.pv", line 496, characters 9-11:
+Warning: identifier msg rebound.
+Process 0 (that is, the initial process):
+{1}new sk_prover: SecretKey;
+{2}new sk_verifier: SecretKey;
+{3}new sk_issuer: SecretKey;
+{4}out(h, pk(sk_issuer));
+{5}out(h, pk(sk_verifier));
+{6}out(h, pk(sk_prover));
+{7}out(h, genDID(pk(sk_prover),sk_prover));
+{8}out(h, genDID(pk(sk_verifier),sk_verifier));
+{9}out(h, genDID(pk(sk_issuer),sk_issuer));
+{10}let acr: ACR = makeRule(genDID(pk(sk_prover),sk_prover),attr,genDID(pk(sk_issuer),sk_issuer)) in
+{11}let acr_otherAgent: ACR = makeRule(genDID(pk(sk_otherAgent),sk_otherAgent),attr_2,genDID(pk(sk_issuer),sk_issuer)) in
+{12}let acr_compromisedIssuer: ACR = makeRule(genDID(pk(sk_prover),sk_prover),attr,genDID(pk(sk_otherAgent),sk_otherAgent)) in
+{13}let acr_compromisedIssuer_2: ACR = makeRule(genDID(pk(sk_prover),sk_prover),attr_2,genDID(pk(sk_otherAgent),sk_otherAgent)) in
+{14}let acr_compromised: ACR = makeRule(genDID(pk(sk_otherAgent),sk_otherAgent),attr,genDID(pk(sk_otherAgent),sk_otherAgent)) in
+{15}let acr_compromised_2: ACR = makeRule(genDID(pk(sk_otherAgent),sk_otherAgent),attr_2,genDID(pk(sk_otherAgent),sk_otherAgent)) in
+(
+    {16}!
+    {17}let sk: SecretKey = sk_issuer in
+    {18}let attr_1: bitstring = attr in
+    {19}let expectedDID: DID = genDID(pk(sk_prover),sk_prover) in
+    {20}let talksOnlyToHonest: bool = true in
+    {21}in(h, x: bitstring);
+    {22}let msg_handshakeReq: bitstring = x in
+    {23}let sgndMsg: bitstring = adec(x,sk) in
+    {24}let (unauth_n_p: bitstring,unauth_spk_p: PublicKey) = getMsg(sgndMsg) in
+    {25}let (n_p: bitstring,spk_p: PublicKey) = auth(sgndMsg,unauth_spk_p) in
+    {26}new ssk: SecretKey;
+    {27}new n_i: bitstring;
+    {28}let msg: bitstring = (n_p,n_i,pk(ssk)) in
+    {29}let msg_handshakeResp: bitstring = aenc(sign(msg,sk),spk_p) in
+    {30}out(h, msg_handshakeResp);
+    {31}in(h, x_1: bitstring);
+    {32}let msg_did: bitstring = x_1 in
+    {33}let sk_1: SecretKey = ssk in
+    {34}let msg_1: bitstring = auth(adec(x_1,sk_1),spk_p) in
+    {35}let (unauth_n'_i: bitstring,unauth_proverDID: DID,unauth_recipientDID: DID) = getMsg(msg_1) in
+    {36}let pk_p: PublicKey = getPubKey(unauth_proverDID) in
+    {37}let (n'_i: bitstring,proverDID: DID,recipientDID: DID) = auth(msg_1,pk_p) in
+    {38}if (proverDID = expectedDID) then
+    {39}if (n'_i = n_i) then
+    {40}if (recipientDID = genDID(pk(sk),sk)) then
+    {41}let cred: AC = issueAC(attr_1,sk) in
+    {42}let msg_2: bitstring = (cred,proverDID) in
+    {43}let sk_2: SecretKey = ssk in
+    {44}let msg_cred: bitstring = aenc(sign(msg_2,sk_2),spk_p) in
+    {45}event auth_IssuerSendsLastMessageToHolder(msg_handshakeReq,msg_handshakeResp,msg_did,msg_cred);
+    {46}out(h, msg_cred);
+    {47}if talksOnlyToHonest then
+    (
+        {48}event auth_IssuerCompletesProtocol(msg_handshakeReq,msg_handshakeResp,msg_did)
+    ) | (
+        {49}out(ch(n_p), n_p_fromIssuer)
+    ) | (
+        {50}out(chA(cred), cred_fromIssuer)
+    ) | (
+        {51}out(ch((cred,proverDID)), credIssuing_fromIssuer_notMeaningful)
+    )
+) | (
+    {52}!
+    {53}let sk_3: SecretKey = sk_issuer in
+    {54}let attr_3: bitstring = attr_2 in
+    {55}let expectedDID_1: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+    {56}let talksOnlyToHonest_1: bool = false in
+    {57}in(h, x_2: bitstring);
+    {58}let msg_handshakeReq_1: bitstring = x_2 in
+    {59}let sgndMsg_1: bitstring = adec(x_2,sk_3) in
+    {60}let (unauth_n_p_1: bitstring,unauth_spk_p_1: PublicKey) = getMsg(sgndMsg_1) in
+    {61}let (n_p_1: bitstring,spk_p_1: PublicKey) = auth(sgndMsg_1,unauth_spk_p_1) in
+    {62}new ssk_1: SecretKey;
+    {63}new n_i_1: bitstring;
+    {64}let msg_3: bitstring = (n_p_1,n_i_1,pk(ssk_1)) in
+    {65}let msg_handshakeResp_1: bitstring = aenc(sign(msg_3,sk_3),spk_p_1) in
+    {66}out(h, msg_handshakeResp_1);
+    {67}in(h, x_3: bitstring);
+    {68}let msg_did_1: bitstring = x_3 in
+    {69}let sk_4: SecretKey = ssk_1 in
+    {70}let msg_4: bitstring = auth(adec(x_3,sk_4),spk_p_1) in
+    {71}let (unauth_n'_i_1: bitstring,unauth_proverDID_1: DID,unauth_recipientDID_1: DID) = getMsg(msg_4) in
+    {72}let pk_p_1: PublicKey = getPubKey(unauth_proverDID_1) in
+    {73}let (n'_i_1: bitstring,proverDID_1: DID,recipientDID_1: DID) = auth(msg_4,pk_p_1) in
+    {74}if (proverDID_1 = expectedDID_1) then
+    {75}if (n'_i_1 = n_i_1) then
+    {76}if (recipientDID_1 = genDID(pk(sk_3),sk_3)) then
+    {77}let cred_1: AC = issueAC(attr_3,sk_3) in
+    {78}let msg_5: bitstring = (cred_1,proverDID_1) in
+    {79}let sk_5: SecretKey = ssk_1 in
+    {80}let msg_cred_1: bitstring = aenc(sign(msg_5,sk_5),spk_p_1) in
+    {81}event auth_IssuerSendsLastMessageToHolder(msg_handshakeReq_1,msg_handshakeResp_1,msg_did_1,msg_cred_1);
+    {82}out(h, msg_cred_1);
+    {83}if talksOnlyToHonest_1 then
+    (
+        {84}event auth_IssuerCompletesProtocol(msg_handshakeReq_1,msg_handshakeResp_1,msg_did_1)
+    ) | (
+        {85}out(ch(n_p_1), n_p_fromIssuer)
+    ) | (
+        {86}out(chA(cred_1), cred_fromIssuer)
+    ) | (
+        {87}out(ch((cred_1,proverDID_1)), credIssuing_fromIssuer_notMeaningful)
+    )
+) | (
+    {88}!
+    {89}let sk_6: SecretKey = sk_prover in
+    {90}let issuerDID: DID = genDID(pk(sk_issuer),sk_issuer) in
+    {91}let verifierDID: DID = genDID(pk(sk_verifier),sk_verifier) in
+    {92}let talksOnlyToHonest_2: bool = true in
+    {93}let pk_i: PublicKey = getPubKey(issuerDID) in
+    {94}new ssk_2: SecretKey;
+    {95}new n_p_2: bitstring;
+    {96}let msg_6: bitstring = (n_p_2,pk(ssk_2)) in
+    {97}let sk_7: SecretKey = ssk_2 in
+    {98}let msg_handshakeReq_2: bitstring = aenc(sign(msg_6,sk_7),pk_i) in
+    {99}out(h, msg_handshakeReq_2);
+    {100}in(h, x_4: bitstring);
+    {101}let msg_handshakeResp_2: bitstring = x_4 in
+    {102}let sk_8: SecretKey = ssk_2 in
+    {103}let msg_7: bitstring = auth(adec(x_4,sk_8),pk_i) in
+    {104}let (n'_p: bitstring,n_i_2: bitstring,spk_i: PublicKey) = msg_7 in
+    {105}if (n'_p = n_p_2) then
+    {106}let msg_8: bitstring = sign((n_i_2,genDID(pk(sk_6),sk_6),issuerDID),sk_6) in
+    {107}let sk_9: SecretKey = ssk_2 in
+    {108}let msg_did_2: bitstring = aenc(sign(msg_8,sk_9),spk_i) in
+    {109}event auth_HolderSendsLastMessageToIssuer(msg_handshakeReq_2,msg_handshakeResp_2,msg_did_2);
+    {110}out(h, msg_did_2);
+    {111}in(h, x_5: bitstring);
+    {112}let msg_credential: bitstring = x_5 in
+    {113}let sk_10: SecretKey = ssk_2 in
+    {114}let (credential: AC,recipientDID_2: DID) = auth(adec(x_5,sk_10),spk_i) in
+    {115}if (recipientDID_2 = genDID(pk(sk_6),sk_6)) then
+    {116}if (getIssuerFromAC(credential) = issuerDID) then
+    (
+        {117}!
+        {118}let pk_v: PublicKey = getPubKey(verifierDID) in
+        {119}new ssk_3: SecretKey;
+        {120}new n_p_3: bitstring;
+        {121}let msg_9: bitstring = (n_p_3,pk(ssk_3)) in
+        {122}let sk_11: SecretKey = ssk_3 in
+        {123}let msg_handshakeReq_3: bitstring = aenc(sign(msg_9,sk_11),pk_v) in
+        {124}out(h, msg_handshakeReq_3);
+        {125}in(h, x_6: bitstring);
+        {126}let msg_handshakeResp_3: bitstring = x_6 in
+        {127}let sk_12: SecretKey = ssk_3 in
+        {128}let msg_10: bitstring = auth(adec(x_6,sk_12),pk_v) in
+        {129}let (n'_p_1: bitstring,n_v: bitstring,spk_v: PublicKey) = msg_10 in
+        {130}if (n'_p_1 = n_p_3) then
+        {131}let msg_11: bitstring = (n_v,uri) in
+        {132}let sk_13: SecretKey = ssk_3 in
+        {133}let msg_uri: bitstring = aenc(sign(msg_11,sk_13),spk_v) in
+        {134}out(h, msg_uri);
+        {135}in(h, x_7: bitstring);
+        {136}let msg_rule: bitstring = x_7 in
+        {137}let sk_14: SecretKey = ssk_3 in
+        {138}let msg_12: bitstring = auth(adec(x_7,sk_14),spk_v) in
+        {139}let (n_c: bitstring,rule: ACR) = msg_12 in
+        {140}let issuerPk: PublicKey = getPubKey(getIssuerFromAC(credential)) in
+        {141}let ph: bitstring = (n_c,verifierDID) in
+        {142}let dc: DC = proofGen(credential,issuerPk,ph) in
+        {143}let vp: bitstring = encodeDC(dc) in
+        {144}let sk_15: SecretKey = ssk_3 in
+        {145}let msg_vp: bitstring = aenc(sign(vp,sk_15),spk_v) in
+        {146}event auth_ProverSendsLastMessageToVerifier(msg_handshakeReq_3,msg_handshakeResp_3,msg_uri,msg_rule,msg_vp);
+        {147}event auth_ProverSendsLastMessageToVerifierInProtocolFull(msg_handshakeReq_2,msg_handshakeResp_2,msg_did_2,msg_credential,msg_handshakeReq_3,msg_handshakeResp_3,msg_uri,msg_rule,msg_vp);
+        {148}out(h, msg_vp);
+        {149}in(h, x_8: bitstring);
+        {150}let msg_accessToken: bitstring = x_8 in
+        {151}let sk_16: SecretKey = ssk_3 in
+        {152}let signed_access_token: bitstring = auth(adec(x_8,sk_16),spk_v) in
+        {153}let access_token: bitstring = auth(signed_access_token,getPubKey(verifierDID)) in
+        {154}if talksOnlyToHonest_2 then
+        (
+            {155}event auth_ProverCompletesProtocol(msg_handshakeReq_3,msg_handshakeResp_3,msg_uri,msg_rule,msg_vp,msg_accessToken)
+        ) | (
+            {156}out(ch(n_p_3), n_p_fromProver)
+        ) | (
+            {157}out(chR(rule), rule_fromProver)
+        ) | (
+            {158}out(ch((n_c,verifierDID,credential)), unsigned_vp_fromProver)
+        ) | (
+            {159}out(ch(vp), vp_fromProver)
+        ) | (
+            {160}out(chA(credential), cred_fromProver)
+        ) | (
+            {161}out(ch(access_token), access_token_fromProver)
+        )
+    ) | (
+        {162}if talksOnlyToHonest_2 then
+        (
+            {163}event auth_HolderCompletesProtocol(msg_handshakeReq_2,msg_handshakeResp_2,msg_did_2,msg_credential)
+        ) | (
+            {164}out(ch(n_p_2), n_p_fromHolder)
+        ) | (
+            {165}out(ch(n_i_2), n_i_fromHolder)
+        ) | (
+            {166}out(ch((n_i_2,genDID(pk(sk_6),sk_6),issuerDID)), providingDID_fromHolder)
+        ) | (
+            {167}out(chA(credential), cred_fromHolder)
+        )
+    )
+) | (
+    {168}!
+    {169}let sk_17: SecretKey = sk_prover in
+    {170}let issuerDID_1: DID = genDID(pk(sk_issuer),sk_issuer) in
+    {171}let verifierDID_1: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+    {172}let talksOnlyToHonest_3: bool = false in
+    {173}let pk_i_1: PublicKey = getPubKey(issuerDID_1) in
+    {174}new ssk_4: SecretKey;
+    {175}new n_p_4: bitstring;
+    {176}let msg_13: bitstring = (n_p_4,pk(ssk_4)) in
+    {177}let sk_18: SecretKey = ssk_4 in
+    {178}let msg_handshakeReq_4: bitstring = aenc(sign(msg_13,sk_18),pk_i_1) in
+    {179}out(h, msg_handshakeReq_4);
+    {180}in(h, x_9: bitstring);
+    {181}let msg_handshakeResp_4: bitstring = x_9 in
+    {182}let sk_19: SecretKey = ssk_4 in
+    {183}let msg_14: bitstring = auth(adec(x_9,sk_19),pk_i_1) in
+    {184}let (n'_p_2: bitstring,n_i_3: bitstring,spk_i_1: PublicKey) = msg_14 in
+    {185}if (n'_p_2 = n_p_4) then
+    {186}let msg_15: bitstring = sign((n_i_3,genDID(pk(sk_17),sk_17),issuerDID_1),sk_17) in
+    {187}let sk_20: SecretKey = ssk_4 in
+    {188}let msg_did_3: bitstring = aenc(sign(msg_15,sk_20),spk_i_1) in
+    {189}event auth_HolderSendsLastMessageToIssuer(msg_handshakeReq_4,msg_handshakeResp_4,msg_did_3);
+    {190}out(h, msg_did_3);
+    {191}in(h, x_10: bitstring);
+    {192}let msg_credential_1: bitstring = x_10 in
+    {193}let sk_21: SecretKey = ssk_4 in
+    {194}let (credential_1: AC,recipientDID_3: DID) = auth(adec(x_10,sk_21),spk_i_1) in
+    {195}if (recipientDID_3 = genDID(pk(sk_17),sk_17)) then
+    {196}if (getIssuerFromAC(credential_1) = issuerDID_1) then
+    (
+        {197}!
+        {198}let pk_v_1: PublicKey = getPubKey(verifierDID_1) in
+        {199}new ssk_5: SecretKey;
+        {200}new n_p_5: bitstring;
+        {201}let msg_16: bitstring = (n_p_5,pk(ssk_5)) in
+        {202}let sk_22: SecretKey = ssk_5 in
+        {203}let msg_handshakeReq_5: bitstring = aenc(sign(msg_16,sk_22),pk_v_1) in
+        {204}out(h, msg_handshakeReq_5);
+        {205}in(h, x_11: bitstring);
+        {206}let msg_handshakeResp_5: bitstring = x_11 in
+        {207}let sk_23: SecretKey = ssk_5 in
+        {208}let msg_17: bitstring = auth(adec(x_11,sk_23),pk_v_1) in
+        {209}let (n'_p_3: bitstring,n_v_1: bitstring,spk_v_1: PublicKey) = msg_17 in
+        {210}if (n'_p_3 = n_p_5) then
+        {211}let msg_18: bitstring = (n_v_1,uri) in
+        {212}let sk_24: SecretKey = ssk_5 in
+        {213}let msg_uri_1: bitstring = aenc(sign(msg_18,sk_24),spk_v_1) in
+        {214}out(h, msg_uri_1);
+        {215}in(h, x_12: bitstring);
+        {216}let msg_rule_1: bitstring = x_12 in
+        {217}let sk_25: SecretKey = ssk_5 in
+        {218}let msg_19: bitstring = auth(adec(x_12,sk_25),spk_v_1) in
+        {219}let (n_c_1: bitstring,rule_1: ACR) = msg_19 in
+        {220}let issuerPk_1: PublicKey = getPubKey(getIssuerFromAC(credential_1)) in
+        {221}let ph_1: bitstring = (n_c_1,verifierDID_1) in
+        {222}let dc_1: DC = proofGen(credential_1,issuerPk_1,ph_1) in
+        {223}let vp_1: bitstring = encodeDC(dc_1) in
+        {224}let sk_26: SecretKey = ssk_5 in
+        {225}let msg_vp_1: bitstring = aenc(sign(vp_1,sk_26),spk_v_1) in
+        {226}event auth_ProverSendsLastMessageToVerifier(msg_handshakeReq_5,msg_handshakeResp_5,msg_uri_1,msg_rule_1,msg_vp_1);
+        {227}event auth_ProverSendsLastMessageToVerifierInProtocolFull(msg_handshakeReq_4,msg_handshakeResp_4,msg_did_3,msg_credential_1,msg_handshakeReq_5,msg_handshakeResp_5,msg_uri_1,msg_rule_1,msg_vp_1);
+        {228}out(h, msg_vp_1);
+        {229}in(h, x_13: bitstring);
+        {230}let msg_accessToken_1: bitstring = x_13 in
+        {231}let sk_27: SecretKey = ssk_5 in
+        {232}let signed_access_token_1: bitstring = auth(adec(x_13,sk_27),spk_v_1) in
+        {233}let access_token_1: bitstring = auth(signed_access_token_1,getPubKey(verifierDID_1)) in
+        {234}if talksOnlyToHonest_3 then
+        (
+            {235}event auth_ProverCompletesProtocol(msg_handshakeReq_5,msg_handshakeResp_5,msg_uri_1,msg_rule_1,msg_vp_1,msg_accessToken_1)
+        ) | (
+            {236}out(ch(n_p_5), n_p_fromProver)
+        ) | (
+            {237}out(chR(rule_1), rule_fromProver)
+        ) | (
+            {238}out(ch((n_c_1,verifierDID_1,credential_1)), unsigned_vp_fromProver)
+        ) | (
+            {239}out(ch(vp_1), vp_fromProver)
+        ) | (
+            {240}out(chA(credential_1), cred_fromProver)
+        ) | (
+            {241}out(ch(access_token_1), access_token_fromProver)
+        )
+    ) | (
+        {242}if talksOnlyToHonest_3 then
+        (
+            {243}event auth_HolderCompletesProtocol(msg_handshakeReq_4,msg_handshakeResp_4,msg_did_3,msg_credential_1)
+        ) | (
+            {244}out(ch(n_p_4), n_p_fromHolder)
+        ) | (
+            {245}out(ch(n_i_3), n_i_fromHolder)
+        ) | (
+            {246}out(ch((n_i_3,genDID(pk(sk_17),sk_17),issuerDID_1)), providingDID_fromHolder)
+        ) | (
+            {247}out(chA(credential_1), cred_fromHolder)
+        )
+    )
+) | (
+    {248}!
+    {249}let sk_28: SecretKey = sk_prover in
+    {250}let issuerDID_2: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+    {251}let verifierDID_2: DID = genDID(pk(sk_verifier),sk_verifier) in
+    {252}let talksOnlyToHonest_4: bool = false in
+    {253}let pk_i_2: PublicKey = getPubKey(issuerDID_2) in
+    {254}new ssk_6: SecretKey;
+    {255}new n_p_6: bitstring;
+    {256}let msg_20: bitstring = (n_p_6,pk(ssk_6)) in
+    {257}let sk_29: SecretKey = ssk_6 in
+    {258}let msg_handshakeReq_6: bitstring = aenc(sign(msg_20,sk_29),pk_i_2) in
+    {259}out(h, msg_handshakeReq_6);
+    {260}in(h, x_14: bitstring);
+    {261}let msg_handshakeResp_6: bitstring = x_14 in
+    {262}let sk_30: SecretKey = ssk_6 in
+    {263}let msg_21: bitstring = auth(adec(x_14,sk_30),pk_i_2) in
+    {264}let (n'_p_4: bitstring,n_i_4: bitstring,spk_i_2: PublicKey) = msg_21 in
+    {265}if (n'_p_4 = n_p_6) then
+    {266}let msg_22: bitstring = sign((n_i_4,genDID(pk(sk_28),sk_28),issuerDID_2),sk_28) in
+    {267}let sk_31: SecretKey = ssk_6 in
+    {268}let msg_did_4: bitstring = aenc(sign(msg_22,sk_31),spk_i_2) in
+    {269}event auth_HolderSendsLastMessageToIssuer(msg_handshakeReq_6,msg_handshakeResp_6,msg_did_4);
+    {270}out(h, msg_did_4);
+    {271}in(h, x_15: bitstring);
+    {272}let msg_credential_2: bitstring = x_15 in
+    {273}let sk_32: SecretKey = ssk_6 in
+    {274}let (credential_2: AC,recipientDID_4: DID) = auth(adec(x_15,sk_32),spk_i_2) in
+    {275}if (recipientDID_4 = genDID(pk(sk_28),sk_28)) then
+    {276}if (getIssuerFromAC(credential_2) = issuerDID_2) then
+    (
+        {277}!
+        {278}let pk_v_2: PublicKey = getPubKey(verifierDID_2) in
+        {279}new ssk_7: SecretKey;
+        {280}new n_p_7: bitstring;
+        {281}let msg_23: bitstring = (n_p_7,pk(ssk_7)) in
+        {282}let sk_33: SecretKey = ssk_7 in
+        {283}let msg_handshakeReq_7: bitstring = aenc(sign(msg_23,sk_33),pk_v_2) in
+        {284}out(h, msg_handshakeReq_7);
+        {285}in(h, x_16: bitstring);
+        {286}let msg_handshakeResp_7: bitstring = x_16 in
+        {287}let sk_34: SecretKey = ssk_7 in
+        {288}let msg_24: bitstring = auth(adec(x_16,sk_34),pk_v_2) in
+        {289}let (n'_p_5: bitstring,n_v_2: bitstring,spk_v_2: PublicKey) = msg_24 in
+        {290}if (n'_p_5 = n_p_7) then
+        {291}let msg_25: bitstring = (n_v_2,uri) in
+        {292}let sk_35: SecretKey = ssk_7 in
+        {293}let msg_uri_2: bitstring = aenc(sign(msg_25,sk_35),spk_v_2) in
+        {294}out(h, msg_uri_2);
+        {295}in(h, x_17: bitstring);
+        {296}let msg_rule_2: bitstring = x_17 in
+        {297}let sk_36: SecretKey = ssk_7 in
+        {298}let msg_26: bitstring = auth(adec(x_17,sk_36),spk_v_2) in
+        {299}let (n_c_2: bitstring,rule_2: ACR) = msg_26 in
+        {300}let issuerPk_2: PublicKey = getPubKey(getIssuerFromAC(credential_2)) in
+        {301}let ph_2: bitstring = (n_c_2,verifierDID_2) in
+        {302}let dc_2: DC = proofGen(credential_2,issuerPk_2,ph_2) in
+        {303}let vp_2: bitstring = encodeDC(dc_2) in
+        {304}let sk_37: SecretKey = ssk_7 in
+        {305}let msg_vp_2: bitstring = aenc(sign(vp_2,sk_37),spk_v_2) in
+        {306}event auth_ProverSendsLastMessageToVerifier(msg_handshakeReq_7,msg_handshakeResp_7,msg_uri_2,msg_rule_2,msg_vp_2);
+        {307}event auth_ProverSendsLastMessageToVerifierInProtocolFull(msg_handshakeReq_6,msg_handshakeResp_6,msg_did_4,msg_credential_2,msg_handshakeReq_7,msg_handshakeResp_7,msg_uri_2,msg_rule_2,msg_vp_2);
+        {308}out(h, msg_vp_2);
+        {309}in(h, x_18: bitstring);
+        {310}let msg_accessToken_2: bitstring = x_18 in
+        {311}let sk_38: SecretKey = ssk_7 in
+        {312}let signed_access_token_2: bitstring = auth(adec(x_18,sk_38),spk_v_2) in
+        {313}let access_token_2: bitstring = auth(signed_access_token_2,getPubKey(verifierDID_2)) in
+        {314}if talksOnlyToHonest_4 then
+        (
+            {315}event auth_ProverCompletesProtocol(msg_handshakeReq_7,msg_handshakeResp_7,msg_uri_2,msg_rule_2,msg_vp_2,msg_accessToken_2)
+        ) | (
+            {316}out(ch(n_p_7), n_p_fromProver)
+        ) | (
+            {317}out(chR(rule_2), rule_fromProver)
+        ) | (
+            {318}out(ch((n_c_2,verifierDID_2,credential_2)), unsigned_vp_fromProver)
+        ) | (
+            {319}out(ch(vp_2), vp_fromProver)
+        ) | (
+            {320}out(chA(credential_2), cred_fromProver)
+        ) | (
+            {321}out(ch(access_token_2), access_token_fromProver)
+        )
+    ) | (
+        {322}if talksOnlyToHonest_4 then
+        (
+            {323}event auth_HolderCompletesProtocol(msg_handshakeReq_6,msg_handshakeResp_6,msg_did_4,msg_credential_2)
+        ) | (
+            {324}out(ch(n_p_6), n_p_fromHolder)
+        ) | (
+            {325}out(ch(n_i_4), n_i_fromHolder)
+        ) | (
+            {326}out(ch((n_i_4,genDID(pk(sk_28),sk_28),issuerDID_2)), providingDID_fromHolder)
+        ) | (
+            {327}out(chA(credential_2), cred_fromHolder)
+        )
+    )
+) | (
+    {328}!
+    {329}let sk_39: SecretKey = sk_prover in
+    {330}let issuerDID_3: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+    {331}let verifierDID_3: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+    {332}let talksOnlyToHonest_5: bool = false in
+    {333}let pk_i_3: PublicKey = getPubKey(issuerDID_3) in
+    {334}new ssk_8: SecretKey;
+    {335}new n_p_8: bitstring;
+    {336}let msg_27: bitstring = (n_p_8,pk(ssk_8)) in
+    {337}let sk_40: SecretKey = ssk_8 in
+    {338}let msg_handshakeReq_8: bitstring = aenc(sign(msg_27,sk_40),pk_i_3) in
+    {339}out(h, msg_handshakeReq_8);
+    {340}in(h, x_19: bitstring);
+    {341}let msg_handshakeResp_8: bitstring = x_19 in
+    {342}let sk_41: SecretKey = ssk_8 in
+    {343}let msg_28: bitstring = auth(adec(x_19,sk_41),pk_i_3) in
+    {344}let (n'_p_6: bitstring,n_i_5: bitstring,spk_i_3: PublicKey) = msg_28 in
+    {345}if (n'_p_6 = n_p_8) then
+    {346}let msg_29: bitstring = sign((n_i_5,genDID(pk(sk_39),sk_39),issuerDID_3),sk_39) in
+    {347}let sk_42: SecretKey = ssk_8 in
+    {348}let msg_did_5: bitstring = aenc(sign(msg_29,sk_42),spk_i_3) in
+    {349}event auth_HolderSendsLastMessageToIssuer(msg_handshakeReq_8,msg_handshakeResp_8,msg_did_5);
+    {350}out(h, msg_did_5);
+    {351}in(h, x_20: bitstring);
+    {352}let msg_credential_3: bitstring = x_20 in
+    {353}let sk_43: SecretKey = ssk_8 in
+    {354}let (credential_3: AC,recipientDID_5: DID) = auth(adec(x_20,sk_43),spk_i_3) in
+    {355}if (recipientDID_5 = genDID(pk(sk_39),sk_39)) then
+    {356}if (getIssuerFromAC(credential_3) = issuerDID_3) then
+    (
+        {357}!
+        {358}let pk_v_3: PublicKey = getPubKey(verifierDID_3) in
+        {359}new ssk_9: SecretKey;
+        {360}new n_p_9: bitstring;
+        {361}let msg_30: bitstring = (n_p_9,pk(ssk_9)) in
+        {362}let sk_44: SecretKey = ssk_9 in
+        {363}let msg_handshakeReq_9: bitstring = aenc(sign(msg_30,sk_44),pk_v_3) in
+        {364}out(h, msg_handshakeReq_9);
+        {365}in(h, x_21: bitstring);
+        {366}let msg_handshakeResp_9: bitstring = x_21 in
+        {367}let sk_45: SecretKey = ssk_9 in
+        {368}let msg_31: bitstring = auth(adec(x_21,sk_45),pk_v_3) in
+        {369}let (n'_p_7: bitstring,n_v_3: bitstring,spk_v_3: PublicKey) = msg_31 in
+        {370}if (n'_p_7 = n_p_9) then
+        {371}let msg_32: bitstring = (n_v_3,uri) in
+        {372}let sk_46: SecretKey = ssk_9 in
+        {373}let msg_uri_3: bitstring = aenc(sign(msg_32,sk_46),spk_v_3) in
+        {374}out(h, msg_uri_3);
+        {375}in(h, x_22: bitstring);
+        {376}let msg_rule_3: bitstring = x_22 in
+        {377}let sk_47: SecretKey = ssk_9 in
+        {378}let msg_33: bitstring = auth(adec(x_22,sk_47),spk_v_3) in
+        {379}let (n_c_3: bitstring,rule_3: ACR) = msg_33 in
+        {380}let issuerPk_3: PublicKey = getPubKey(getIssuerFromAC(credential_3)) in
+        {381}let ph_3: bitstring = (n_c_3,verifierDID_3) in
+        {382}let dc_3: DC = proofGen(credential_3,issuerPk_3,ph_3) in
+        {383}let vp_3: bitstring = encodeDC(dc_3) in
+        {384}let sk_48: SecretKey = ssk_9 in
+        {385}let msg_vp_3: bitstring = aenc(sign(vp_3,sk_48),spk_v_3) in
+        {386}event auth_ProverSendsLastMessageToVerifier(msg_handshakeReq_9,msg_handshakeResp_9,msg_uri_3,msg_rule_3,msg_vp_3);
+        {387}event auth_ProverSendsLastMessageToVerifierInProtocolFull(msg_handshakeReq_8,msg_handshakeResp_8,msg_did_5,msg_credential_3,msg_handshakeReq_9,msg_handshakeResp_9,msg_uri_3,msg_rule_3,msg_vp_3);
+        {388}out(h, msg_vp_3);
+        {389}in(h, x_23: bitstring);
+        {390}let msg_accessToken_3: bitstring = x_23 in
+        {391}let sk_49: SecretKey = ssk_9 in
+        {392}let signed_access_token_3: bitstring = auth(adec(x_23,sk_49),spk_v_3) in
+        {393}let access_token_3: bitstring = auth(signed_access_token_3,getPubKey(verifierDID_3)) in
+        {394}if talksOnlyToHonest_5 then
+        (
+            {395}event auth_ProverCompletesProtocol(msg_handshakeReq_9,msg_handshakeResp_9,msg_uri_3,msg_rule_3,msg_vp_3,msg_accessToken_3)
+        ) | (
+            {396}out(ch(n_p_9), n_p_fromProver)
+        ) | (
+            {397}out(chR(rule_3), rule_fromProver)
+        ) | (
+            {398}out(ch((n_c_3,verifierDID_3,credential_3)), unsigned_vp_fromProver)
+        ) | (
+            {399}out(ch(vp_3), vp_fromProver)
+        ) | (
+            {400}out(chA(credential_3), cred_fromProver)
+        ) | (
+            {401}out(ch(access_token_3), access_token_fromProver)
+        )
+    ) | (
+        {402}if talksOnlyToHonest_5 then
+        (
+            {403}event auth_HolderCompletesProtocol(msg_handshakeReq_8,msg_handshakeResp_8,msg_did_5,msg_credential_3)
+        ) | (
+            {404}out(ch(n_p_8), n_p_fromHolder)
+        ) | (
+            {405}out(ch(n_i_5), n_i_fromHolder)
+        ) | (
+            {406}out(ch((n_i_5,genDID(pk(sk_39),sk_39),issuerDID_3)), providingDID_fromHolder)
+        ) | (
+            {407}out(chA(credential_3), cred_fromHolder)
+        )
+    )
+) | (
+    {408}!
+    {409}let sk_50: SecretKey = sk_verifier in
+    {410}let talksOnlyToHonest_6: bool = true in
+    {411}in(h, x_24: bitstring);
+    {412}let msg_handshakeReq_10: bitstring = x_24 in
+    {413}let sgndMsg_2: bitstring = adec(x_24,sk_50) in
+    {414}let msg_34: bitstring = sgndMsg_2 in
+    {415}let (unauth_n_p_2: bitstring,unauth_spk_p_2: PublicKey) = getMsg(sgndMsg_2) in
+    {416}let (n_p_10: bitstring,spk_p_2: PublicKey) = auth(sgndMsg_2,unauth_spk_p_2) in
+    {417}new ssk_10: SecretKey;
+    {418}new n_v_4: bitstring;
+    {419}let msg_35: bitstring = (n_p_10,n_v_4,pk(ssk_10)) in
+    {420}let msg_handshakeResp_10: bitstring = aenc(sign(msg_35,sk_50),spk_p_2) in
+    {421}out(h, msg_handshakeResp_10);
+    {422}in(h, x_25: bitstring);
+    {423}let msg_uri_4: bitstring = x_25 in
+    {424}let sk_51: SecretKey = ssk_10 in
+    {425}let msg_36: bitstring = auth(adec(x_25,sk_51),spk_p_2) in
+    {426}let (n'_v: bitstring,u: bitstring) = msg_36 in
+    {427}if (n'_v = n_v_4) then
+    {428}if (u = uri) then
+    {429}new n_c_4: bitstring;
+    {430}let msg_37: bitstring = (n_c_4,acr) in
+    {431}let sk_52: SecretKey = ssk_10 in
+    {432}let msg_rule_4: bitstring = aenc(sign(msg_37,sk_52),spk_p_2) in
+    {433}out(h, msg_rule_4);
+    {434}in(h, x_26: bitstring);
+    {435}let msg_vp_4: bitstring = x_26 in
+    {436}let sk_53: SecretKey = ssk_10 in
+    {437}let unauth_dc: DC = decodeDC(auth(adec(x_26,sk_53),spk_p_2)) in
+    {438}let issuer_1: DID = getIssuerFromDC(unauth_dc) in
+    {439}let issuerPk_4: PublicKey = getPubKey(issuer_1) in
+    {440}let ph_4: bitstring = (n_c_4,genDID(pk(sk_50),sk_50)) in
+    {441}if proofVerify(unauth_dc,ph_4,getAttrFromRule(acr),issuerPk_4) then
+    {442}if (issuer_1 = getIssuerFromRule(acr)) then
+    {443}if (getAttrFromDC(unauth_dc) = getAttrFromRule(acr)) then
+    {444}new access_token_4: bitstring;
+    {445}let msg_38: bitstring = sign(access_token_4,sk_50) in
+    {446}let sk_54: SecretKey = ssk_10 in
+    {447}let msg_accessToken_4: bitstring = aenc(sign(msg_38,sk_54),spk_p_2) in
+    {448}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_10,msg_handshakeResp_10,msg_uri_4,msg_rule_4,msg_vp_4,msg_accessToken_4);
+    {449}out(h, msg_accessToken_4);
+    {450}if talksOnlyToHonest_6 then
+    (
+        {451}event auth_VerifierCompletesProtocol(msg_handshakeReq_10,msg_handshakeResp_10,msg_uri_4,msg_rule_4,msg_vp_4)
+    ) | (
+        {452}out(ch(n_p_10), n_p_fromVerifier)
+    ) | (
+        {453}out(chR(acr), rule_fromVerifier)
+    ) | (
+        {454}out(ch((n_c_4,acr)), credRequest_fromVerifier)
+    ) | (
+        {455}out(ch(encodeDC(unauth_dc)), unauth_vp_fromVerifier)
+    ) | (
+        {456}out(chD(unauth_dc), cred_fromVerifier)
+    ) | (
+        {457}out(ch(access_token_4), access_token_fromVerifier)
+    )
+) | (
+    {458}!
+    {459}let sk_55: SecretKey = sk_verifier in
+    {460}let talksOnlyToHonest_7: bool = false in
+    {461}in(h, x_27: bitstring);
+    {462}let msg_handshakeReq_11: bitstring = x_27 in
+    {463}let sgndMsg_3: bitstring = adec(x_27,sk_55) in
+    {464}let msg_39: bitstring = sgndMsg_3 in
+    {465}let (unauth_n_p_3: bitstring,unauth_spk_p_3: PublicKey) = getMsg(sgndMsg_3) in
+    {466}let (n_p_11: bitstring,spk_p_3: PublicKey) = auth(sgndMsg_3,unauth_spk_p_3) in
+    {467}new ssk_11: SecretKey;
+    {468}new n_v_5: bitstring;
+    {469}let msg_40: bitstring = (n_p_11,n_v_5,pk(ssk_11)) in
+    {470}let msg_handshakeResp_11: bitstring = aenc(sign(msg_40,sk_55),spk_p_3) in
+    {471}out(h, msg_handshakeResp_11);
+    {472}in(h, x_28: bitstring);
+    {473}let msg_uri_5: bitstring = x_28 in
+    {474}let sk_56: SecretKey = ssk_11 in
+    {475}let msg_41: bitstring = auth(adec(x_28,sk_56),spk_p_3) in
+    {476}let (n'_v_1: bitstring,u_1: bitstring) = msg_41 in
+    {477}if (n'_v_1 = n_v_5) then
+    {478}if (u_1 = uri) then
+    {479}new n_c_5: bitstring;
+    {480}let msg_42: bitstring = (n_c_5,acr_otherAgent) in
+    {481}let sk_57: SecretKey = ssk_11 in
+    {482}let msg_rule_5: bitstring = aenc(sign(msg_42,sk_57),spk_p_3) in
+    {483}out(h, msg_rule_5);
+    {484}in(h, x_29: bitstring);
+    {485}let msg_vp_5: bitstring = x_29 in
+    {486}let sk_58: SecretKey = ssk_11 in
+    {487}let unauth_dc_1: DC = decodeDC(auth(adec(x_29,sk_58),spk_p_3)) in
+    {488}let issuer_2: DID = getIssuerFromDC(unauth_dc_1) in
+    {489}let issuerPk_5: PublicKey = getPubKey(issuer_2) in
+    {490}let ph_5: bitstring = (n_c_5,genDID(pk(sk_55),sk_55)) in
+    {491}if proofVerify(unauth_dc_1,ph_5,getAttrFromRule(acr_otherAgent),issuerPk_5) then
+    {492}if (issuer_2 = getIssuerFromRule(acr_otherAgent)) then
+    {493}if (getAttrFromDC(unauth_dc_1) = getAttrFromRule(acr_otherAgent)) then
+    {494}new access_token_5: bitstring;
+    {495}let msg_43: bitstring = sign(access_token_5,sk_55) in
+    {496}let sk_59: SecretKey = ssk_11 in
+    {497}let msg_accessToken_5: bitstring = aenc(sign(msg_43,sk_59),spk_p_3) in
+    {498}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_11,msg_handshakeResp_11,msg_uri_5,msg_rule_5,msg_vp_5,msg_accessToken_5);
+    {499}out(h, msg_accessToken_5);
+    {500}if talksOnlyToHonest_7 then
+    (
+        {501}event auth_VerifierCompletesProtocol(msg_handshakeReq_11,msg_handshakeResp_11,msg_uri_5,msg_rule_5,msg_vp_5)
+    ) | (
+        {502}out(ch(n_p_11), n_p_fromVerifier)
+    ) | (
+        {503}out(chR(acr_otherAgent), rule_fromVerifier)
+    ) | (
+        {504}out(ch((n_c_5,acr_otherAgent)), credRequest_fromVerifier)
+    ) | (
+        {505}out(ch(encodeDC(unauth_dc_1)), unauth_vp_fromVerifier)
+    ) | (
+        {506}out(chD(unauth_dc_1), cred_fromVerifier)
+    ) | (
+        {507}out(ch(access_token_5), access_token_fromVerifier)
+    )
+) | (
+    {508}!
+    {509}let sk_60: SecretKey = sk_verifier in
+    {510}let talksOnlyToHonest_8: bool = false in
+    {511}in(h, x_30: bitstring);
+    {512}let msg_handshakeReq_12: bitstring = x_30 in
+    {513}let sgndMsg_4: bitstring = adec(x_30,sk_60) in
+    {514}let msg_44: bitstring = sgndMsg_4 in
+    {515}let (unauth_n_p_4: bitstring,unauth_spk_p_4: PublicKey) = getMsg(sgndMsg_4) in
+    {516}let (n_p_12: bitstring,spk_p_4: PublicKey) = auth(sgndMsg_4,unauth_spk_p_4) in
+    {517}new ssk_12: SecretKey;
+    {518}new n_v_6: bitstring;
+    {519}let msg_45: bitstring = (n_p_12,n_v_6,pk(ssk_12)) in
+    {520}let msg_handshakeResp_12: bitstring = aenc(sign(msg_45,sk_60),spk_p_4) in
+    {521}out(h, msg_handshakeResp_12);
+    {522}in(h, x_31: bitstring);
+    {523}let msg_uri_6: bitstring = x_31 in
+    {524}let sk_61: SecretKey = ssk_12 in
+    {525}let msg_46: bitstring = auth(adec(x_31,sk_61),spk_p_4) in
+    {526}let (n'_v_2: bitstring,u_2: bitstring) = msg_46 in
+    {527}if (n'_v_2 = n_v_6) then
+    {528}if (u_2 = uri) then
+    {529}new n_c_6: bitstring;
+    {530}let msg_47: bitstring = (n_c_6,acr_compromisedIssuer) in
+    {531}let sk_62: SecretKey = ssk_12 in
+    {532}let msg_rule_6: bitstring = aenc(sign(msg_47,sk_62),spk_p_4) in
+    {533}out(h, msg_rule_6);
+    {534}in(h, x_32: bitstring);
+    {535}let msg_vp_6: bitstring = x_32 in
+    {536}let sk_63: SecretKey = ssk_12 in
+    {537}let unauth_dc_2: DC = decodeDC(auth(adec(x_32,sk_63),spk_p_4)) in
+    {538}let issuer_3: DID = getIssuerFromDC(unauth_dc_2) in
+    {539}let issuerPk_6: PublicKey = getPubKey(issuer_3) in
+    {540}let ph_6: bitstring = (n_c_6,genDID(pk(sk_60),sk_60)) in
+    {541}if proofVerify(unauth_dc_2,ph_6,getAttrFromRule(acr_compromisedIssuer),issuerPk_6) then
+    {542}if (issuer_3 = getIssuerFromRule(acr_compromisedIssuer)) then
+    {543}if (getAttrFromDC(unauth_dc_2) = getAttrFromRule(acr_compromisedIssuer)) then
+    {544}new access_token_6: bitstring;
+    {545}let msg_48: bitstring = sign(access_token_6,sk_60) in
+    {546}let sk_64: SecretKey = ssk_12 in
+    {547}let msg_accessToken_6: bitstring = aenc(sign(msg_48,sk_64),spk_p_4) in
+    {548}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_12,msg_handshakeResp_12,msg_uri_6,msg_rule_6,msg_vp_6,msg_accessToken_6);
+    {549}out(h, msg_accessToken_6);
+    {550}if talksOnlyToHonest_8 then
+    (
+        {551}event auth_VerifierCompletesProtocol(msg_handshakeReq_12,msg_handshakeResp_12,msg_uri_6,msg_rule_6,msg_vp_6)
+    ) | (
+        {552}out(ch(n_p_12), n_p_fromVerifier)
+    ) | (
+        {553}out(chR(acr_compromisedIssuer), rule_fromVerifier)
+    ) | (
+        {554}out(ch((n_c_6,acr_compromisedIssuer)), credRequest_fromVerifier)
+    ) | (
+        {555}out(ch(encodeDC(unauth_dc_2)), unauth_vp_fromVerifier)
+    ) | (
+        {556}out(chD(unauth_dc_2), cred_fromVerifier)
+    ) | (
+        {557}out(ch(access_token_6), access_token_fromVerifier)
+    )
+) | (
+    {558}!
+    {559}let sk_65: SecretKey = sk_verifier in
+    {560}let talksOnlyToHonest_9: bool = false in
+    {561}in(h, x_33: bitstring);
+    {562}let msg_handshakeReq_13: bitstring = x_33 in
+    {563}let sgndMsg_5: bitstring = adec(x_33,sk_65) in
+    {564}let msg_49: bitstring = sgndMsg_5 in
+    {565}let (unauth_n_p_5: bitstring,unauth_spk_p_5: PublicKey) = getMsg(sgndMsg_5) in
+    {566}let (n_p_13: bitstring,spk_p_5: PublicKey) = auth(sgndMsg_5,unauth_spk_p_5) in
+    {567}new ssk_13: SecretKey;
+    {568}new n_v_7: bitstring;
+    {569}let msg_50: bitstring = (n_p_13,n_v_7,pk(ssk_13)) in
+    {570}let msg_handshakeResp_13: bitstring = aenc(sign(msg_50,sk_65),spk_p_5) in
+    {571}out(h, msg_handshakeResp_13);
+    {572}in(h, x_34: bitstring);
+    {573}let msg_uri_7: bitstring = x_34 in
+    {574}let sk_66: SecretKey = ssk_13 in
+    {575}let msg_51: bitstring = auth(adec(x_34,sk_66),spk_p_5) in
+    {576}let (n'_v_3: bitstring,u_3: bitstring) = msg_51 in
+    {577}if (n'_v_3 = n_v_7) then
+    {578}if (u_3 = uri) then
+    {579}new n_c_7: bitstring;
+    {580}let msg_52: bitstring = (n_c_7,acr_compromisedIssuer_2) in
+    {581}let sk_67: SecretKey = ssk_13 in
+    {582}let msg_rule_7: bitstring = aenc(sign(msg_52,sk_67),spk_p_5) in
+    {583}out(h, msg_rule_7);
+    {584}in(h, x_35: bitstring);
+    {585}let msg_vp_7: bitstring = x_35 in
+    {586}let sk_68: SecretKey = ssk_13 in
+    {587}let unauth_dc_3: DC = decodeDC(auth(adec(x_35,sk_68),spk_p_5)) in
+    {588}let issuer_4: DID = getIssuerFromDC(unauth_dc_3) in
+    {589}let issuerPk_7: PublicKey = getPubKey(issuer_4) in
+    {590}let ph_7: bitstring = (n_c_7,genDID(pk(sk_65),sk_65)) in
+    {591}if proofVerify(unauth_dc_3,ph_7,getAttrFromRule(acr_compromisedIssuer_2),issuerPk_7) then
+    {592}if (issuer_4 = getIssuerFromRule(acr_compromisedIssuer_2)) then
+    {593}if (getAttrFromDC(unauth_dc_3) = getAttrFromRule(acr_compromisedIssuer_2)) then
+    {594}new access_token_7: bitstring;
+    {595}let msg_53: bitstring = sign(access_token_7,sk_65) in
+    {596}let sk_69: SecretKey = ssk_13 in
+    {597}let msg_accessToken_7: bitstring = aenc(sign(msg_53,sk_69),spk_p_5) in
+    {598}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_13,msg_handshakeResp_13,msg_uri_7,msg_rule_7,msg_vp_7,msg_accessToken_7);
+    {599}out(h, msg_accessToken_7);
+    {600}if talksOnlyToHonest_9 then
+    (
+        {601}event auth_VerifierCompletesProtocol(msg_handshakeReq_13,msg_handshakeResp_13,msg_uri_7,msg_rule_7,msg_vp_7)
+    ) | (
+        {602}out(ch(n_p_13), n_p_fromVerifier)
+    ) | (
+        {603}out(chR(acr_compromisedIssuer_2), rule_fromVerifier)
+    ) | (
+        {604}out(ch((n_c_7,acr_compromisedIssuer_2)), credRequest_fromVerifier)
+    ) | (
+        {605}out(ch(encodeDC(unauth_dc_3)), unauth_vp_fromVerifier)
+    ) | (
+        {606}out(chD(unauth_dc_3), cred_fromVerifier)
+    ) | (
+        {607}out(ch(access_token_7), access_token_fromVerifier)
+    )
+) | (
+    {608}!
+    {609}let sk_70: SecretKey = sk_verifier in
+    {610}let talksOnlyToHonest_10: bool = false in
+    {611}in(h, x_36: bitstring);
+    {612}let msg_handshakeReq_14: bitstring = x_36 in
+    {613}let sgndMsg_6: bitstring = adec(x_36,sk_70) in
+    {614}let msg_54: bitstring = sgndMsg_6 in
+    {615}let (unauth_n_p_6: bitstring,unauth_spk_p_6: PublicKey) = getMsg(sgndMsg_6) in
+    {616}let (n_p_14: bitstring,spk_p_6: PublicKey) = auth(sgndMsg_6,unauth_spk_p_6) in
+    {617}new ssk_14: SecretKey;
+    {618}new n_v_8: bitstring;
+    {619}let msg_55: bitstring = (n_p_14,n_v_8,pk(ssk_14)) in
+    {620}let msg_handshakeResp_14: bitstring = aenc(sign(msg_55,sk_70),spk_p_6) in
+    {621}out(h, msg_handshakeResp_14);
+    {622}in(h, x_37: bitstring);
+    {623}let msg_uri_8: bitstring = x_37 in
+    {624}let sk_71: SecretKey = ssk_14 in
+    {625}let msg_56: bitstring = auth(adec(x_37,sk_71),spk_p_6) in
+    {626}let (n'_v_4: bitstring,u_4: bitstring) = msg_56 in
+    {627}if (n'_v_4 = n_v_8) then
+    {628}if (u_4 = uri) then
+    {629}new n_c_8: bitstring;
+    {630}let msg_57: bitstring = (n_c_8,acr_compromised) in
+    {631}let sk_72: SecretKey = ssk_14 in
+    {632}let msg_rule_8: bitstring = aenc(sign(msg_57,sk_72),spk_p_6) in
+    {633}out(h, msg_rule_8);
+    {634}in(h, x_38: bitstring);
+    {635}let msg_vp_8: bitstring = x_38 in
+    {636}let sk_73: SecretKey = ssk_14 in
+    {637}let unauth_dc_4: DC = decodeDC(auth(adec(x_38,sk_73),spk_p_6)) in
+    {638}let issuer_5: DID = getIssuerFromDC(unauth_dc_4) in
+    {639}let issuerPk_8: PublicKey = getPubKey(issuer_5) in
+    {640}let ph_8: bitstring = (n_c_8,genDID(pk(sk_70),sk_70)) in
+    {641}if proofVerify(unauth_dc_4,ph_8,getAttrFromRule(acr_compromised),issuerPk_8) then
+    {642}if (issuer_5 = getIssuerFromRule(acr_compromised)) then
+    {643}if (getAttrFromDC(unauth_dc_4) = getAttrFromRule(acr_compromised)) then
+    {644}new access_token_8: bitstring;
+    {645}let msg_58: bitstring = sign(access_token_8,sk_70) in
+    {646}let sk_74: SecretKey = ssk_14 in
+    {647}let msg_accessToken_8: bitstring = aenc(sign(msg_58,sk_74),spk_p_6) in
+    {648}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_14,msg_handshakeResp_14,msg_uri_8,msg_rule_8,msg_vp_8,msg_accessToken_8);
+    {649}out(h, msg_accessToken_8);
+    {650}if talksOnlyToHonest_10 then
+    (
+        {651}event auth_VerifierCompletesProtocol(msg_handshakeReq_14,msg_handshakeResp_14,msg_uri_8,msg_rule_8,msg_vp_8)
+    ) | (
+        {652}out(ch(n_p_14), n_p_fromVerifier)
+    ) | (
+        {653}out(chR(acr_compromised), rule_fromVerifier)
+    ) | (
+        {654}out(ch((n_c_8,acr_compromised)), credRequest_fromVerifier)
+    ) | (
+        {655}out(ch(encodeDC(unauth_dc_4)), unauth_vp_fromVerifier)
+    ) | (
+        {656}out(chD(unauth_dc_4), cred_fromVerifier)
+    ) | (
+        {657}out(ch(access_token_8), access_token_fromVerifier)
+    )
+) | (
+    {658}!
+    {659}let sk_75: SecretKey = sk_verifier in
+    {660}let talksOnlyToHonest_11: bool = false in
+    {661}in(h, x_39: bitstring);
+    {662}let msg_handshakeReq_15: bitstring = x_39 in
+    {663}let sgndMsg_7: bitstring = adec(x_39,sk_75) in
+    {664}let msg_59: bitstring = sgndMsg_7 in
+    {665}let (unauth_n_p_7: bitstring,unauth_spk_p_7: PublicKey) = getMsg(sgndMsg_7) in
+    {666}let (n_p_15: bitstring,spk_p_7: PublicKey) = auth(sgndMsg_7,unauth_spk_p_7) in
+    {667}new ssk_15: SecretKey;
+    {668}new n_v_9: bitstring;
+    {669}let msg_60: bitstring = (n_p_15,n_v_9,pk(ssk_15)) in
+    {670}let msg_handshakeResp_15: bitstring = aenc(sign(msg_60,sk_75),spk_p_7) in
+    {671}out(h, msg_handshakeResp_15);
+    {672}in(h, x_40: bitstring);
+    {673}let msg_uri_9: bitstring = x_40 in
+    {674}let sk_76: SecretKey = ssk_15 in
+    {675}let msg_61: bitstring = auth(adec(x_40,sk_76),spk_p_7) in
+    {676}let (n'_v_5: bitstring,u_5: bitstring) = msg_61 in
+    {677}if (n'_v_5 = n_v_9) then
+    {678}if (u_5 = uri) then
+    {679}new n_c_9: bitstring;
+    {680}let msg_62: bitstring = (n_c_9,acr_compromised_2) in
+    {681}let sk_77: SecretKey = ssk_15 in
+    {682}let msg_rule_9: bitstring = aenc(sign(msg_62,sk_77),spk_p_7) in
+    {683}out(h, msg_rule_9);
+    {684}in(h, x_41: bitstring);
+    {685}let msg_vp_9: bitstring = x_41 in
+    {686}let sk_78: SecretKey = ssk_15 in
+    {687}let unauth_dc_5: DC = decodeDC(auth(adec(x_41,sk_78),spk_p_7)) in
+    {688}let issuer_6: DID = getIssuerFromDC(unauth_dc_5) in
+    {689}let issuerPk_9: PublicKey = getPubKey(issuer_6) in
+    {690}let ph_9: bitstring = (n_c_9,genDID(pk(sk_75),sk_75)) in
+    {691}if proofVerify(unauth_dc_5,ph_9,getAttrFromRule(acr_compromised_2),issuerPk_9) then
+    {692}if (issuer_6 = getIssuerFromRule(acr_compromised_2)) then
+    {693}if (getAttrFromDC(unauth_dc_5) = getAttrFromRule(acr_compromised_2)) then
+    {694}new access_token_9: bitstring;
+    {695}let msg_63: bitstring = sign(access_token_9,sk_75) in
+    {696}let sk_79: SecretKey = ssk_15 in
+    {697}let msg_accessToken_9: bitstring = aenc(sign(msg_63,sk_79),spk_p_7) in
+    {698}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_15,msg_handshakeResp_15,msg_uri_9,msg_rule_9,msg_vp_9,msg_accessToken_9);
+    {699}out(h, msg_accessToken_9);
+    {700}if talksOnlyToHonest_11 then
+    (
+        {701}event auth_VerifierCompletesProtocol(msg_handshakeReq_15,msg_handshakeResp_15,msg_uri_9,msg_rule_9,msg_vp_9)
+    ) | (
+        {702}out(ch(n_p_15), n_p_fromVerifier)
+    ) | (
+        {703}out(chR(acr_compromised_2), rule_fromVerifier)
+    ) | (
+        {704}out(ch((n_c_9,acr_compromised_2)), credRequest_fromVerifier)
+    ) | (
+        {705}out(ch(encodeDC(unauth_dc_5)), unauth_vp_fromVerifier)
+    ) | (
+        {706}out(chD(unauth_dc_5), cred_fromVerifier)
+    ) | (
+        {707}out(ch(access_token_9), access_token_fromVerifier)
+    )
+)
+
+--  Process 1 (that is, process 0, with let moved downwards):
+{1}new sk_prover: SecretKey;
+{2}new sk_verifier: SecretKey;
+{3}new sk_issuer: SecretKey;
+{4}out(h, pk(sk_issuer));
+{5}out(h, pk(sk_verifier));
+{6}out(h, pk(sk_prover));
+{7}out(h, genDID(pk(sk_prover),sk_prover));
+{8}out(h, genDID(pk(sk_verifier),sk_verifier));
+{9}out(h, genDID(pk(sk_issuer),sk_issuer));
+(
+    {16}!
+    {21}in(h, x: bitstring);
+    {17}let sk: SecretKey = sk_issuer in
+    {23}let sgndMsg: bitstring = adec(x,sk) in
+    {24}let (unauth_n_p: bitstring,unauth_spk_p: PublicKey) = getMsg(sgndMsg) in
+    {25}let (n_p: bitstring,spk_p: PublicKey) = auth(sgndMsg,unauth_spk_p) in
+    {26}new ssk: SecretKey;
+    {27}new n_i: bitstring;
+    {28}let msg: bitstring = (n_p,n_i,pk(ssk)) in
+    {29}let msg_handshakeResp: bitstring = aenc(sign(msg,sk),spk_p) in
+    {30}out(h, msg_handshakeResp);
+    {31}in(h, x_1: bitstring);
+    {33}let sk_1: SecretKey = ssk in
+    {34}let msg_1: bitstring = auth(adec(x_1,sk_1),spk_p) in
+    {35}let (unauth_n'_i: bitstring,unauth_proverDID: DID,unauth_recipientDID: DID) = getMsg(msg_1) in
+    {36}let pk_p: PublicKey = getPubKey(unauth_proverDID) in
+    {37}let (n'_i: bitstring,proverDID: DID,recipientDID: DID) = auth(msg_1,pk_p) in
+    {19}let expectedDID: DID = genDID(pk(sk_prover),sk_prover) in
+    {38}if (proverDID = expectedDID) then
+    {39}if (n'_i = n_i) then
+    {40}if (recipientDID = genDID(pk(sk),sk)) then
+    {43}let sk_2: SecretKey = ssk in
+    {18}let attr_1: bitstring = attr in
+    {41}let cred: AC = issueAC(attr_1,sk) in
+    {42}let msg_2: bitstring = (cred,proverDID) in
+    {44}let msg_cred: bitstring = aenc(sign(msg_2,sk_2),spk_p) in
+    {32}let msg_did: bitstring = x_1 in
+    {22}let msg_handshakeReq: bitstring = x in
+    {45}event auth_IssuerSendsLastMessageToHolder(msg_handshakeReq,msg_handshakeResp,msg_did,msg_cred);
+    {46}out(h, msg_cred);
+    {20}let talksOnlyToHonest: bool = true in
+    {47}if talksOnlyToHonest then
+    (
+        {48}event auth_IssuerCompletesProtocol(msg_handshakeReq,msg_handshakeResp,msg_did)
+    ) | (
+        {49}out(ch(n_p), n_p_fromIssuer)
+    ) | (
+        {50}out(chA(cred), cred_fromIssuer)
+    ) | (
+        {51}out(ch((cred,proverDID)), credIssuing_fromIssuer_notMeaningful)
+    )
+) | (
+    {52}!
+    {57}in(h, x_2: bitstring);
+    {53}let sk_3: SecretKey = sk_issuer in
+    {59}let sgndMsg_1: bitstring = adec(x_2,sk_3) in
+    {60}let (unauth_n_p_1: bitstring,unauth_spk_p_1: PublicKey) = getMsg(sgndMsg_1) in
+    {61}let (n_p_1: bitstring,spk_p_1: PublicKey) = auth(sgndMsg_1,unauth_spk_p_1) in
+    {62}new ssk_1: SecretKey;
+    {63}new n_i_1: bitstring;
+    {64}let msg_3: bitstring = (n_p_1,n_i_1,pk(ssk_1)) in
+    {65}let msg_handshakeResp_1: bitstring = aenc(sign(msg_3,sk_3),spk_p_1) in
+    {66}out(h, msg_handshakeResp_1);
+    {67}in(h, x_3: bitstring);
+    {69}let sk_4: SecretKey = ssk_1 in
+    {70}let msg_4: bitstring = auth(adec(x_3,sk_4),spk_p_1) in
+    {71}let (unauth_n'_i_1: bitstring,unauth_proverDID_1: DID,unauth_recipientDID_1: DID) = getMsg(msg_4) in
+    {72}let pk_p_1: PublicKey = getPubKey(unauth_proverDID_1) in
+    {73}let (n'_i_1: bitstring,proverDID_1: DID,recipientDID_1: DID) = auth(msg_4,pk_p_1) in
+    {55}let expectedDID_1: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+    {74}if (proverDID_1 = expectedDID_1) then
+    {75}if (n'_i_1 = n_i_1) then
+    {76}if (recipientDID_1 = genDID(pk(sk_3),sk_3)) then
+    {79}let sk_5: SecretKey = ssk_1 in
+    {54}let attr_3: bitstring = attr_2 in
+    {77}let cred_1: AC = issueAC(attr_3,sk_3) in
+    {78}let msg_5: bitstring = (cred_1,proverDID_1) in
+    {80}let msg_cred_1: bitstring = aenc(sign(msg_5,sk_5),spk_p_1) in
+    {68}let msg_did_1: bitstring = x_3 in
+    {58}let msg_handshakeReq_1: bitstring = x_2 in
+    {81}event auth_IssuerSendsLastMessageToHolder(msg_handshakeReq_1,msg_handshakeResp_1,msg_did_1,msg_cred_1);
+    {82}out(h, msg_cred_1);
+    {56}let talksOnlyToHonest_1: bool = false in
+    {83}if talksOnlyToHonest_1 then
+    (
+        {84}event auth_IssuerCompletesProtocol(msg_handshakeReq_1,msg_handshakeResp_1,msg_did_1)
+    ) | (
+        {85}out(ch(n_p_1), n_p_fromIssuer)
+    ) | (
+        {86}out(chA(cred_1), cred_fromIssuer)
+    ) | (
+        {87}out(ch((cred_1,proverDID_1)), credIssuing_fromIssuer_notMeaningful)
+    )
+) | (
+    {88}!
+    {90}let issuerDID: DID = genDID(pk(sk_issuer),sk_issuer) in
+    {93}let pk_i: PublicKey = getPubKey(issuerDID) in
+    {94}new ssk_2: SecretKey;
+    {95}new n_p_2: bitstring;
+    {97}let sk_7: SecretKey = ssk_2 in
+    {96}let msg_6: bitstring = (n_p_2,pk(ssk_2)) in
+    {98}let msg_handshakeReq_2: bitstring = aenc(sign(msg_6,sk_7),pk_i) in
+    {99}out(h, msg_handshakeReq_2);
+    {100}in(h, x_4: bitstring);
+    {102}let sk_8: SecretKey = ssk_2 in
+    {103}let msg_7: bitstring = auth(adec(x_4,sk_8),pk_i) in
+    {104}let (n'_p: bitstring,n_i_2: bitstring,spk_i: PublicKey) = msg_7 in
+    {105}if (n'_p = n_p_2) then
+    {107}let sk_9: SecretKey = ssk_2 in
+    {89}let sk_6: SecretKey = sk_prover in
+    {106}let msg_8: bitstring = sign((n_i_2,genDID(pk(sk_6),sk_6),issuerDID),sk_6) in
+    {108}let msg_did_2: bitstring = aenc(sign(msg_8,sk_9),spk_i) in
+    {101}let msg_handshakeResp_2: bitstring = x_4 in
+    {109}event auth_HolderSendsLastMessageToIssuer(msg_handshakeReq_2,msg_handshakeResp_2,msg_did_2);
+    {110}out(h, msg_did_2);
+    {111}in(h, x_5: bitstring);
+    {113}let sk_10: SecretKey = ssk_2 in
+    {114}let (credential: AC,recipientDID_2: DID) = auth(adec(x_5,sk_10),spk_i) in
+    {115}if (recipientDID_2 = genDID(pk(sk_6),sk_6)) then
+    {116}if (getIssuerFromAC(credential) = issuerDID) then
+    {112}let msg_credential: bitstring = x_5 in
+    {92}let talksOnlyToHonest_2: bool = true in
+    (
+        {117}!
+        {91}let verifierDID: DID = genDID(pk(sk_verifier),sk_verifier) in
+        {118}let pk_v: PublicKey = getPubKey(verifierDID) in
+        {119}new ssk_3: SecretKey;
+        {120}new n_p_3: bitstring;
+        {122}let sk_11: SecretKey = ssk_3 in
+        {121}let msg_9: bitstring = (n_p_3,pk(ssk_3)) in
+        {123}let msg_handshakeReq_3: bitstring = aenc(sign(msg_9,sk_11),pk_v) in
+        {124}out(h, msg_handshakeReq_3);
+        {125}in(h, x_6: bitstring);
+        {127}let sk_12: SecretKey = ssk_3 in
+        {128}let msg_10: bitstring = auth(adec(x_6,sk_12),pk_v) in
+        {129}let (n'_p_1: bitstring,n_v: bitstring,spk_v: PublicKey) = msg_10 in
+        {130}if (n'_p_1 = n_p_3) then
+        {132}let sk_13: SecretKey = ssk_3 in
+        {131}let msg_11: bitstring = (n_v,uri) in
+        {133}let msg_uri: bitstring = aenc(sign(msg_11,sk_13),spk_v) in
+        {134}out(h, msg_uri);
+        {135}in(h, x_7: bitstring);
+        {137}let sk_14: SecretKey = ssk_3 in
+        {138}let msg_12: bitstring = auth(adec(x_7,sk_14),spk_v) in
+        {139}let (n_c: bitstring,rule: ACR) = msg_12 in
+        {140}let issuerPk: PublicKey = getPubKey(getIssuerFromAC(credential)) in
+        {144}let sk_15: SecretKey = ssk_3 in
+        {141}let ph: bitstring = (n_c,verifierDID) in
+        {142}let dc: DC = proofGen(credential,issuerPk,ph) in
+        {143}let vp: bitstring = encodeDC(dc) in
+        {145}let msg_vp: bitstring = aenc(sign(vp,sk_15),spk_v) in
+        {136}let msg_rule: bitstring = x_7 in
+        {126}let msg_handshakeResp_3: bitstring = x_6 in
+        {146}event auth_ProverSendsLastMessageToVerifier(msg_handshakeReq_3,msg_handshakeResp_3,msg_uri,msg_rule,msg_vp);
+        {147}event auth_ProverSendsLastMessageToVerifierInProtocolFull(msg_handshakeReq_2,msg_handshakeResp_2,msg_did_2,msg_credential,msg_handshakeReq_3,msg_handshakeResp_3,msg_uri,msg_rule,msg_vp);
+        {148}out(h, msg_vp);
+        {149}in(h, x_8: bitstring);
+        {151}let sk_16: SecretKey = ssk_3 in
+        {152}let signed_access_token: bitstring = auth(adec(x_8,sk_16),spk_v) in
+        {153}let access_token: bitstring = auth(signed_access_token,getPubKey(verifierDID)) in
+        {154}if talksOnlyToHonest_2 then
+        (
+            {150}let msg_accessToken: bitstring = x_8 in
+            {155}event auth_ProverCompletesProtocol(msg_handshakeReq_3,msg_handshakeResp_3,msg_uri,msg_rule,msg_vp,msg_accessToken)
+        ) | (
+            {156}out(ch(n_p_3), n_p_fromProver)
+        ) | (
+            {157}out(chR(rule), rule_fromProver)
+        ) | (
+            {158}out(ch((n_c,verifierDID,credential)), unsigned_vp_fromProver)
+        ) | (
+            {159}out(ch(vp), vp_fromProver)
+        ) | (
+            {160}out(chA(credential), cred_fromProver)
+        ) | (
+            {161}out(ch(access_token), access_token_fromProver)
+        )
+    ) | (
+        {162}if talksOnlyToHonest_2 then
+        (
+            {163}event auth_HolderCompletesProtocol(msg_handshakeReq_2,msg_handshakeResp_2,msg_did_2,msg_credential)
+        ) | (
+            {164}out(ch(n_p_2), n_p_fromHolder)
+        ) | (
+            {165}out(ch(n_i_2), n_i_fromHolder)
+        ) | (
+            {166}out(ch((n_i_2,genDID(pk(sk_6),sk_6),issuerDID)), providingDID_fromHolder)
+        ) | (
+            {167}out(chA(credential), cred_fromHolder)
+        )
+    )
+) | (
+    {168}!
+    {170}let issuerDID_1: DID = genDID(pk(sk_issuer),sk_issuer) in
+    {173}let pk_i_1: PublicKey = getPubKey(issuerDID_1) in
+    {174}new ssk_4: SecretKey;
+    {175}new n_p_4: bitstring;
+    {177}let sk_18: SecretKey = ssk_4 in
+    {176}let msg_13: bitstring = (n_p_4,pk(ssk_4)) in
+    {178}let msg_handshakeReq_4: bitstring = aenc(sign(msg_13,sk_18),pk_i_1) in
+    {179}out(h, msg_handshakeReq_4);
+    {180}in(h, x_9: bitstring);
+    {182}let sk_19: SecretKey = ssk_4 in
+    {183}let msg_14: bitstring = auth(adec(x_9,sk_19),pk_i_1) in
+    {184}let (n'_p_2: bitstring,n_i_3: bitstring,spk_i_1: PublicKey) = msg_14 in
+    {185}if (n'_p_2 = n_p_4) then
+    {187}let sk_20: SecretKey = ssk_4 in
+    {169}let sk_17: SecretKey = sk_prover in
+    {186}let msg_15: bitstring = sign((n_i_3,genDID(pk(sk_17),sk_17),issuerDID_1),sk_17) in
+    {188}let msg_did_3: bitstring = aenc(sign(msg_15,sk_20),spk_i_1) in
+    {181}let msg_handshakeResp_4: bitstring = x_9 in
+    {189}event auth_HolderSendsLastMessageToIssuer(msg_handshakeReq_4,msg_handshakeResp_4,msg_did_3);
+    {190}out(h, msg_did_3);
+    {191}in(h, x_10: bitstring);
+    {193}let sk_21: SecretKey = ssk_4 in
+    {194}let (credential_1: AC,recipientDID_3: DID) = auth(adec(x_10,sk_21),spk_i_1) in
+    {195}if (recipientDID_3 = genDID(pk(sk_17),sk_17)) then
+    {196}if (getIssuerFromAC(credential_1) = issuerDID_1) then
+    {192}let msg_credential_1: bitstring = x_10 in
+    {172}let talksOnlyToHonest_3: bool = false in
+    (
+        {197}!
+        {171}let verifierDID_1: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+        {198}let pk_v_1: PublicKey = getPubKey(verifierDID_1) in
+        {199}new ssk_5: SecretKey;
+        {200}new n_p_5: bitstring;
+        {202}let sk_22: SecretKey = ssk_5 in
+        {201}let msg_16: bitstring = (n_p_5,pk(ssk_5)) in
+        {203}let msg_handshakeReq_5: bitstring = aenc(sign(msg_16,sk_22),pk_v_1) in
+        {204}out(h, msg_handshakeReq_5);
+        {205}in(h, x_11: bitstring);
+        {207}let sk_23: SecretKey = ssk_5 in
+        {208}let msg_17: bitstring = auth(adec(x_11,sk_23),pk_v_1) in
+        {209}let (n'_p_3: bitstring,n_v_1: bitstring,spk_v_1: PublicKey) = msg_17 in
+        {210}if (n'_p_3 = n_p_5) then
+        {212}let sk_24: SecretKey = ssk_5 in
+        {211}let msg_18: bitstring = (n_v_1,uri) in
+        {213}let msg_uri_1: bitstring = aenc(sign(msg_18,sk_24),spk_v_1) in
+        {214}out(h, msg_uri_1);
+        {215}in(h, x_12: bitstring);
+        {217}let sk_25: SecretKey = ssk_5 in
+        {218}let msg_19: bitstring = auth(adec(x_12,sk_25),spk_v_1) in
+        {219}let (n_c_1: bitstring,rule_1: ACR) = msg_19 in
+        {220}let issuerPk_1: PublicKey = getPubKey(getIssuerFromAC(credential_1)) in
+        {224}let sk_26: SecretKey = ssk_5 in
+        {221}let ph_1: bitstring = (n_c_1,verifierDID_1) in
+        {222}let dc_1: DC = proofGen(credential_1,issuerPk_1,ph_1) in
+        {223}let vp_1: bitstring = encodeDC(dc_1) in
+        {225}let msg_vp_1: bitstring = aenc(sign(vp_1,sk_26),spk_v_1) in
+        {216}let msg_rule_1: bitstring = x_12 in
+        {206}let msg_handshakeResp_5: bitstring = x_11 in
+        {226}event auth_ProverSendsLastMessageToVerifier(msg_handshakeReq_5,msg_handshakeResp_5,msg_uri_1,msg_rule_1,msg_vp_1);
+        {227}event auth_ProverSendsLastMessageToVerifierInProtocolFull(msg_handshakeReq_4,msg_handshakeResp_4,msg_did_3,msg_credential_1,msg_handshakeReq_5,msg_handshakeResp_5,msg_uri_1,msg_rule_1,msg_vp_1);
+        {228}out(h, msg_vp_1);
+        {229}in(h, x_13: bitstring);
+        {231}let sk_27: SecretKey = ssk_5 in
+        {232}let signed_access_token_1: bitstring = auth(adec(x_13,sk_27),spk_v_1) in
+        {233}let access_token_1: bitstring = auth(signed_access_token_1,getPubKey(verifierDID_1)) in
+        {234}if talksOnlyToHonest_3 then
+        (
+            {230}let msg_accessToken_1: bitstring = x_13 in
+            {235}event auth_ProverCompletesProtocol(msg_handshakeReq_5,msg_handshakeResp_5,msg_uri_1,msg_rule_1,msg_vp_1,msg_accessToken_1)
+        ) | (
+            {236}out(ch(n_p_5), n_p_fromProver)
+        ) | (
+            {237}out(chR(rule_1), rule_fromProver)
+        ) | (
+            {238}out(ch((n_c_1,verifierDID_1,credential_1)), unsigned_vp_fromProver)
+        ) | (
+            {239}out(ch(vp_1), vp_fromProver)
+        ) | (
+            {240}out(chA(credential_1), cred_fromProver)
+        ) | (
+            {241}out(ch(access_token_1), access_token_fromProver)
+        )
+    ) | (
+        {242}if talksOnlyToHonest_3 then
+        (
+            {243}event auth_HolderCompletesProtocol(msg_handshakeReq_4,msg_handshakeResp_4,msg_did_3,msg_credential_1)
+        ) | (
+            {244}out(ch(n_p_4), n_p_fromHolder)
+        ) | (
+            {245}out(ch(n_i_3), n_i_fromHolder)
+        ) | (
+            {246}out(ch((n_i_3,genDID(pk(sk_17),sk_17),issuerDID_1)), providingDID_fromHolder)
+        ) | (
+            {247}out(chA(credential_1), cred_fromHolder)
+        )
+    )
+) | (
+    {248}!
+    {250}let issuerDID_2: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+    {253}let pk_i_2: PublicKey = getPubKey(issuerDID_2) in
+    {254}new ssk_6: SecretKey;
+    {255}new n_p_6: bitstring;
+    {257}let sk_29: SecretKey = ssk_6 in
+    {256}let msg_20: bitstring = (n_p_6,pk(ssk_6)) in
+    {258}let msg_handshakeReq_6: bitstring = aenc(sign(msg_20,sk_29),pk_i_2) in
+    {259}out(h, msg_handshakeReq_6);
+    {260}in(h, x_14: bitstring);
+    {262}let sk_30: SecretKey = ssk_6 in
+    {263}let msg_21: bitstring = auth(adec(x_14,sk_30),pk_i_2) in
+    {264}let (n'_p_4: bitstring,n_i_4: bitstring,spk_i_2: PublicKey) = msg_21 in
+    {265}if (n'_p_4 = n_p_6) then
+    {267}let sk_31: SecretKey = ssk_6 in
+    {249}let sk_28: SecretKey = sk_prover in
+    {266}let msg_22: bitstring = sign((n_i_4,genDID(pk(sk_28),sk_28),issuerDID_2),sk_28) in
+    {268}let msg_did_4: bitstring = aenc(sign(msg_22,sk_31),spk_i_2) in
+    {261}let msg_handshakeResp_6: bitstring = x_14 in
+    {269}event auth_HolderSendsLastMessageToIssuer(msg_handshakeReq_6,msg_handshakeResp_6,msg_did_4);
+    {270}out(h, msg_did_4);
+    {271}in(h, x_15: bitstring);
+    {273}let sk_32: SecretKey = ssk_6 in
+    {274}let (credential_2: AC,recipientDID_4: DID) = auth(adec(x_15,sk_32),spk_i_2) in
+    {275}if (recipientDID_4 = genDID(pk(sk_28),sk_28)) then
+    {276}if (getIssuerFromAC(credential_2) = issuerDID_2) then
+    {272}let msg_credential_2: bitstring = x_15 in
+    {252}let talksOnlyToHonest_4: bool = false in
+    (
+        {277}!
+        {251}let verifierDID_2: DID = genDID(pk(sk_verifier),sk_verifier) in
+        {278}let pk_v_2: PublicKey = getPubKey(verifierDID_2) in
+        {279}new ssk_7: SecretKey;
+        {280}new n_p_7: bitstring;
+        {282}let sk_33: SecretKey = ssk_7 in
+        {281}let msg_23: bitstring = (n_p_7,pk(ssk_7)) in
+        {283}let msg_handshakeReq_7: bitstring = aenc(sign(msg_23,sk_33),pk_v_2) in
+        {284}out(h, msg_handshakeReq_7);
+        {285}in(h, x_16: bitstring);
+        {287}let sk_34: SecretKey = ssk_7 in
+        {288}let msg_24: bitstring = auth(adec(x_16,sk_34),pk_v_2) in
+        {289}let (n'_p_5: bitstring,n_v_2: bitstring,spk_v_2: PublicKey) = msg_24 in
+        {290}if (n'_p_5 = n_p_7) then
+        {292}let sk_35: SecretKey = ssk_7 in
+        {291}let msg_25: bitstring = (n_v_2,uri) in
+        {293}let msg_uri_2: bitstring = aenc(sign(msg_25,sk_35),spk_v_2) in
+        {294}out(h, msg_uri_2);
+        {295}in(h, x_17: bitstring);
+        {297}let sk_36: SecretKey = ssk_7 in
+        {298}let msg_26: bitstring = auth(adec(x_17,sk_36),spk_v_2) in
+        {299}let (n_c_2: bitstring,rule_2: ACR) = msg_26 in
+        {300}let issuerPk_2: PublicKey = getPubKey(getIssuerFromAC(credential_2)) in
+        {304}let sk_37: SecretKey = ssk_7 in
+        {301}let ph_2: bitstring = (n_c_2,verifierDID_2) in
+        {302}let dc_2: DC = proofGen(credential_2,issuerPk_2,ph_2) in
+        {303}let vp_2: bitstring = encodeDC(dc_2) in
+        {305}let msg_vp_2: bitstring = aenc(sign(vp_2,sk_37),spk_v_2) in
+        {296}let msg_rule_2: bitstring = x_17 in
+        {286}let msg_handshakeResp_7: bitstring = x_16 in
+        {306}event auth_ProverSendsLastMessageToVerifier(msg_handshakeReq_7,msg_handshakeResp_7,msg_uri_2,msg_rule_2,msg_vp_2);
+        {307}event auth_ProverSendsLastMessageToVerifierInProtocolFull(msg_handshakeReq_6,msg_handshakeResp_6,msg_did_4,msg_credential_2,msg_handshakeReq_7,msg_handshakeResp_7,msg_uri_2,msg_rule_2,msg_vp_2);
+        {308}out(h, msg_vp_2);
+        {309}in(h, x_18: bitstring);
+        {311}let sk_38: SecretKey = ssk_7 in
+        {312}let signed_access_token_2: bitstring = auth(adec(x_18,sk_38),spk_v_2) in
+        {313}let access_token_2: bitstring = auth(signed_access_token_2,getPubKey(verifierDID_2)) in
+        {314}if talksOnlyToHonest_4 then
+        (
+            {310}let msg_accessToken_2: bitstring = x_18 in
+            {315}event auth_ProverCompletesProtocol(msg_handshakeReq_7,msg_handshakeResp_7,msg_uri_2,msg_rule_2,msg_vp_2,msg_accessToken_2)
+        ) | (
+            {316}out(ch(n_p_7), n_p_fromProver)
+        ) | (
+            {317}out(chR(rule_2), rule_fromProver)
+        ) | (
+            {318}out(ch((n_c_2,verifierDID_2,credential_2)), unsigned_vp_fromProver)
+        ) | (
+            {319}out(ch(vp_2), vp_fromProver)
+        ) | (
+            {320}out(chA(credential_2), cred_fromProver)
+        ) | (
+            {321}out(ch(access_token_2), access_token_fromProver)
+        )
+    ) | (
+        {322}if talksOnlyToHonest_4 then
+        (
+            {323}event auth_HolderCompletesProtocol(msg_handshakeReq_6,msg_handshakeResp_6,msg_did_4,msg_credential_2)
+        ) | (
+            {324}out(ch(n_p_6), n_p_fromHolder)
+        ) | (
+            {325}out(ch(n_i_4), n_i_fromHolder)
+        ) | (
+            {326}out(ch((n_i_4,genDID(pk(sk_28),sk_28),issuerDID_2)), providingDID_fromHolder)
+        ) | (
+            {327}out(chA(credential_2), cred_fromHolder)
+        )
+    )
+) | (
+    {328}!
+    {330}let issuerDID_3: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+    {333}let pk_i_3: PublicKey = getPubKey(issuerDID_3) in
+    {334}new ssk_8: SecretKey;
+    {335}new n_p_8: bitstring;
+    {337}let sk_40: SecretKey = ssk_8 in
+    {336}let msg_27: bitstring = (n_p_8,pk(ssk_8)) in
+    {338}let msg_handshakeReq_8: bitstring = aenc(sign(msg_27,sk_40),pk_i_3) in
+    {339}out(h, msg_handshakeReq_8);
+    {340}in(h, x_19: bitstring);
+    {342}let sk_41: SecretKey = ssk_8 in
+    {343}let msg_28: bitstring = auth(adec(x_19,sk_41),pk_i_3) in
+    {344}let (n'_p_6: bitstring,n_i_5: bitstring,spk_i_3: PublicKey) = msg_28 in
+    {345}if (n'_p_6 = n_p_8) then
+    {347}let sk_42: SecretKey = ssk_8 in
+    {329}let sk_39: SecretKey = sk_prover in
+    {346}let msg_29: bitstring = sign((n_i_5,genDID(pk(sk_39),sk_39),issuerDID_3),sk_39) in
+    {348}let msg_did_5: bitstring = aenc(sign(msg_29,sk_42),spk_i_3) in
+    {341}let msg_handshakeResp_8: bitstring = x_19 in
+    {349}event auth_HolderSendsLastMessageToIssuer(msg_handshakeReq_8,msg_handshakeResp_8,msg_did_5);
+    {350}out(h, msg_did_5);
+    {351}in(h, x_20: bitstring);
+    {353}let sk_43: SecretKey = ssk_8 in
+    {354}let (credential_3: AC,recipientDID_5: DID) = auth(adec(x_20,sk_43),spk_i_3) in
+    {355}if (recipientDID_5 = genDID(pk(sk_39),sk_39)) then
+    {356}if (getIssuerFromAC(credential_3) = issuerDID_3) then
+    {352}let msg_credential_3: bitstring = x_20 in
+    {332}let talksOnlyToHonest_5: bool = false in
+    (
+        {357}!
+        {331}let verifierDID_3: DID = genDID(pk(sk_otherAgent),sk_otherAgent) in
+        {358}let pk_v_3: PublicKey = getPubKey(verifierDID_3) in
+        {359}new ssk_9: SecretKey;
+        {360}new n_p_9: bitstring;
+        {362}let sk_44: SecretKey = ssk_9 in
+        {361}let msg_30: bitstring = (n_p_9,pk(ssk_9)) in
+        {363}let msg_handshakeReq_9: bitstring = aenc(sign(msg_30,sk_44),pk_v_3) in
+        {364}out(h, msg_handshakeReq_9);
+        {365}in(h, x_21: bitstring);
+        {367}let sk_45: SecretKey = ssk_9 in
+        {368}let msg_31: bitstring = auth(adec(x_21,sk_45),pk_v_3) in
+        {369}let (n'_p_7: bitstring,n_v_3: bitstring,spk_v_3: PublicKey) = msg_31 in
+        {370}if (n'_p_7 = n_p_9) then
+        {372}let sk_46: SecretKey = ssk_9 in
+        {371}let msg_32: bitstring = (n_v_3,uri) in
+        {373}let msg_uri_3: bitstring = aenc(sign(msg_32,sk_46),spk_v_3) in
+        {374}out(h, msg_uri_3);
+        {375}in(h, x_22: bitstring);
+        {377}let sk_47: SecretKey = ssk_9 in
+        {378}let msg_33: bitstring = auth(adec(x_22,sk_47),spk_v_3) in
+        {379}let (n_c_3: bitstring,rule_3: ACR) = msg_33 in
+        {380}let issuerPk_3: PublicKey = getPubKey(getIssuerFromAC(credential_3)) in
+        {384}let sk_48: SecretKey = ssk_9 in
+        {381}let ph_3: bitstring = (n_c_3,verifierDID_3) in
+        {382}let dc_3: DC = proofGen(credential_3,issuerPk_3,ph_3) in
+        {383}let vp_3: bitstring = encodeDC(dc_3) in
+        {385}let msg_vp_3: bitstring = aenc(sign(vp_3,sk_48),spk_v_3) in
+        {376}let msg_rule_3: bitstring = x_22 in
+        {366}let msg_handshakeResp_9: bitstring = x_21 in
+        {386}event auth_ProverSendsLastMessageToVerifier(msg_handshakeReq_9,msg_handshakeResp_9,msg_uri_3,msg_rule_3,msg_vp_3);
+        {387}event auth_ProverSendsLastMessageToVerifierInProtocolFull(msg_handshakeReq_8,msg_handshakeResp_8,msg_did_5,msg_credential_3,msg_handshakeReq_9,msg_handshakeResp_9,msg_uri_3,msg_rule_3,msg_vp_3);
+        {388}out(h, msg_vp_3);
+        {389}in(h, x_23: bitstring);
+        {391}let sk_49: SecretKey = ssk_9 in
+        {392}let signed_access_token_3: bitstring = auth(adec(x_23,sk_49),spk_v_3) in
+        {393}let access_token_3: bitstring = auth(signed_access_token_3,getPubKey(verifierDID_3)) in
+        {394}if talksOnlyToHonest_5 then
+        (
+            {390}let msg_accessToken_3: bitstring = x_23 in
+            {395}event auth_ProverCompletesProtocol(msg_handshakeReq_9,msg_handshakeResp_9,msg_uri_3,msg_rule_3,msg_vp_3,msg_accessToken_3)
+        ) | (
+            {396}out(ch(n_p_9), n_p_fromProver)
+        ) | (
+            {397}out(chR(rule_3), rule_fromProver)
+        ) | (
+            {398}out(ch((n_c_3,verifierDID_3,credential_3)), unsigned_vp_fromProver)
+        ) | (
+            {399}out(ch(vp_3), vp_fromProver)
+        ) | (
+            {400}out(chA(credential_3), cred_fromProver)
+        ) | (
+            {401}out(ch(access_token_3), access_token_fromProver)
+        )
+    ) | (
+        {402}if talksOnlyToHonest_5 then
+        (
+            {403}event auth_HolderCompletesProtocol(msg_handshakeReq_8,msg_handshakeResp_8,msg_did_5,msg_credential_3)
+        ) | (
+            {404}out(ch(n_p_8), n_p_fromHolder)
+        ) | (
+            {405}out(ch(n_i_5), n_i_fromHolder)
+        ) | (
+            {406}out(ch((n_i_5,genDID(pk(sk_39),sk_39),issuerDID_3)), providingDID_fromHolder)
+        ) | (
+            {407}out(chA(credential_3), cred_fromHolder)
+        )
+    )
+) | (
+    {408}!
+    {411}in(h, x_24: bitstring);
+    {409}let sk_50: SecretKey = sk_verifier in
+    {413}let sgndMsg_2: bitstring = adec(x_24,sk_50) in
+    {415}let (unauth_n_p_2: bitstring,unauth_spk_p_2: PublicKey) = getMsg(sgndMsg_2) in
+    {416}let (n_p_10: bitstring,spk_p_2: PublicKey) = auth(sgndMsg_2,unauth_spk_p_2) in
+    {417}new ssk_10: SecretKey;
+    {418}new n_v_4: bitstring;
+    {419}let msg_35: bitstring = (n_p_10,n_v_4,pk(ssk_10)) in
+    {420}let msg_handshakeResp_10: bitstring = aenc(sign(msg_35,sk_50),spk_p_2) in
+    {421}out(h, msg_handshakeResp_10);
+    {422}in(h, x_25: bitstring);
+    {424}let sk_51: SecretKey = ssk_10 in
+    {425}let msg_36: bitstring = auth(adec(x_25,sk_51),spk_p_2) in
+    {426}let (n'_v: bitstring,u: bitstring) = msg_36 in
+    {427}if (n'_v = n_v_4) then
+    {428}if (u = uri) then
+    {429}new n_c_4: bitstring;
+    {431}let sk_52: SecretKey = ssk_10 in
+    {10}let acr: ACR = makeRule(genDID(pk(sk_prover),sk_prover),attr,genDID(pk(sk_issuer),sk_issuer)) in
+    {430}let msg_37: bitstring = (n_c_4,acr) in
+    {432}let msg_rule_4: bitstring = aenc(sign(msg_37,sk_52),spk_p_2) in
+    {433}out(h, msg_rule_4);
+    {434}in(h, x_26: bitstring);
+    {436}let sk_53: SecretKey = ssk_10 in
+    {437}let unauth_dc: DC = decodeDC(auth(adec(x_26,sk_53),spk_p_2)) in
+    {438}let issuer_1: DID = getIssuerFromDC(unauth_dc) in
+    {439}let issuerPk_4: PublicKey = getPubKey(issuer_1) in
+    {440}let ph_4: bitstring = (n_c_4,genDID(pk(sk_50),sk_50)) in
+    {441}if proofVerify(unauth_dc,ph_4,getAttrFromRule(acr),issuerPk_4) then
+    {442}if (issuer_1 = getIssuerFromRule(acr)) then
+    {443}if (getAttrFromDC(unauth_dc) = getAttrFromRule(acr)) then
+    {444}new access_token_4: bitstring;
+    {446}let sk_54: SecretKey = ssk_10 in
+    {445}let msg_38: bitstring = sign(access_token_4,sk_50) in
+    {447}let msg_accessToken_4: bitstring = aenc(sign(msg_38,sk_54),spk_p_2) in
+    {435}let msg_vp_4: bitstring = x_26 in
+    {423}let msg_uri_4: bitstring = x_25 in
+    {412}let msg_handshakeReq_10: bitstring = x_24 in
+    {448}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_10,msg_handshakeResp_10,msg_uri_4,msg_rule_4,msg_vp_4,msg_accessToken_4);
+    {449}out(h, msg_accessToken_4);
+    {410}let talksOnlyToHonest_6: bool = true in
+    {450}if talksOnlyToHonest_6 then
+    (
+        {451}event auth_VerifierCompletesProtocol(msg_handshakeReq_10,msg_handshakeResp_10,msg_uri_4,msg_rule_4,msg_vp_4)
+    ) | (
+        {452}out(ch(n_p_10), n_p_fromVerifier)
+    ) | (
+        {453}out(chR(acr), rule_fromVerifier)
+    ) | (
+        {454}out(ch((n_c_4,acr)), credRequest_fromVerifier)
+    ) | (
+        {455}out(ch(encodeDC(unauth_dc)), unauth_vp_fromVerifier)
+    ) | (
+        {456}out(chD(unauth_dc), cred_fromVerifier)
+    ) | (
+        {457}out(ch(access_token_4), access_token_fromVerifier)
+    )
+) | (
+    {458}!
+    {461}in(h, x_27: bitstring);
+    {459}let sk_55: SecretKey = sk_verifier in
+    {463}let sgndMsg_3: bitstring = adec(x_27,sk_55) in
+    {465}let (unauth_n_p_3: bitstring,unauth_spk_p_3: PublicKey) = getMsg(sgndMsg_3) in
+    {466}let (n_p_11: bitstring,spk_p_3: PublicKey) = auth(sgndMsg_3,unauth_spk_p_3) in
+    {467}new ssk_11: SecretKey;
+    {468}new n_v_5: bitstring;
+    {469}let msg_40: bitstring = (n_p_11,n_v_5,pk(ssk_11)) in
+    {470}let msg_handshakeResp_11: bitstring = aenc(sign(msg_40,sk_55),spk_p_3) in
+    {471}out(h, msg_handshakeResp_11);
+    {472}in(h, x_28: bitstring);
+    {474}let sk_56: SecretKey = ssk_11 in
+    {475}let msg_41: bitstring = auth(adec(x_28,sk_56),spk_p_3) in
+    {476}let (n'_v_1: bitstring,u_1: bitstring) = msg_41 in
+    {477}if (n'_v_1 = n_v_5) then
+    {478}if (u_1 = uri) then
+    {479}new n_c_5: bitstring;
+    {481}let sk_57: SecretKey = ssk_11 in
+    {11}let acr_otherAgent: ACR = makeRule(genDID(pk(sk_otherAgent),sk_otherAgent),attr_2,genDID(pk(sk_issuer),sk_issuer)) in
+    {480}let msg_42: bitstring = (n_c_5,acr_otherAgent) in
+    {482}let msg_rule_5: bitstring = aenc(sign(msg_42,sk_57),spk_p_3) in
+    {483}out(h, msg_rule_5);
+    {484}in(h, x_29: bitstring);
+    {486}let sk_58: SecretKey = ssk_11 in
+    {487}let unauth_dc_1: DC = decodeDC(auth(adec(x_29,sk_58),spk_p_3)) in
+    {488}let issuer_2: DID = getIssuerFromDC(unauth_dc_1) in
+    {489}let issuerPk_5: PublicKey = getPubKey(issuer_2) in
+    {490}let ph_5: bitstring = (n_c_5,genDID(pk(sk_55),sk_55)) in
+    {491}if proofVerify(unauth_dc_1,ph_5,getAttrFromRule(acr_otherAgent),issuerPk_5) then
+    {492}if (issuer_2 = getIssuerFromRule(acr_otherAgent)) then
+    {493}if (getAttrFromDC(unauth_dc_1) = getAttrFromRule(acr_otherAgent)) then
+    {494}new access_token_5: bitstring;
+    {496}let sk_59: SecretKey = ssk_11 in
+    {495}let msg_43: bitstring = sign(access_token_5,sk_55) in
+    {497}let msg_accessToken_5: bitstring = aenc(sign(msg_43,sk_59),spk_p_3) in
+    {485}let msg_vp_5: bitstring = x_29 in
+    {473}let msg_uri_5: bitstring = x_28 in
+    {462}let msg_handshakeReq_11: bitstring = x_27 in
+    {498}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_11,msg_handshakeResp_11,msg_uri_5,msg_rule_5,msg_vp_5,msg_accessToken_5);
+    {499}out(h, msg_accessToken_5);
+    {460}let talksOnlyToHonest_7: bool = false in
+    {500}if talksOnlyToHonest_7 then
+    (
+        {501}event auth_VerifierCompletesProtocol(msg_handshakeReq_11,msg_handshakeResp_11,msg_uri_5,msg_rule_5,msg_vp_5)
+    ) | (
+        {502}out(ch(n_p_11), n_p_fromVerifier)
+    ) | (
+        {503}out(chR(acr_otherAgent), rule_fromVerifier)
+    ) | (
+        {504}out(ch((n_c_5,acr_otherAgent)), credRequest_fromVerifier)
+    ) | (
+        {505}out(ch(encodeDC(unauth_dc_1)), unauth_vp_fromVerifier)
+    ) | (
+        {506}out(chD(unauth_dc_1), cred_fromVerifier)
+    ) | (
+        {507}out(ch(access_token_5), access_token_fromVerifier)
+    )
+) | (
+    {508}!
+    {511}in(h, x_30: bitstring);
+    {509}let sk_60: SecretKey = sk_verifier in
+    {513}let sgndMsg_4: bitstring = adec(x_30,sk_60) in
+    {515}let (unauth_n_p_4: bitstring,unauth_spk_p_4: PublicKey) = getMsg(sgndMsg_4) in
+    {516}let (n_p_12: bitstring,spk_p_4: PublicKey) = auth(sgndMsg_4,unauth_spk_p_4) in
+    {517}new ssk_12: SecretKey;
+    {518}new n_v_6: bitstring;
+    {519}let msg_45: bitstring = (n_p_12,n_v_6,pk(ssk_12)) in
+    {520}let msg_handshakeResp_12: bitstring = aenc(sign(msg_45,sk_60),spk_p_4) in
+    {521}out(h, msg_handshakeResp_12);
+    {522}in(h, x_31: bitstring);
+    {524}let sk_61: SecretKey = ssk_12 in
+    {525}let msg_46: bitstring = auth(adec(x_31,sk_61),spk_p_4) in
+    {526}let (n'_v_2: bitstring,u_2: bitstring) = msg_46 in
+    {527}if (n'_v_2 = n_v_6) then
+    {528}if (u_2 = uri) then
+    {529}new n_c_6: bitstring;
+    {531}let sk_62: SecretKey = ssk_12 in
+    {12}let acr_compromisedIssuer: ACR = makeRule(genDID(pk(sk_prover),sk_prover),attr,genDID(pk(sk_otherAgent),sk_otherAgent)) in
+    {530}let msg_47: bitstring = (n_c_6,acr_compromisedIssuer) in
+    {532}let msg_rule_6: bitstring = aenc(sign(msg_47,sk_62),spk_p_4) in
+    {533}out(h, msg_rule_6);
+    {534}in(h, x_32: bitstring);
+    {536}let sk_63: SecretKey = ssk_12 in
+    {537}let unauth_dc_2: DC = decodeDC(auth(adec(x_32,sk_63),spk_p_4)) in
+    {538}let issuer_3: DID = getIssuerFromDC(unauth_dc_2) in
+    {539}let issuerPk_6: PublicKey = getPubKey(issuer_3) in
+    {540}let ph_6: bitstring = (n_c_6,genDID(pk(sk_60),sk_60)) in
+    {541}if proofVerify(unauth_dc_2,ph_6,getAttrFromRule(acr_compromisedIssuer),issuerPk_6) then
+    {542}if (issuer_3 = getIssuerFromRule(acr_compromisedIssuer)) then
+    {543}if (getAttrFromDC(unauth_dc_2) = getAttrFromRule(acr_compromisedIssuer)) then
+    {544}new access_token_6: bitstring;
+    {546}let sk_64: SecretKey = ssk_12 in
+    {545}let msg_48: bitstring = sign(access_token_6,sk_60) in
+    {547}let msg_accessToken_6: bitstring = aenc(sign(msg_48,sk_64),spk_p_4) in
+    {535}let msg_vp_6: bitstring = x_32 in
+    {523}let msg_uri_6: bitstring = x_31 in
+    {512}let msg_handshakeReq_12: bitstring = x_30 in
+    {548}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_12,msg_handshakeResp_12,msg_uri_6,msg_rule_6,msg_vp_6,msg_accessToken_6);
+    {549}out(h, msg_accessToken_6);
+    {510}let talksOnlyToHonest_8: bool = false in
+    {550}if talksOnlyToHonest_8 then
+    (
+        {551}event auth_VerifierCompletesProtocol(msg_handshakeReq_12,msg_handshakeResp_12,msg_uri_6,msg_rule_6,msg_vp_6)
+    ) | (
+        {552}out(ch(n_p_12), n_p_fromVerifier)
+    ) | (
+        {553}out(chR(acr_compromisedIssuer), rule_fromVerifier)
+    ) | (
+        {554}out(ch((n_c_6,acr_compromisedIssuer)), credRequest_fromVerifier)
+    ) | (
+        {555}out(ch(encodeDC(unauth_dc_2)), unauth_vp_fromVerifier)
+    ) | (
+        {556}out(chD(unauth_dc_2), cred_fromVerifier)
+    ) | (
+        {557}out(ch(access_token_6), access_token_fromVerifier)
+    )
+) | (
+    {558}!
+    {561}in(h, x_33: bitstring);
+    {559}let sk_65: SecretKey = sk_verifier in
+    {563}let sgndMsg_5: bitstring = adec(x_33,sk_65) in
+    {565}let (unauth_n_p_5: bitstring,unauth_spk_p_5: PublicKey) = getMsg(sgndMsg_5) in
+    {566}let (n_p_13: bitstring,spk_p_5: PublicKey) = auth(sgndMsg_5,unauth_spk_p_5) in
+    {567}new ssk_13: SecretKey;
+    {568}new n_v_7: bitstring;
+    {569}let msg_50: bitstring = (n_p_13,n_v_7,pk(ssk_13)) in
+    {570}let msg_handshakeResp_13: bitstring = aenc(sign(msg_50,sk_65),spk_p_5) in
+    {571}out(h, msg_handshakeResp_13);
+    {572}in(h, x_34: bitstring);
+    {574}let sk_66: SecretKey = ssk_13 in
+    {575}let msg_51: bitstring = auth(adec(x_34,sk_66),spk_p_5) in
+    {576}let (n'_v_3: bitstring,u_3: bitstring) = msg_51 in
+    {577}if (n'_v_3 = n_v_7) then
+    {578}if (u_3 = uri) then
+    {579}new n_c_7: bitstring;
+    {581}let sk_67: SecretKey = ssk_13 in
+    {13}let acr_compromisedIssuer_2: ACR = makeRule(genDID(pk(sk_prover),sk_prover),attr_2,genDID(pk(sk_otherAgent),sk_otherAgent)) in
+    {580}let msg_52: bitstring = (n_c_7,acr_compromisedIssuer_2) in
+    {582}let msg_rule_7: bitstring = aenc(sign(msg_52,sk_67),spk_p_5) in
+    {583}out(h, msg_rule_7);
+    {584}in(h, x_35: bitstring);
+    {586}let sk_68: SecretKey = ssk_13 in
+    {587}let unauth_dc_3: DC = decodeDC(auth(adec(x_35,sk_68),spk_p_5)) in
+    {588}let issuer_4: DID = getIssuerFromDC(unauth_dc_3) in
+    {589}let issuerPk_7: PublicKey = getPubKey(issuer_4) in
+    {590}let ph_7: bitstring = (n_c_7,genDID(pk(sk_65),sk_65)) in
+    {591}if proofVerify(unauth_dc_3,ph_7,getAttrFromRule(acr_compromisedIssuer_2),issuerPk_7) then
+    {592}if (issuer_4 = getIssuerFromRule(acr_compromisedIssuer_2)) then
+    {593}if (getAttrFromDC(unauth_dc_3) = getAttrFromRule(acr_compromisedIssuer_2)) then
+    {594}new access_token_7: bitstring;
+    {596}let sk_69: SecretKey = ssk_13 in
+    {595}let msg_53: bitstring = sign(access_token_7,sk_65) in
+    {597}let msg_accessToken_7: bitstring = aenc(sign(msg_53,sk_69),spk_p_5) in
+    {585}let msg_vp_7: bitstring = x_35 in
+    {573}let msg_uri_7: bitstring = x_34 in
+    {562}let msg_handshakeReq_13: bitstring = x_33 in
+    {598}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_13,msg_handshakeResp_13,msg_uri_7,msg_rule_7,msg_vp_7,msg_accessToken_7);
+    {599}out(h, msg_accessToken_7);
+    {560}let talksOnlyToHonest_9: bool = false in
+    {600}if talksOnlyToHonest_9 then
+    (
+        {601}event auth_VerifierCompletesProtocol(msg_handshakeReq_13,msg_handshakeResp_13,msg_uri_7,msg_rule_7,msg_vp_7)
+    ) | (
+        {602}out(ch(n_p_13), n_p_fromVerifier)
+    ) | (
+        {603}out(chR(acr_compromisedIssuer_2), rule_fromVerifier)
+    ) | (
+        {604}out(ch((n_c_7,acr_compromisedIssuer_2)), credRequest_fromVerifier)
+    ) | (
+        {605}out(ch(encodeDC(unauth_dc_3)), unauth_vp_fromVerifier)
+    ) | (
+        {606}out(chD(unauth_dc_3), cred_fromVerifier)
+    ) | (
+        {607}out(ch(access_token_7), access_token_fromVerifier)
+    )
+) | (
+    {608}!
+    {611}in(h, x_36: bitstring);
+    {609}let sk_70: SecretKey = sk_verifier in
+    {613}let sgndMsg_6: bitstring = adec(x_36,sk_70) in
+    {615}let (unauth_n_p_6: bitstring,unauth_spk_p_6: PublicKey) = getMsg(sgndMsg_6) in
+    {616}let (n_p_14: bitstring,spk_p_6: PublicKey) = auth(sgndMsg_6,unauth_spk_p_6) in
+    {617}new ssk_14: SecretKey;
+    {618}new n_v_8: bitstring;
+    {619}let msg_55: bitstring = (n_p_14,n_v_8,pk(ssk_14)) in
+    {620}let msg_handshakeResp_14: bitstring = aenc(sign(msg_55,sk_70),spk_p_6) in
+    {621}out(h, msg_handshakeResp_14);
+    {622}in(h, x_37: bitstring);
+    {624}let sk_71: SecretKey = ssk_14 in
+    {625}let msg_56: bitstring = auth(adec(x_37,sk_71),spk_p_6) in
+    {626}let (n'_v_4: bitstring,u_4: bitstring) = msg_56 in
+    {627}if (n'_v_4 = n_v_8) then
+    {628}if (u_4 = uri) then
+    {629}new n_c_8: bitstring;
+    {631}let sk_72: SecretKey = ssk_14 in
+    {14}let acr_compromised: ACR = makeRule(genDID(pk(sk_otherAgent),sk_otherAgent),attr,genDID(pk(sk_otherAgent),sk_otherAgent)) in
+    {630}let msg_57: bitstring = (n_c_8,acr_compromised) in
+    {632}let msg_rule_8: bitstring = aenc(sign(msg_57,sk_72),spk_p_6) in
+    {633}out(h, msg_rule_8);
+    {634}in(h, x_38: bitstring);
+    {636}let sk_73: SecretKey = ssk_14 in
+    {637}let unauth_dc_4: DC = decodeDC(auth(adec(x_38,sk_73),spk_p_6)) in
+    {638}let issuer_5: DID = getIssuerFromDC(unauth_dc_4) in
+    {639}let issuerPk_8: PublicKey = getPubKey(issuer_5) in
+    {640}let ph_8: bitstring = (n_c_8,genDID(pk(sk_70),sk_70)) in
+    {641}if proofVerify(unauth_dc_4,ph_8,getAttrFromRule(acr_compromised),issuerPk_8) then
+    {642}if (issuer_5 = getIssuerFromRule(acr_compromised)) then
+    {643}if (getAttrFromDC(unauth_dc_4) = getAttrFromRule(acr_compromised)) then
+    {644}new access_token_8: bitstring;
+    {646}let sk_74: SecretKey = ssk_14 in
+    {645}let msg_58: bitstring = sign(access_token_8,sk_70) in
+    {647}let msg_accessToken_8: bitstring = aenc(sign(msg_58,sk_74),spk_p_6) in
+    {635}let msg_vp_8: bitstring = x_38 in
+    {623}let msg_uri_8: bitstring = x_37 in
+    {612}let msg_handshakeReq_14: bitstring = x_36 in
+    {648}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_14,msg_handshakeResp_14,msg_uri_8,msg_rule_8,msg_vp_8,msg_accessToken_8);
+    {649}out(h, msg_accessToken_8);
+    {610}let talksOnlyToHonest_10: bool = false in
+    {650}if talksOnlyToHonest_10 then
+    (
+        {651}event auth_VerifierCompletesProtocol(msg_handshakeReq_14,msg_handshakeResp_14,msg_uri_8,msg_rule_8,msg_vp_8)
+    ) | (
+        {652}out(ch(n_p_14), n_p_fromVerifier)
+    ) | (
+        {653}out(chR(acr_compromised), rule_fromVerifier)
+    ) | (
+        {654}out(ch((n_c_8,acr_compromised)), credRequest_fromVerifier)
+    ) | (
+        {655}out(ch(encodeDC(unauth_dc_4)), unauth_vp_fromVerifier)
+    ) | (
+        {656}out(chD(unauth_dc_4), cred_fromVerifier)
+    ) | (
+        {657}out(ch(access_token_8), access_token_fromVerifier)
+    )
+) | (
+    {658}!
+    {661}in(h, x_39: bitstring);
+    {659}let sk_75: SecretKey = sk_verifier in
+    {663}let sgndMsg_7: bitstring = adec(x_39,sk_75) in
+    {665}let (unauth_n_p_7: bitstring,unauth_spk_p_7: PublicKey) = getMsg(sgndMsg_7) in
+    {666}let (n_p_15: bitstring,spk_p_7: PublicKey) = auth(sgndMsg_7,unauth_spk_p_7) in
+    {667}new ssk_15: SecretKey;
+    {668}new n_v_9: bitstring;
+    {669}let msg_60: bitstring = (n_p_15,n_v_9,pk(ssk_15)) in
+    {670}let msg_handshakeResp_15: bitstring = aenc(sign(msg_60,sk_75),spk_p_7) in
+    {671}out(h, msg_handshakeResp_15);
+    {672}in(h, x_40: bitstring);
+    {674}let sk_76: SecretKey = ssk_15 in
+    {675}let msg_61: bitstring = auth(adec(x_40,sk_76),spk_p_7) in
+    {676}let (n'_v_5: bitstring,u_5: bitstring) = msg_61 in
+    {677}if (n'_v_5 = n_v_9) then
+    {678}if (u_5 = uri) then
+    {679}new n_c_9: bitstring;
+    {681}let sk_77: SecretKey = ssk_15 in
+    {15}let acr_compromised_2: ACR = makeRule(genDID(pk(sk_otherAgent),sk_otherAgent),attr_2,genDID(pk(sk_otherAgent),sk_otherAgent)) in
+    {680}let msg_62: bitstring = (n_c_9,acr_compromised_2) in
+    {682}let msg_rule_9: bitstring = aenc(sign(msg_62,sk_77),spk_p_7) in
+    {683}out(h, msg_rule_9);
+    {684}in(h, x_41: bitstring);
+    {686}let sk_78: SecretKey = ssk_15 in
+    {687}let unauth_dc_5: DC = decodeDC(auth(adec(x_41,sk_78),spk_p_7)) in
+    {688}let issuer_6: DID = getIssuerFromDC(unauth_dc_5) in
+    {689}let issuerPk_9: PublicKey = getPubKey(issuer_6) in
+    {690}let ph_9: bitstring = (n_c_9,genDID(pk(sk_75),sk_75)) in
+    {691}if proofVerify(unauth_dc_5,ph_9,getAttrFromRule(acr_compromised_2),issuerPk_9) then
+    {692}if (issuer_6 = getIssuerFromRule(acr_compromised_2)) then
+    {693}if (getAttrFromDC(unauth_dc_5) = getAttrFromRule(acr_compromised_2)) then
+    {694}new access_token_9: bitstring;
+    {696}let sk_79: SecretKey = ssk_15 in
+    {695}let msg_63: bitstring = sign(access_token_9,sk_75) in
+    {697}let msg_accessToken_9: bitstring = aenc(sign(msg_63,sk_79),spk_p_7) in
+    {685}let msg_vp_9: bitstring = x_41 in
+    {673}let msg_uri_9: bitstring = x_40 in
+    {662}let msg_handshakeReq_15: bitstring = x_39 in
+    {698}event auth_VerifierSendsLastMessageToProver(msg_handshakeReq_15,msg_handshakeResp_15,msg_uri_9,msg_rule_9,msg_vp_9,msg_accessToken_9);
+    {699}out(h, msg_accessToken_9);
+    {660}let talksOnlyToHonest_11: bool = false in
+    {700}if talksOnlyToHonest_11 then
+    (
+        {701}event auth_VerifierCompletesProtocol(msg_handshakeReq_15,msg_handshakeResp_15,msg_uri_9,msg_rule_9,msg_vp_9)
+    ) | (
+        {702}out(ch(n_p_15), n_p_fromVerifier)
+    ) | (
+        {703}out(chR(acr_compromised_2), rule_fromVerifier)
+    ) | (
+        {704}out(ch((n_c_9,acr_compromised_2)), credRequest_fromVerifier)
+    ) | (
+        {705}out(ch(encodeDC(unauth_dc_5)), unauth_vp_fromVerifier)
+    ) | (
+        {706}out(chD(unauth_dc_5), cred_fromVerifier)
+    ) | (
+        {707}out(ch(access_token_9), access_token_fromVerifier)
+    )
+)
+
+-- Query not attacker(n_p_fromHolder[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(n_p_fromHolder[])
+RESULT not attacker(n_p_fromHolder[]) is true.
+-- Query not attacker(n_i_fromHolder[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(n_i_fromHolder[])
+RESULT not attacker(n_i_fromHolder[]) is true.
+-- Query not attacker(providingDID_fromHolder[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(providingDID_fromHolder[])
+RESULT not attacker(providingDID_fromHolder[]) is true.
+-- Query not attacker(n_p_fromIssuer[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(n_p_fromIssuer[])
+RESULT not attacker(n_p_fromIssuer[]) is true.
+-- Query not attacker(credIssuing_fromIssuer_notMeaningful[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(credIssuing_fromIssuer_notMeaningful[])
+RESULT not attacker(credIssuing_fromIssuer_notMeaningful[]) is true.
+-- Query not attacker(n_p_fromProver[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(n_p_fromProver[])
+RESULT not attacker(n_p_fromProver[]) is true.
+-- Query not attacker(unsigned_vp_fromProver[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(unsigned_vp_fromProver[])
+RESULT not attacker(unsigned_vp_fromProver[]) is true.
+-- Query not attacker(vp_fromProver[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(vp_fromProver[])
+RESULT not attacker(vp_fromProver[]) is true.
+-- Query not attacker(cred_fromProver[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(cred_fromProver[])
+RESULT not attacker(cred_fromProver[]) is true.
+-- Query not attacker(access_token_fromProver[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(access_token_fromProver[])
+RESULT not attacker(access_token_fromProver[]) is true.
+-- Query not attacker(n_p_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(n_p_fromVerifier[])
+RESULT not attacker(n_p_fromVerifier[]) is true.
+-- Query not attacker(rule_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(rule_fromVerifier[])
+goal reachable: attacker(rule_fromVerifier[])
+
+Derivation:
+Abbreviations:
+n_p_16 = n_p_2[!1 = @sid]
+ssk_16 = ssk_2[!1 = @sid]
+ssk_17 = ssk[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+n_i_6 = n_i[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+n_p_17 = n_p_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)),x_4 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+ssk_18 = ssk_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)),x_4 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+n_v_10 = n_v_4[x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+ssk_19 = ssk_10[x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+n_c_10 = n_c_4[x_25 = aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+
+1. The message genDID(pk(sk_issuer[]),sk_issuer[]) may be sent to the attacker at output {9}.
+attacker(genDID(pk(sk_issuer[]),sk_issuer[])).
+
+2. Using the function attr the attacker may obtain attr.
+attacker(attr).
+
+3. The message genDID(pk(sk_prover[]),sk_prover[]) may be sent to the attacker at output {7}.
+attacker(genDID(pk(sk_prover[]),sk_prover[])).
+
+4. By 3, the attacker may know genDID(pk(sk_prover[]),sk_prover[]).
+By 2, the attacker may know attr.
+By 1, the attacker may know genDID(pk(sk_issuer[]),sk_issuer[]).
+Using the function makeRule the attacker may obtain makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[])).
+attacker(makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))).
+
+5. By 4, the attacker may know makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[])).
+Using the function chR the attacker may obtain chR(makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))).
+attacker(chR(makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[])))).
+
+6. The message aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])) may be sent to the attacker at output {99}.
+attacker(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[]))).
+
+7. The message aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])) that the attacker may have by 6 may be received at input {21}.
+So the message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) may be sent to the attacker at output {30}.
+attacker(aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16))).
+
+8. The message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) that the attacker may have by 7 may be received at input {100}.
+So the message aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)) may be sent to the attacker at output {110}.
+attacker(aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17))).
+
+9. The message aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])) that the attacker may have by 6 may be received at input {21}.
+The message aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)) that the attacker may have by 8 may be received at input {31}.
+So the message aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)) may be sent to the attacker at output {46}.
+attacker(aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16))).
+
+10. The message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) that the attacker may have by 7 may be received at input {100}.
+The message aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)) that the attacker may have by 9 may be received at input {111}.
+So the message aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])) may be sent to the attacker at output {124}.
+attacker(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[]))).
+
+11. The message aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])) that the attacker may have by 10 may be received at input {411}.
+So the message aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)) may be sent to the attacker at output {421}.
+attacker(aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18))).
+
+12. The message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) that the attacker may have by 7 may be received at input {100}.
+The message aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)) that the attacker may have by 9 may be received at input {111}.
+The message aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)) that the attacker may have by 11 may be received at input {125}.
+So the message aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) may be sent to the attacker at output {134}.
+attacker(aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19))).
+
+13. The message aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])) that the attacker may have by 10 may be received at input {411}.
+The message aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) that the attacker may have by 12 may be received at input {422}.
+So the message aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)) may be sent to the attacker at output {433}.
+attacker(aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18))).
+
+14. The message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) that the attacker may have by 7 may be received at input {100}.
+The message aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)) that the attacker may have by 9 may be received at input {111}.
+The message aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)) that the attacker may have by 11 may be received at input {125}.
+The message aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)) that the attacker may have by 13 may be received at input {135}.
+So the message aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19)) may be sent to the attacker at output {148}.
+attacker(aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19))).
+
+15. The message aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])) that the attacker may have by 10 may be received at input {411}.
+The message aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) that the attacker may have by 12 may be received at input {422}.
+The message aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19)) that the attacker may have by 14 may be received at input {434}.
+So the message rule_fromVerifier[] may be sent on channel chR(makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))) at output {453}.
+mess(chR(makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),rule_fromVerifier[]).
+
+16. By 5, the attacker may have the channel chR(makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))).
+By 15, the message rule_fromVerifier[] may be sent on this channel.
+So the attacker may obtain the message rule_fromVerifier[] by listening on this channel.
+attacker(rule_fromVerifier[]).
+
+17. By 16, attacker(rule_fromVerifier[]).
+The goal is reached, represented in the following fact:
+attacker(rule_fromVerifier[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new sk_prover: SecretKey creating sk_prover_1 at {1}
+
+new sk_verifier: SecretKey creating sk_verifier_1 at {2}
+
+new sk_issuer: SecretKey creating sk_issuer_1 at {3}
+
+out(h, ~M) with ~M = pk(sk_issuer_1) at {4}
+
+out(h, ~M_1) with ~M_1 = pk(sk_verifier_1) at {5}
+
+out(h, ~M_2) with ~M_2 = pk(sk_prover_1) at {6}
+
+out(h, ~M_3) with ~M_3 = genDID(pk(sk_prover_1),sk_prover_1) at {7}
+
+out(h, ~M_4) with ~M_4 = genDID(pk(sk_verifier_1),sk_verifier_1) at {8}
+
+out(h, ~M_5) with ~M_5 = genDID(pk(sk_issuer_1),sk_issuer_1) at {9}
+
+new ssk_2: SecretKey creating ssk_16 at {94} in copy a
+
+new n_p_2: bitstring creating n_p_16 at {95} in copy a
+
+out(h, ~M_6) with ~M_6 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)) at {99} in copy a
+
+in(h, ~M_6) with ~M_6 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)) at {21} in copy a_1
+
+new ssk: SecretKey creating ssk_17 at {26} in copy a_1
+
+new n_i: bitstring creating n_i_6 at {27} in copy a_1
+
+out(h, ~M_7) with ~M_7 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)) at {30} in copy a_1
+
+in(h, ~M_7) with ~M_7 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)) at {100} in copy a
+
+event auth_HolderSendsLastMessageToIssuer(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17))) at {109} in copy a
+
+out(h, ~M_8) with ~M_8 = aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17)) at {110} in copy a
+
+in(h, ~M_8) with ~M_8 = aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17)) at {31} in copy a_1
+
+event auth_IssuerSendsLastMessageToHolder(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer_1),genDID(pk(sk_prover_1),sk_prover_1)),ssk_17),pk(ssk_16))) at {45} in copy a_1
+
+out(h, ~M_9) with ~M_9 = aenc(sign((issueAC(attr,sk_issuer_1),genDID(pk(sk_prover_1),sk_prover_1)),ssk_17),pk(ssk_16)) at {46} in copy a_1
+
+event auth_IssuerCompletesProtocol(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17))) at {48} in copy a_1
+
+in(h, ~M_9) with ~M_9 = aenc(sign((issueAC(attr,sk_issuer_1),genDID(pk(sk_prover_1),sk_prover_1)),ssk_17),pk(ssk_16)) at {111} in copy a
+
+event auth_HolderCompletesProtocol(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer_1),genDID(pk(sk_prover_1),sk_prover_1)),ssk_17),pk(ssk_16))) at {163} in copy a
+
+new ssk_3: SecretKey creating ssk_18 at {119} in copy a, a_2
+
+new n_p_3: bitstring creating n_p_17 at {120} in copy a, a_2
+
+out(h, ~M_10) with ~M_10 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)) at {124} in copy a, a_2
+
+in(h, ~M_10) with ~M_10 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)) at {411} in copy a_3
+
+new ssk_10: SecretKey creating ssk_19 at {417} in copy a_3
+
+new n_v_4: bitstring creating n_v_10 at {418} in copy a_3
+
+out(h, ~M_11) with ~M_11 = aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)) at {421} in copy a_3
+
+in(h, ~M_11) with ~M_11 = aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)) at {125} in copy a, a_2
+
+out(h, ~M_12) with ~M_12 = aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) at {134} in copy a, a_2
+
+in(h, ~M_12) with ~M_12 = aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) at {422} in copy a_3
+
+new n_c_4: bitstring creating n_c_10 at {429} in copy a_3
+
+out(h, ~M_13) with ~M_13 = aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)) at {433} in copy a_3
+
+in(h, ~M_13) with ~M_13 = aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)) at {135} in copy a, a_2
+
+event auth_ProverSendsLastMessageToVerifier(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19))) at {146} in copy a, a_2
+
+event auth_ProverSendsLastMessageToVerifierInProtocolFull(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer_1),genDID(pk(sk_prover_1),sk_prover_1)),ssk_17),pk(ssk_16)),aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19))) at {147} in copy a, a_2
+
+out(h, ~M_14) with ~M_14 = aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19)) at {148} in copy a, a_2
+
+in(h, ~M_14) with ~M_14 = aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19)) at {434} in copy a_3
+
+new access_token_4: bitstring creating access_token_10 at {444} in copy a_3
+
+event auth_VerifierSendsLastMessageToProver(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19)),aenc(sign(sign(access_token_10,sk_verifier_1),ssk_19),pk(ssk_18))) at {448} in copy a_3
+
+out(h, ~M_15) with ~M_15 = aenc(sign(sign(access_token_10,sk_verifier_1),ssk_19),pk(ssk_18)) at {449} in copy a_3
+
+out(chR(makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))), ~M_16) with ~M_16 = rule_fromVerifier at {453} in copy a_3
+
+event auth_VerifierCompletesProtocol(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19))) at {451} in copy a_3
+
+The attacker has the message ~M_16 = rule_fromVerifier.
+A trace has been found.
+RESULT not attacker(rule_fromVerifier[]) is false.
+-- Query not attacker(credRequest_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(credRequest_fromVerifier[])
+RESULT not attacker(credRequest_fromVerifier[]) is true.
+-- Query not attacker(unauth_vp_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(unauth_vp_fromVerifier[])
+RESULT not attacker(unauth_vp_fromVerifier[]) is true.
+-- Query not attacker(vp_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(vp_fromVerifier[])
+RESULT not attacker(vp_fromVerifier[]) is true.
+-- Query not attacker(cred_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(cred_fromVerifier[])
+RESULT not attacker(cred_fromVerifier[]) is true.
+-- Query not attacker(access_token_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 341 rules (79 with conclusion selected). Queue: 60 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 682 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 844 rules (137 with conclusion selected). Queue: 103 rules.
+1200 rules inserted. Base: 948 rules (152 with conclusion selected). Queue: 110 rules.
+1400 rules inserted. Base: 1045 rules (174 with conclusion selected). Queue: 193 rules.
+1600 rules inserted. Base: 1234 rules (187 with conclusion selected). Queue: 151 rules.
+1800 rules inserted. Base: 1346 rules (201 with conclusion selected). Queue: 145 rules.
+2000 rules inserted. Base: 1456 rules (202 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1424 rules (216 with conclusion selected). Queue: 80 rules.
+2400 rules inserted. Base: 1500 rules (230 with conclusion selected). Queue: 97 rules.
+2600 rules inserted. Base: 1564 rules (248 with conclusion selected). Queue: 81 rules.
+2800 rules inserted. Base: 1491 rules (259 with conclusion selected). Queue: 84 rules.
+3000 rules inserted. Base: 1590 rules (275 with conclusion selected). Queue: 1 rules.
+Starting query not attacker(access_token_fromVerifier[])
+RESULT not attacker(access_token_fromVerifier[]) is true.
+-- Query inj-event(auth_ProverCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) ==> inj-event(auth_VerifierSendsLastMessageToProver(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 90 rules.
+400 rules inserted. Base: 342 rules (78 with conclusion selected). Queue: 64 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 147 rules.
+800 rules inserted. Base: 691 rules (125 with conclusion selected). Queue: 141 rules.
+1000 rules inserted. Base: 853 rules (127 with conclusion selected). Queue: 88 rules.
+1200 rules inserted. Base: 989 rules (150 with conclusion selected). Queue: 125 rules.
+1400 rules inserted. Base: 1056 rules (174 with conclusion selected). Queue: 242 rules.
+1600 rules inserted. Base: 1244 rules (178 with conclusion selected). Queue: 196 rules.
+1800 rules inserted. Base: 1406 rules (191 with conclusion selected). Queue: 155 rules.
+2000 rules inserted. Base: 1487 rules (201 with conclusion selected). Queue: 146 rules.
+2200 rules inserted. Base: 1612 rules (204 with conclusion selected). Queue: 46 rules.
+2400 rules inserted. Base: 1637 rules (216 with conclusion selected). Queue: 77 rules.
+2600 rules inserted. Base: 1726 rules (231 with conclusion selected). Queue: 103 rules.
+2800 rules inserted. Base: 1820 rules (249 with conclusion selected). Queue: 87 rules.
+3000 rules inserted. Base: 1956 rules (257 with conclusion selected). Queue: 127 rules.
+3200 rules inserted. Base: 2078 rules (265 with conclusion selected). Queue: 103 rules.
+Starting query inj-event(auth_ProverCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) ==> inj-event(auth_VerifierSendsLastMessageToProver(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken))
+goal reachable: begin(auth_VerifierSendsLastMessageToProver(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),aenc(sign((n_p_16,n_v_10,pk(ssk_17)),sk_verifier[]),pk(ssk_16)),aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_17),pk(ssk_16)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17)),aenc(sign(sign(access_token_10,sk_verifier[]),ssk_17),pk(ssk_16))),@occ448_1) -> end(@occ155_1,auth_ProverCompletesProtocol(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),aenc(sign((n_p_16,n_v_10,pk(ssk_17)),sk_verifier[]),pk(ssk_16)),aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_17),pk(ssk_16)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17)),aenc(sign(sign(access_token_10,sk_verifier[]),ssk_17),pk(ssk_16))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_17 = n_p_2[!1 = @sid]
+ssk_18 = ssk_2[!1 = @sid]
+ssk_19 = ssk[x = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_issuer[])),!1 = @sid_1]
+n_i_6 = n_i[x = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_issuer[])),!1 = @sid_1]
+n_p_16 = n_p_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18)),x_4 = aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),!1 = @sid]
+ssk_16 = ssk_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18)),x_4 = aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),!1 = @sid]
+n_v_10 = n_v_4[x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+ssk_17 = ssk_10[x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+n_c_10 = n_c_4[x_25 = aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+access_token_10 = access_token_4[x_26 = aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17)),x_25 = aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+@occ155_1 = @occ155[x_8 = aenc(sign(sign(access_token_10,sk_verifier[]),ssk_17),pk(ssk_16)),x_7 = aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_17),pk(ssk_16)),x_6 = aenc(sign((n_p_16,n_v_10,pk(ssk_17)),sk_verifier[]),pk(ssk_16)),!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18)),x_4 = aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),!1 = @sid]
+@occ448_1 = @occ448[x_26 = aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17)),x_25 = aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+RESULT inj-event(auth_ProverCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) ==> inj-event(auth_VerifierSendsLastMessageToProver(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) is true.
+-- Query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 90 rules.
+400 rules inserted. Base: 342 rules (78 with conclusion selected). Queue: 63 rules.
+600 rules inserted. Base: 524 rules (107 with conclusion selected). Queue: 132 rules.
+800 rules inserted. Base: 700 rules (125 with conclusion selected). Queue: 123 rules.
+1000 rules inserted. Base: 863 rules (137 with conclusion selected). Queue: 102 rules.
+1200 rules inserted. Base: 991 rules (152 with conclusion selected). Queue: 111 rules.
+1400 rules inserted. Base: 1142 rules (174 with conclusion selected). Queue: 255 rules.
+1600 rules inserted. Base: 1334 rules (181 with conclusion selected). Queue: 248 rules.
+1800 rules inserted. Base: 1497 rules (191 with conclusion selected). Queue: 196 rules.
+2000 rules inserted. Base: 1577 rules (205 with conclusion selected). Queue: 195 rules.
+2200 rules inserted. Base: 1718 rules (210 with conclusion selected). Queue: 88 rules.
+2400 rules inserted. Base: 1747 rules (219 with conclusion selected). Queue: 79 rules.
+2600 rules inserted. Base: 1845 rules (237 with conclusion selected). Queue: 72 rules.
+2800 rules inserted. Base: 1903 rules (252 with conclusion selected). Queue: 109 rules.
+3000 rules inserted. Base: 2048 rules (262 with conclusion selected). Queue: 179 rules.
+3200 rules inserted. Base: 2190 rules (269 with conclusion selected). Queue: 151 rules.
+3400 rules inserted. Base: 2317 rules (275 with conclusion selected). Queue: 117 rules.
+3600 rules inserted. Base: 2427 rules (284 with conclusion selected). Queue: 4 rules.
+Starting query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp))
+goal reachable: begin(auth_ProverSendsLastMessageToVerifier(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),aenc(sign((n_p_16,n_v_10,pk(ssk_17)),sk_verifier[]),pk(ssk_16)),aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_17),pk(ssk_16)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17))),@occ146_1) -> end(@occ451_1,auth_VerifierCompletesProtocol(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),aenc(sign((n_p_16,n_v_10,pk(ssk_17)),sk_verifier[]),pk(ssk_16)),aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_17),pk(ssk_16)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_17 = n_p_2[!1 = @sid]
+ssk_18 = ssk_2[!1 = @sid]
+ssk_19 = ssk[x = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_issuer[])),!1 = @sid_1]
+n_i_6 = n_i[x = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_issuer[])),!1 = @sid_1]
+n_p_16 = n_p_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18)),x_4 = aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),!1 = @sid]
+ssk_16 = ssk_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18)),x_4 = aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),!1 = @sid]
+n_v_10 = n_v_4[x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+ssk_17 = ssk_10[x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+n_c_10 = n_c_4[x_25 = aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+@occ451_1 = @occ451[x_26 = aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17)),x_25 = aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+@occ146_1 = @occ146[x_7 = aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_17),pk(ssk_16)),x_6 = aenc(sign((n_p_16,n_v_10,pk(ssk_17)),sk_verifier[]),pk(ssk_16)),!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18)),x_4 = aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),!1 = @sid]
+RESULT inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) is true.
+-- Query inj-event(auth_HolderCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did,m_cred)) ==> inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq,m_handshakeResp,m_did,m_cred)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 90 rules.
+400 rules inserted. Base: 349 rules (78 with conclusion selected). Queue: 70 rules.
+600 rules inserted. Base: 535 rules (108 with conclusion selected). Queue: 147 rules.
+800 rules inserted. Base: 701 rules (128 with conclusion selected). Queue: 138 rules.
+1000 rules inserted. Base: 859 rules (130 with conclusion selected). Queue: 84 rules.
+1200 rules inserted. Base: 987 rules (153 with conclusion selected). Queue: 125 rules.
+1400 rules inserted. Base: 1052 rules (177 with conclusion selected). Queue: 216 rules.
+1600 rules inserted. Base: 1240 rules (182 with conclusion selected). Queue: 169 rules.
+1800 rules inserted. Base: 1388 rules (204 with conclusion selected). Queue: 139 rules.
+2000 rules inserted. Base: 1475 rules (206 with conclusion selected). Queue: 101 rules.
+2200 rules inserted. Base: 1466 rules (214 with conclusion selected). Queue: 60 rules.
+2400 rules inserted. Base: 1558 rules (232 with conclusion selected). Queue: 63 rules.
+2600 rules inserted. Base: 1616 rules (247 with conclusion selected). Queue: 88 rules.
+2800 rules inserted. Base: 1593 rules (257 with conclusion selected). Queue: 107 rules.
+3000 rules inserted. Base: 1679 rules (268 with conclusion selected). Queue: 48 rules.
+Starting query inj-event(auth_HolderCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did,m_cred)) ==> inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq,m_handshakeResp,m_did,m_cred))
+goal reachable: begin(auth_IssuerSendsLastMessageToHolder(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16))),@occ45_1) -> end(@occ163_1,auth_HolderCompletesProtocol(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_16 = n_p_2[!1 = @sid]
+ssk_16 = ssk_2[!1 = @sid]
+ssk_17 = ssk[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+n_i_6 = n_i[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+@occ163_1 = @occ163[x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)),x_4 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+@occ45_1 = @occ45[x_1 = aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)),x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+RESULT inj-event(auth_HolderCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did,m_cred)) ==> inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq,m_handshakeResp,m_did,m_cred)) is true.
+-- Query inj-event(auth_IssuerCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did)) ==> inj-event(auth_HolderSendsLastMessageToIssuer(m_handshakeReq,m_handshakeResp,m_did)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 89 rules.
+400 rules inserted. Base: 348 rules (78 with conclusion selected). Queue: 69 rules.
+600 rules inserted. Base: 537 rules (109 with conclusion selected). Queue: 148 rules.
+800 rules inserted. Base: 700 rules (130 with conclusion selected). Queue: 137 rules.
+1000 rules inserted. Base: 848 rules (132 with conclusion selected). Queue: 95 rules.
+1200 rules inserted. Base: 984 rules (155 with conclusion selected). Queue: 134 rules.
+1400 rules inserted. Base: 1034 rules (175 with conclusion selected). Queue: 183 rules.
+1600 rules inserted. Base: 1213 rules (182 with conclusion selected). Queue: 171 rules.
+1800 rules inserted. Base: 1370 rules (197 with conclusion selected). Queue: 137 rules.
+2000 rules inserted. Base: 1456 rules (207 with conclusion selected). Queue: 121 rules.
+2200 rules inserted. Base: 1543 rules (215 with conclusion selected). Queue: 60 rules.
+2400 rules inserted. Base: 1537 rules (221 with conclusion selected). Queue: 56 rules.
+2600 rules inserted. Base: 1598 rules (235 with conclusion selected). Queue: 92 rules.
+2800 rules inserted. Base: 1571 rules (257 with conclusion selected). Queue: 115 rules.
+3000 rules inserted. Base: 1639 rules (268 with conclusion selected). Queue: 57 rules.
+Starting query inj-event(auth_IssuerCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did)) ==> inj-event(auth_HolderSendsLastMessageToIssuer(m_handshakeReq,m_handshakeResp,m_did))
+goal reachable: begin(auth_HolderSendsLastMessageToIssuer(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17))),@occ189_1) -> end(@occ48_1,auth_IssuerCompletesProtocol(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_16 = n_p_4[!1 = @sid]
+ssk_16 = ssk_4[!1 = @sid]
+n_i_6 = n_i[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+ssk_17 = ssk[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+@occ48_1 = @occ48[x_1 = aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)),x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+@occ189_1 = @occ189[x_9 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+goal reachable: begin(auth_HolderSendsLastMessageToIssuer(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17))),@occ109_1) -> end(@occ48_1,auth_IssuerCompletesProtocol(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_16 = n_p_2[!1 = @sid]
+ssk_16 = ssk_2[!1 = @sid]
+n_i_6 = n_i[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+ssk_17 = ssk[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+@occ48_1 = @occ48[x_1 = aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)),x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+@occ109_1 = @occ109[x_4 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+RESULT inj-event(auth_IssuerCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did)) ==> inj-event(auth_HolderSendsLastMessageToIssuer(m_handshakeReq,m_handshakeResp,m_did)) is true.
+-- Query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && inj-event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 90 rules.
+400 rules inserted. Base: 349 rules (79 with conclusion selected). Queue: 69 rules.
+600 rules inserted. Base: 536 rules (107 with conclusion selected). Queue: 145 rules.
+800 rules inserted. Base: 714 rules (127 with conclusion selected). Queue: 131 rules.
+1000 rules inserted. Base: 877 rules (132 with conclusion selected). Queue: 83 rules.
+1200 rules inserted. Base: 1024 rules (152 with conclusion selected). Queue: 121 rules.
+1400 rules inserted. Base: 1143 rules (176 with conclusion selected). Queue: 258 rules.
+1600 rules inserted. Base: 1332 rules (180 with conclusion selected). Queue: 245 rules.
+1800 rules inserted. Base: 1507 rules (191 with conclusion selected). Queue: 210 rules.
+2000 rules inserted. Base: 1608 rules (204 with conclusion selected). Queue: 196 rules.
+2200 rules inserted. Base: 1724 rules (212 with conclusion selected). Queue: 118 rules.
+2400 rules inserted. Base: 1799 rules (221 with conclusion selected). Queue: 66 rules.
+2600 rules inserted. Base: 1850 rules (227 with conclusion selected). Queue: 63 rules.
+2800 rules inserted. Base: 1932 rules (241 with conclusion selected). Queue: 117 rules.
+3000 rules inserted. Base: 2051 rules (260 with conclusion selected). Queue: 86 rules.
+3200 rules inserted. Base: 2205 rules (269 with conclusion selected). Queue: 160 rules.
+3400 rules inserted. Base: 2331 rules (276 with conclusion selected). Queue: 140 rules.
+3600 rules inserted. Base: 2468 rules (278 with conclusion selected). Queue: 31 rules.
+Starting query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && inj-event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred))
+goal reachable: begin(auth_ProverSendsLastMessageToVerifier(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),aenc(sign((n_p_16,n_v_10,pk(ssk_17)),sk_verifier[]),pk(ssk_16)),aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_17),pk(ssk_16)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17))),@occ146_2) && begin(auth_IssuerSendsLastMessageToHolder(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_issuer[])),aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_18),pk(ssk_19)),aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18))),@occ45_2) -> end(@occ451_2,auth_VerifierCompletesProtocol(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),aenc(sign((n_p_16,n_v_10,pk(ssk_17)),sk_verifier[]),pk(ssk_16)),aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_17),pk(ssk_16)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17))))
+Abbreviations:
+n_p_17 = n_p_2[!1 = @sid]
+ssk_18 = ssk_2[!1 = @sid]
+ssk_19 = ssk[x = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_issuer[])),!1 = @sid_1]
+n_i_6 = n_i[x = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_issuer[])),!1 = @sid_1]
+n_p_16 = n_p_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18)),x_4 = aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),!1 = @sid]
+ssk_16 = ssk_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18)),x_4 = aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),!1 = @sid]
+n_v_10 = n_v_4[x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+ssk_17 = ssk_10[x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+n_c_10 = n_c_4[x_25 = aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+@occ451_2 = @occ451_1[x_26 = aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_16),pk(ssk_17)),x_25 = aenc(sign((n_v_10,uri),ssk_16),pk(ssk_17)),x_24 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_verifier[])),!1 = @sid_3]
+@occ146_2 = @occ146_1[x_7 = aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_17),pk(ssk_16)),x_6 = aenc(sign((n_p_16,n_v_10,pk(ssk_17)),sk_verifier[]),pk(ssk_16)),!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_19),pk(ssk_18)),x_4 = aenc(sign((n_p_17,n_i_6,pk(ssk_19)),sk_issuer[]),pk(ssk_18)),!1 = @sid]
+@occ45_2 = @occ45_1[x_1 = aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_18),pk(ssk_19)),x = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_issuer[])),!1 = @sid_1]
+
+Derivation:
+Abbreviations:
+n_p_16 = n_p_2[!1 = @sid]
+ssk_16 = ssk_2[!1 = @sid]
+ssk_17 = ssk[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+n_i_6 = n_i[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+n_p_17 = n_p_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)),x_4 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+ssk_18 = ssk_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)),x_4 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+n_v_10 = n_v_4[x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+ssk_19 = ssk_10[x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+n_c_10 = n_c_4[x_25 = aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+@occ451_2 = @occ451_1[x_26 = aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19)),x_25 = aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+@occ146_2 = @occ146_1[x_7 = aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)),x_6 = aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)),!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)),x_4 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+@occ45_2 = @occ45_1[x_1 = aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)),x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+
+1. The message aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])) may be sent to the attacker at output {99}.
+attacker(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[]))).
+
+2. The message aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])) that the attacker may have by 1 may be received at input {21}.
+So the message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) may be sent to the attacker at output {30}.
+attacker(aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16))).
+
+3. The message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) that the attacker may have by 2 may be received at input {100}.
+So the message aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)) may be sent to the attacker at output {110}.
+attacker(aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17))).
+
+4. The message aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])) that the attacker may have by 1 may be received at input {21}.
+The message aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)) that the attacker may have by 3 may be received at input {31}.
+The event auth_IssuerSendsLastMessageToHolder(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16))) (with occurrence name @occ45_2) may be executed at {45}.
+So the message aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)) may be sent to the attacker at output {46}.
+attacker(aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16))).
+
+5. The message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) that the attacker may have by 2 may be received at input {100}.
+The message aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)) that the attacker may have by 4 may be received at input {111}.
+So the message aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])) may be sent to the attacker at output {124}.
+attacker(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[]))).
+
+6. The message aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])) that the attacker may have by 5 may be received at input {411}.
+So the message aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)) may be sent to the attacker at output {421}.
+attacker(aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18))).
+
+7. The message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) that the attacker may have by 2 may be received at input {100}.
+The message aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)) that the attacker may have by 4 may be received at input {111}.
+The message aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)) that the attacker may have by 6 may be received at input {125}.
+So the message aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) may be sent to the attacker at output {134}.
+attacker(aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19))).
+
+8. The message aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])) that the attacker may have by 5 may be received at input {411}.
+The message aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) that the attacker may have by 7 may be received at input {422}.
+So the message aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)) may be sent to the attacker at output {433}.
+attacker(aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18))).
+
+9. The message aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)) that the attacker may have by 2 may be received at input {100}.
+The message aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)) that the attacker may have by 4 may be received at input {111}.
+The message aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)) that the attacker may have by 6 may be received at input {125}.
+The message aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)) that the attacker may have by 8 may be received at input {135}.
+The event auth_ProverSendsLastMessageToVerifier(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19))) (with occurrence name @occ146_2) may be executed at {146}.
+So the message aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19)) may be sent to the attacker at output {148}.
+attacker(aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19))).
+
+10. The message aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])) that the attacker may have by 5 may be received at input {411}.
+The message aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) that the attacker may have by 7 may be received at input {422}.
+The message aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19)) that the attacker may have by 9 may be received at input {434}.
+So event auth_VerifierCompletesProtocol(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19))) may be executed at {451} in session @sid_3.
+end(@occ451_2,auth_VerifierCompletesProtocol(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19)))).
+
+11. By 10, end(@occ451_2,auth_VerifierCompletesProtocol(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19)))).
+The goal is reached, represented in the following fact:
+end(@occ451_2,auth_VerifierCompletesProtocol(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19)))).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new sk_prover: SecretKey creating sk_prover_1 at {1}
+
+new sk_verifier: SecretKey creating sk_verifier_1 at {2}
+
+new sk_issuer: SecretKey creating sk_issuer_1 at {3}
+
+out(h, ~M) with ~M = pk(sk_issuer_1) at {4}
+
+out(h, ~M_1) with ~M_1 = pk(sk_verifier_1) at {5}
+
+out(h, ~M_2) with ~M_2 = pk(sk_prover_1) at {6}
+
+out(h, ~M_3) with ~M_3 = genDID(pk(sk_prover_1),sk_prover_1) at {7}
+
+out(h, ~M_4) with ~M_4 = genDID(pk(sk_verifier_1),sk_verifier_1) at {8}
+
+out(h, ~M_5) with ~M_5 = genDID(pk(sk_issuer_1),sk_issuer_1) at {9}
+
+new ssk_2: SecretKey creating ssk_16 at {94} in copy a
+
+new n_p_2: bitstring creating n_p_16 at {95} in copy a
+
+out(h, ~M_6) with ~M_6 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)) at {99} in copy a
+
+in(h, ~M_6) with ~M_6 = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)) at {21} in copy a_1
+
+new ssk: SecretKey creating ssk_17 at {26} in copy a_1
+
+new n_i: bitstring creating n_i_6 at {27} in copy a_1
+
+out(h, ~M_7) with ~M_7 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)) at {30} in copy a_1
+
+in(h, ~M_7) with ~M_7 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)) at {100} in copy a
+
+event auth_HolderSendsLastMessageToIssuer(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17))) at {109} in copy a
+
+out(h, ~M_8) with ~M_8 = aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17)) at {110} in copy a
+
+in(h, ~M_8) with ~M_8 = aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17)) at {31} in copy a_1
+
+event auth_IssuerSendsLastMessageToHolder(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer_1),genDID(pk(sk_prover_1),sk_prover_1)),ssk_17),pk(ssk_16))) at {45} in copy a_1
+
+out(h, ~M_9) with ~M_9 = aenc(sign((issueAC(attr,sk_issuer_1),genDID(pk(sk_prover_1),sk_prover_1)),ssk_17),pk(ssk_16)) at {46} in copy a_1
+
+event auth_IssuerCompletesProtocol(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17))) at {48} in copy a_1
+
+in(h, ~M_9) with ~M_9 = aenc(sign((issueAC(attr,sk_issuer_1),genDID(pk(sk_prover_1),sk_prover_1)),ssk_17),pk(ssk_16)) at {111} in copy a
+
+new ssk_3: SecretKey creating ssk_18 at {119} in copy a, a_2
+
+new n_p_3: bitstring creating n_p_17 at {120} in copy a, a_2
+
+out(h, ~M_10) with ~M_10 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)) at {124} in copy a, a_2
+
+in(h, ~M_10) with ~M_10 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)) at {411} in copy a_3
+
+new ssk_10: SecretKey creating ssk_19 at {417} in copy a_3
+
+new n_v_4: bitstring creating n_v_10 at {418} in copy a_3
+
+out(h, ~M_11) with ~M_11 = aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)) at {421} in copy a_3
+
+in(h, ~M_11) with ~M_11 = aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)) at {125} in copy a, a_2
+
+out(h, ~M_12) with ~M_12 = aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) at {134} in copy a, a_2
+
+in(h, ~M_12) with ~M_12 = aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)) at {422} in copy a_3
+
+new n_c_4: bitstring creating n_c_10 at {429} in copy a_3
+
+out(h, ~M_13) with ~M_13 = aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)) at {433} in copy a_3
+
+in(h, ~M_13) with ~M_13 = aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)) at {135} in copy a, a_2
+
+event auth_ProverSendsLastMessageToVerifier(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19))) at {146} in copy a, a_2
+
+event auth_ProverSendsLastMessageToVerifierInProtocolFull(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer_1)),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer_1),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover_1),sk_prover_1),genDID(pk(sk_issuer_1),sk_issuer_1)),sk_prover_1),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer_1),genDID(pk(sk_prover_1),sk_prover_1)),ssk_17),pk(ssk_16)),aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19))) at {147} in copy a, a_2
+
+out(h, ~M_14) with ~M_14 = aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19)) at {148} in copy a, a_2
+
+in(h, ~M_14) with ~M_14 = aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19)) at {434} in copy a_3
+
+new access_token_4: bitstring creating access_token_10 at {444} in copy a_3
+
+event auth_VerifierSendsLastMessageToProver(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19)),aenc(sign(sign(access_token_10,sk_verifier_1),ssk_19),pk(ssk_18))) at {448} in copy a_3
+
+out(h, ~M_15) with ~M_15 = aenc(sign(sign(access_token_10,sk_verifier_1),ssk_19),pk(ssk_18)) at {449} in copy a_3
+
+event auth_VerifierCompletesProtocol(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19))) at {451} in copy a_3 (goal)
+
+The event auth_VerifierCompletesProtocol(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier_1)),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier_1),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover_1),sk_prover_1),attr,genDID(pk(sk_issuer_1),sk_issuer_1))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer_1),pk(sk_issuer_1),(n_c_10,genDID(pk(sk_verifier_1),sk_verifier_1)))),ssk_18),pk(ssk_19))) is executed at {451} in copy a_3.
+A trace has been found.
+RESULT inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && inj-event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) is false.
+RESULT (even event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) is false.)
+-- Query event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_ProverSendsLastMessageToVerifierInProtocolFull(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred,m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (47 with conclusion selected). Queue: 90 rules.
+400 rules inserted. Base: 349 rules (79 with conclusion selected). Queue: 69 rules.
+600 rules inserted. Base: 536 rules (107 with conclusion selected). Queue: 145 rules.
+800 rules inserted. Base: 714 rules (127 with conclusion selected). Queue: 131 rules.
+1000 rules inserted. Base: 877 rules (132 with conclusion selected). Queue: 83 rules.
+1200 rules inserted. Base: 1024 rules (152 with conclusion selected). Queue: 121 rules.
+1400 rules inserted. Base: 1143 rules (176 with conclusion selected). Queue: 258 rules.
+1600 rules inserted. Base: 1332 rules (180 with conclusion selected). Queue: 245 rules.
+1800 rules inserted. Base: 1507 rules (191 with conclusion selected). Queue: 210 rules.
+2000 rules inserted. Base: 1608 rules (204 with conclusion selected). Queue: 196 rules.
+2200 rules inserted. Base: 1724 rules (212 with conclusion selected). Queue: 118 rules.
+2400 rules inserted. Base: 1799 rules (221 with conclusion selected). Queue: 66 rules.
+2600 rules inserted. Base: 1840 rules (227 with conclusion selected). Queue: 63 rules.
+2800 rules inserted. Base: 1922 rules (241 with conclusion selected). Queue: 117 rules.
+3000 rules inserted. Base: 2001 rules (260 with conclusion selected). Queue: 86 rules.
+3200 rules inserted. Base: 2010 rules (269 with conclusion selected). Queue: 160 rules.
+3400 rules inserted. Base: 2121 rules (276 with conclusion selected). Queue: 140 rules.
+3600 rules inserted. Base: 2258 rules (278 with conclusion selected). Queue: 31 rules.
+Starting query event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_ProverSendsLastMessageToVerifierInProtocolFull(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred,m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp))
+goal reachable: begin(auth_ProverSendsLastMessageToVerifierInProtocolFull(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)),aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19)))) && begin(auth_IssuerSendsLastMessageToHolder(aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),aenc(sign(sign((n_i_6,genDID(pk(sk_prover[]),sk_prover[]),genDID(pk(sk_issuer[]),sk_issuer[])),sk_prover[]),ssk_16),pk(ssk_17)),aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)))) -> end(auth_VerifierCompletesProtocol(aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),aenc(sign((n_p_17,n_v_10,pk(ssk_19)),sk_verifier[]),pk(ssk_18)),aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),aenc(sign((n_c_10,makeRule(genDID(pk(sk_prover[]),sk_prover[]),attr,genDID(pk(sk_issuer[]),sk_issuer[]))),ssk_19),pk(ssk_18)),aenc(sign(encodeDC(proofGen(issueAC(attr,sk_issuer[]),pk(sk_issuer[]),(n_c_10,genDID(pk(sk_verifier[]),sk_verifier[])))),ssk_18),pk(ssk_19))))
+Abbreviations:
+n_p_16 = n_p_2[!1 = @sid]
+ssk_16 = ssk_2[!1 = @sid]
+ssk_17 = ssk[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+n_i_6 = n_i[x = aenc(sign((n_p_16,pk(ssk_16)),ssk_16),pk(sk_issuer[])),!1 = @sid_1]
+n_p_17 = n_p_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)),x_4 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+ssk_18 = ssk_3[!2 = @sid_2,x_5 = aenc(sign((issueAC(attr,sk_issuer[]),genDID(pk(sk_prover[]),sk_prover[])),ssk_17),pk(ssk_16)),x_4 = aenc(sign((n_p_16,n_i_6,pk(ssk_17)),sk_issuer[]),pk(ssk_16)),!1 = @sid]
+n_v_10 = n_v_4[x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+ssk_19 = ssk_10[x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+n_c_10 = n_c_4[x_25 = aenc(sign((n_v_10,uri),ssk_18),pk(ssk_19)),x_24 = aenc(sign((n_p_17,pk(ssk_18)),ssk_18),pk(sk_verifier[])),!1 = @sid_3]
+RESULT event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_ProverSendsLastMessageToVerifierInProtocolFull(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred,m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) is true.
+
+--------------------------------------------------------------
+Verification summary:
+
+Query not attacker(n_p_fromHolder[]) is true.
+
+Query not attacker(n_i_fromHolder[]) is true.
+
+Query not attacker(providingDID_fromHolder[]) is true.
+
+Query not attacker(n_p_fromIssuer[]) is true.
+
+Query not attacker(credIssuing_fromIssuer_notMeaningful[]) is true.
+
+Query not attacker(n_p_fromProver[]) is true.
+
+Query not attacker(unsigned_vp_fromProver[]) is true.
+
+Query not attacker(vp_fromProver[]) is true.
+
+Query not attacker(cred_fromProver[]) is true.
+
+Query not attacker(access_token_fromProver[]) is true.
+
+Query not attacker(n_p_fromVerifier[]) is true.
+
+Query not attacker(rule_fromVerifier[]) is false.
+
+Query not attacker(credRequest_fromVerifier[]) is true.
+
+Query not attacker(unauth_vp_fromVerifier[]) is true.
+
+Query not attacker(vp_fromVerifier[]) is true.
+
+Query not attacker(cred_fromVerifier[]) is true.
+
+Query not attacker(access_token_fromVerifier[]) is true.
+
+Query inj-event(auth_ProverCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) ==> inj-event(auth_VerifierSendsLastMessageToProver(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) is true.
+
+Query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) is true.
+
+Query inj-event(auth_HolderCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did,m_cred)) ==> inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq,m_handshakeResp,m_did,m_cred)) is true.
+
+Query inj-event(auth_IssuerCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did)) ==> inj-event(auth_HolderSendsLastMessageToIssuer(m_handshakeReq,m_handshakeResp,m_did)) is true.
+
+Query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && inj-event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) is false.
+
+Query event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_ProverSendsLastMessageToVerifierInProtocolFull(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred,m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) is true.
+
+--------------------------------------------------------------
+

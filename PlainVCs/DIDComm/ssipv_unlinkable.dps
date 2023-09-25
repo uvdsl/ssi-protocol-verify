@@ -1,0 +1,529 @@
+(* This is a ProVerif description of the Protocol Flow. *)
+
+fun pk/1.
+(* END keys *)
+
+(* START asymmetric encryption *)
+fun aenc/2.
+reduc adec(aenc(msg,pk(sk)),sk) -> msg (*asymmetric decrypt*).
+(* END Asymmetric encryption *)
+
+(* START digital signature *)
+fun sign/2 (*sign the input msg*).
+reduc auth(sign(msg,sk),pk(sk)) -> msg (*check signature, and get msg*).
+reduc getMsg(sign(msg,sk)) -> msg (*just get msg*).
+(* END digital signature *)
+
+(* ALTERNATIVE model authcrypt directly as a set of corresponding funcs and reducs...*)
+(*
+letfun authcrypt(msg,sk,pk) = aenc(sign(msg,sk),pk).
+letfun authdecrypt(cipher,sk,pk) = auth(adec(cipher,sk),pk).
+*)
+(* ALTERNATIVE model authcrypt directly as a set of corresponding funcs and reducs...*)
+
+(* START DID *)
+fun genDID/2.
+reduc getPubKey(genDID(pk(sk),sk)) = pk(sk). (* as of page 129 of manual *)
+(* this implies that a DID may only be associated to only one pubKey, which is not true => model as table*)
+(* but tables do not seem to be publically available? as of page 41 of manual *)
+(* END DID *)
+
+
+
+(* START credential *)
+fun issueVC/3.
+reduc verify(sign(msg,issuerSk),pk(issuerSk)) -> msg.
+reduc getAttrFromVC(sign((subject,attr, issuerDID),issuerSk)) -> attr.
+reduc getSubjectFromVC(sign((subject,attr, issuerDID),issuerSk)) -> subject.
+reduc getIssuerFromVC(sign((subject,attr, issuerDID),issuerSk)) -> issuerDID.
+(*
+reduc verify(issueVC(subject,attr,issuerSk),pk(issuerSk)) -> (subject,attr).
+reduc getIssuerFromVC(issueVC(subject,attr,issuerSk)) -> genDID(pk(issuerSk),issuerSk).
+reduc getAttrFromVC(issueVC(subject,attr,issuerSk)) -> attr.
+reduc getSubjectFromVC(issueVC(subject,attr,issuerSk)) -> subject.
+reduc getVcAsTuple(issueVC(subject,attr,issuerSk)) -> (subject,attr,genDID(pk(issuerSk),issuerSk)).
+*)
+(* do table for (attr,issuerDID) lookup*)
+(* for now use if then *)
+(* END credential *)
+
+(* START access control rule (ACR) *)
+fun makeRule/3. (* technically, the subject is dynamically injected or when unknown an implicit placeholder in the rule; but for the sake of simplicity we omit that technical detail.*)
+reduc getIssuerFromRule(makeRule(subject,attr,issuer)) -> issuer.
+reduc getAttrFromRule(makeRule(subject,attr,issuer)) -> attr.
+reduc getSubjectFromRule(makeRule(subject,attr,issuer)) -> subject.
+(*
+reduc getRuleAsTuple(makeRule(subject,attr,issuer)) -> (subject,attr,issuer).
+*)
+(* END access control rule *)
+
+(*DEFS*)
+const h.
+const debugging.
+const key.
+const attr.
+const uri.
+const sk_otherAgent.
+const sk_issuer.
+
+
+(* START process macros ~ agent *)
+
+
+
+  (**)
+  (**)
+  (**)
+  (**)
+  (* Part 2 - Prover - Verifier *)
+  (**)
+  (**)
+  (**)
+  (**)
+
+
+
+(** START Prover **)
+let prover(sk, cred, verifierDID)
+ (* input ~ what the agent starts with in private*) =
+    let pk_v = getPubKey(verifierDID) in
+    (* mint session key pair *)        
+    new ssk;                          
+    (* mint a nonce *)
+    new n_p;
+    (* send authcrypt msg*)
+    let msg = (n_p,pk(ssk)) in
+    let msg_handshakeReq = aenc(sign(msg,ssk),pk_v) in
+    out(h, msg_handshakeReq);
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    let msg_handshakeResp = x in
+    (* authdecrypt msg *)
+    let msg = auth(adec(x,ssk),pk_v) in (*<= ERROR*)
+    (* deconstruct msg=(n'_p,n_v,pk(ssk_v)) *)
+    let (n'_p,n_v,spk_v) = msg in
+    (* check nonce *)
+    if n'_p = n_p then
+    (* send authrypt msg /w URI *)
+    let msg = (n_v,uri) in
+    let msg_uri = aenc(sign(msg,ssk),pk_v) in
+    out(h, msg_uri);
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    let msg_rule = x in
+    (* authdecrypt msg *)
+    let msg = auth(adec(x,ssk),spk_v)  in 
+    (* deconstruct msg=(n_c,r) *)
+    let (n_c,rule) = msg in
+    (* lookup credential *)
+    if verify(cred, getPubKey(getIssuerFromVC(cred))) = (getSubjectFromRule(rule),getAttrFromRule(rule),getIssuerFromRule(rule)) then (* TODO lookup *)
+    (* create Verifiable Presentation *)
+    let vp = sign((n_c,verifierDID,cred),sk) in
+    (* send authcrypt msg /w VP *)
+    let msg_vp = aenc(sign(vp,ssk),spk_v) in
+    out(h, msg_vp);
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    in(h,x);
+    (* authdecrypt msg *)
+    let msg_accessToken = x in
+    let (access_token, recipientDID) = auth(adec(x,ssk),spk_v)  in 
+    if recipientDID = genDID(pk(sk),sk) then
+    (* event received_access_token; and I am the recipient *)
+    (* Prover about to complete protocol! *)
+    0.
+(** END Prover **)
+
+
+(** START Verifier **)
+let verifier(sk, rule1, rule2) (* input ~ what the agent starts with in private*) =
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    let msg_handshakeReq = x in 
+    (* decrypt msg *)
+    let sgndMsg = adec(x,sk) in
+    let msg = sgndMsg in
+    (* get pub key *)
+    let (unauth_n_p,unauth_spk_p) = getMsg(sgndMsg) in
+    (* auth msg and deconstruct *)
+    let (n_p,spk_p) = auth(sgndMsg,unauth_spk_p) in 
+    (* mint session key pair *)        
+    new ssk;                          
+    (* mint a nonce *)
+    new n_v;
+    (* create a message *)
+    let msg = (n_p,n_v,pk(ssk)) in (* UNSURE if it would be better to sign with both, session and long? *)
+    let msg_handshakeResp = aenc(sign(msg,sk),spk_p) in
+    out(h,msg_handshakeResp); (* UNSURE signing with long-lived secret, is another signature with session secret necessary?*)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    (* authdecrypt msg *)
+    let msg_uri = x in
+    let msg = auth(adec(x,ssk),spk_p) in 
+    (* deconstruct msg=(n'_v,u) *)
+    let (n'_v,u) = msg in
+    (* check nonce *)
+    if n'_v = n_v then 
+    (* lookup u's ACR *)
+    if u = uri then (* TODO lookup *)  
+    (* mint a nonce *)
+    new n_c;
+    (* send authcrypt msg*)
+    let msg = (n_c,rule1) in
+    let msg_rule = aenc(sign(msg,ssk),spk_p) in
+    out(h, msg_rule);
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    let msg_vp = x in
+    (* authdecrypt msg *)
+    let unauth_vp = auth(adec(x,ssk),spk_p)  in 
+    (* deconstruct vp=(n_c,cred) *)
+    let (unauth_n'_c,unauth_recipient,unauth_cred) = getMsg(unauth_vp) in
+    (*get subject *)
+    let cred_subject = genDID( pk(getSubjectFromVC(unauth_cred)), getSubjectFromVC(unauth_cred) ) in
+
+    (* check if subject match from cred and rule *) (* delete if you do not want the specificy*)
+    if cred_subject = getSubjectFromRule(rule1) then ( (* where prover p is the expected type of agent, i.e. honest*)
+
+	    (* get subject pubkey *)
+	    let pk_subject = getPubKey(cred_subject) in
+	    (* authenticate VP *)
+	    let (n'_c,recipientDID,cred) = auth(unauth_vp,pk_subject) in
+	
+	    (* check if verifier is actual recipient*)
+	    if recipientDID = genDID(pk(sk),sk) then
+	    
+	    (* check nonce *)
+	    if n'_c = n_c then
+	    (* check if issuers match from cred and rule *)
+	    if getIssuerFromVC(cred) = getIssuerFromRule(rule1) then
+	    (* check cred integrity *)
+	    let (subjectDID,asserted_attr,issuerDID) = verify(cred,getPubKey(getIssuerFromVC(cred))) in
+	    (* check if attribute match from cred and rule *)
+	    if asserted_attr = getAttrFromRule(rule1) then
+	    (* mint new access token *)
+	    new access_token;
+	    let msg = (access_token,subjectDID) in
+	    let msg_accessToken = aenc(sign(msg,ssk),spk_p) in
+	    out(h, msg_accessToken);
+	    0 )
+        (* check if subject match from cred and rule *) (* delete if you do not want the specificy*)
+    else if cred_subject = getSubjectFromRule(rule2) then (* where prover p is the expected type of agent, i.e. honest*)
+
+    (* get subject pubkey *)
+    let pk_subject = getPubKey(cred_subject) in
+    (* authenticate VP *)
+    let (n'_c,recipientDID,cred) = auth(unauth_vp,pk_subject) in
+
+    (* check if verifier is actual recipient*)
+    if recipientDID = genDID(pk(sk),sk) then
+
+    (* check nonce *)
+    if n'_c = n_c then
+    (* check if issuers match from cred and rule *)
+    if getIssuerFromVC(cred) = getIssuerFromRule(rule2) then
+    (* check cred integrity *)
+    let (subjectDID,asserted_attr,issuerDID) = verify(cred,getPubKey(getIssuerFromVC(cred))) in
+    (* check if attribute match from cred and rule *)
+    if asserted_attr = getAttrFromRule(rule2) then
+    (* mint new access token *)
+    new access_token;
+    let msg = (access_token,subjectDID) in
+    let msg_accessToken = aenc(sign(msg,ssk),spk_p) in
+    out(h, msg_accessToken);
+    0.
+    
+(** END Verifier **)
+
+
+  (**)
+  (**)
+  (**)
+  (**)
+  (* Part 1 - Issuer - Holder (i.e. Prover in part 2) *)
+  (**)
+  (**)
+  (**)
+  (**)
+
+
+(** START Holder/Prover **)
+let holder(sk, issuerDID, verifierDID) (* input ~ what the agent starts with in private*) =
+    (* get Issuer DID *)
+    (* check issuerDID to be ok *)            
+    (* lookup pubkey of V *)         
+    let pk_i = getPubKey(issuerDID) in
+    (* mint session key pair *)        
+    new ssk;                          
+    (* mint a nonce *)
+    new n_p;
+    (* send authcrypt msg*)
+    let msg = (n_p,pk(ssk)) in
+    let msg_handshakeReq = aenc(sign(msg,ssk),pk_i) in
+    out(debugging, msg_handshakeReq);
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    let msg_handshakeResp = x in
+    (* authdecrypt msg *)
+    let msg = auth(adec(x,ssk),pk_i)   in (*<= ERROR*)
+    (* deconstruct msg=(n'_p,n_i,pk(ssk_i)) *)
+    let (n'_p,n_i,spk_i) = msg in
+    (* check nonce *)
+    if n'_p = n_p then
+    (* send authrypt msg /w own DID , proving to be in control of DID*)
+    let msg = sign((n_i,genDID(pk(sk),sk),issuerDID),sk) in
+    (* create Verifiable Request *)
+    let msg_did = aenc(sign(msg,ssk),spk_i) in
+    out(h, msg_did);
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    (* authdecrypt msg *)
+    let msg_credential = x in
+    (* let (credential, recipientDID, n_strongSecrecy) =  auth(adec(x,ssk),spk_i)   in  *)
+    let (credential, recipientDID) = auth(adec(x,ssk),spk_i)  in 
+    if recipientDID = genDID(pk(sk),sk) then
+    if getIssuerFromVC(credential) = issuerDID then
+    (* TODO validate credential *)
+    (* event received_access_token; and I am the recipient *)
+    (* Prover about to complete protocol! *)
+
+    !^2 prover(sk, credential, verifierDID) |
+   
+    0.
+
+
+
+
+(** Specification: START Holder/Prover **)
+let holderU(sk, sk', issuerDID, verifierDID) (* input ~ what the agent starts with in private*) =
+    (* get Issuer DID *)
+    (* check issuerDID to be ok *)            
+    (* lookup pubkey of V *)         
+    let pk_i = getPubKey(issuerDID) in
+    (* mint session key pair *)        
+    new ssk;                          
+    (* mint a nonce *)
+    new n_p;
+    (* send authcrypt msg*)
+    let msg = (n_p,pk(ssk)) in
+    let msg_handshakeReq = aenc(sign(msg,ssk),pk_i) in
+    out(debugging, msg_handshakeReq);
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    let msg_handshakeResp = x in
+    (* authdecrypt msg *)
+    let msg = auth(adec(x,ssk),pk_i)   in (*<= ERROR*)
+    (* deconstruct msg=(n'_p,n_i,pk(ssk_i)) *)
+    let (n'_p,n_i,spk_i) = msg in
+    (* check nonce *)
+    if n'_p = n_p then
+    (* send authrypt msg /w own DID , proving to be in control of DID*)
+    let msg = sign((n_i,genDID(pk(sk),sk),issuerDID),sk) in
+    (* create Verifiable Request *)
+    let msg_did = aenc(sign(msg,ssk),spk_i) in
+    out(h, msg_did);
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    (* authdecrypt msg *)
+    let msg_credential = x in
+    (* let (credential, recipientDID, n_strongSecrecy) =  auth(adec(x,ssk),spk_i)   in  *)
+    let (credential, recipientDID) = auth(adec(x,ssk),spk_i)  in 
+    if recipientDID = genDID(pk(sk),sk) then
+    if getIssuerFromVC(credential) = issuerDID then
+    (* TODO validate credential *)
+    (* Prover about to complete protocol! *)
+    (
+    !^1 prover(sk, credential, verifierDID)
+    |
+    let credential' = sign(( genDID(pk(sk'),sk'), attr, genDID(pk(sk_issuer),sk_issuer)), sk_issuer)  in 
+    !^1 prover(sk', credential', verifierDID) 
+    ).
+
+
+    
+(** END Holder/Prover **)
+
+(** START Issuer **)
+let issuer(sk, attr, expectedDID) (* input ~ what the agent starts with in private*) =
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    let msg_handshakeReq = x in 
+    (* decrypt msg *)
+    let sgndMsg = adec(x,sk) in
+    (* get pub key *)
+    let (unauth_n_p,unauth_spk_p) = getMsg(sgndMsg) in
+    (* auth msg and deconstruct *)
+    let (n_p,spk_p) = auth(sgndMsg,unauth_spk_p) in 
+    (* mint session key pair *)        
+    new ssk;                          
+    (* mint a nonce *)
+    new n_i;
+    (* create a message *)
+    let msg = (n_p,n_i,pk(ssk)) in (* UNSURE if it would be better to sign with both, session and long? *)
+    let msg_handshakeResp = aenc(sign(msg,sk),spk_p) in
+    out(h,msg_handshakeResp); (* UNSURE signing with long-lived secret, is another signature with session secret necessary?*)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (**)
+    (* receive msg *)
+    in(h,x);
+    (* authdecrypt msg *)
+    let msg_did = x in
+    let msg = auth(adec(x,ssk),spk_p)  in 
+    (* deconstruct msg=(n'_i,proverDID,issuerDID) *)
+    let (unauth_n'_i,unauth_proverDID,unauth_recipientDID) = getMsg(msg) in
+    (* get prover pubkey *)
+    let pk_p = getPubKey(unauth_proverDID) in
+    (* auth msg and deconstruct *)
+    let (n'_i,proverDID,recipientDID) = auth(msg,pk_p) in 
+    (* check if actually talking to expected i.e. honest or dishonest *)
+    if proverDID = expectedDID then(*this is just for proverif, to model it s.t. secrecy check is only executed when proverDID is expceted. nobody cares if attacker knows some message that was explicitly and knowingly send to the attacker.*)
+    (* check nonce *)
+    if n'_i = n_i then 
+    (* check if issuer is actual recipient*)
+    if recipientDID = genDID(pk(sk),sk) then
+
+    (* issue new credential *)
+    let cred = sign((proverDID,attr, genDID(pk(sk),sk)), sk) in (* was issueVC *)
+    (* new n_strongSecrecy:bitstring; *)
+    (* let msg = (cred,proverDID,n_strongSecrecy) in *)
+    let msg = (cred,proverDID) in
+    let msg_cred = aenc(sign(msg,ssk),spk_p) in
+    out(h, msg_cred);
+
+    0.
+(** END Issuer **)
+
+(* END process macros *)
+
+(* SECRECY *)
+
+
+
+(* MAIN *)
+
+
+let SessionsU = (*use root process for setup *)
+    (*declare secret keys*)
+    new sk_prover1;
+    new sk_prover2;
+    new sk_verifier;
+    (*advertise public keys*)
+    out(key,pk(sk_verifier));
+    out(key,pk(sk_prover1));
+    out(key,pk(sk_prover2));
+    (*advertise DIDs*)
+    out(key,genDID(pk(sk_prover1),sk_prover1));
+    out(key,genDID(pk(sk_prover2),sk_prover2));
+    out(key,genDID(pk(sk_verifier),sk_verifier));
+    
+    (*assume verifier trusts issuer for asserting attribute*)
+    (* rule = (DID_prover , attribute , DID_issuer) *)
+    let acr1 = makeRule(  genDID(pk(sk_prover1),sk_prover1),   attr,   genDID(pk(sk_issuer),sk_issuer)  ) in (* where prover p is honest agent*)
+    (* rule = (DID_prover , attribute , DID_issuer) *)
+    let acr2 = makeRule(  genDID(pk(sk_prover2),sk_prover2),   attr,   genDID(pk(sk_issuer),sk_issuer)  ) in (* where prover p is honest agent*)
+
+    (*let agents dance*)
+    (
+        !^1 holder(sk_prover1,  genDID(pk(sk_issuer),sk_issuer), genDID(pk(sk_verifier),sk_verifier))
+        |
+        !^2 verifier(sk_verifier, acr1, acr2)
+    ).   
+    
+    
+let SessionsV = (*use root process for setup *)
+    (*declare secret keys*)
+    new sk_prover1;
+    new sk_prover2;
+    new sk_verifier;
+    (*advertise public keys*)
+    out(key,pk(sk_verifier));
+    out(key,pk(sk_prover1));
+    out(key,pk(sk_prover2));
+    (*advertise DIDs*)
+    out(key,genDID(pk(sk_prover1),sk_prover1));
+    out(key,genDID(pk(sk_prover2),sk_prover2));
+    out(key,genDID(pk(sk_verifier),sk_verifier));
+    
+    (*assume verifier trusts issuer for asserting attribute*)
+    (* rule = (DID_prover , attribute , DID_issuer) *)
+    let acr1 = makeRule(  genDID(pk(sk_prover1),sk_prover1),   attr,   genDID(pk(sk_issuer),sk_issuer)  ) in (* where prover p is honest agent*)
+    (* rule = (DID_prover , attribute , DID_issuer) *)
+    let acr2 = makeRule(  genDID(pk(sk_prover2),sk_prover2),   attr,   genDID(pk(sk_issuer),sk_issuer)  ) in (* where prover p is honest agent*)
+
+    (*let agents dance*)
+    (
+        !^1 holderU(sk_prover1, sk_prover2,  genDID(pk(sk_issuer),sk_issuer), genDID(pk(sk_verifier),sk_verifier))
+        |
+        !^2 verifier(sk_verifier, acr1, acr2)
+    ).    
+    
+    
+query session_equiv(SessionsU,SessionsV).

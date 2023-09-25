@@ -1,0 +1,2140 @@
+File "ssipv.pv", line 154, characters 11-14:
+Warning: identifier attr rebound.
+File "ssipv.pv", line 231, characters 14-17:
+Warning: identifier attr rebound.
+Process 0 (that is, the initial process):
+{1}new attr_2: bitstring;
+{2}out(h, attr_2);
+{3}new sk_I: SecretKey;
+{4}new sk_V: SecretKey;
+{5}new sk_P: SecretKey;
+{6}out(h, pk(sk_I));
+{7}out(h, pk(sk_V));
+{8}out(h, pk(sk_P));
+{9}let DID_I: DID = genDID(pk(sk_I),sk_I) in
+{10}let DID_V: DID = genDID(pk(sk_V),sk_V) in
+{11}let DID_P: DID = genDID(pk(sk_P),sk_P) in
+{12}let DID_E: DID = genDID(pk(sk_E),sk_E) in
+{13}out(h, DID_I);
+{14}out(h, DID_V);
+{15}out(h, DID_P);
+{16}out(h, DID_E);
+{17}let rule_I: bitstring = (attr,DID_I) in
+{18}let rule_E: bitstring = (attr,DID_E) in
+{19}let rule_I_2: bitstring = (attr_2,DID_I) in
+{20}let rule_E_2: bitstring = (attr_2,DID_E) in
+(
+    {21}!
+    {22}let sk_I_1: SecretKey = sk_I in
+    {23}let attr_1: bitstring = attr in
+    {24}let pk_P: PublicKey = pk(sk_P) in
+    {25}let talksOnlyToHonest: bool = true in
+    {26}in(h, m_0: bitstring);
+    {27}let ((n_p: bitstring,spk_P: PublicKey),sigVal_0: bitstring) = adec(m_0,sk_I_1) in
+    {28}if check((n_p,spk_P),sigVal_0,spk_P) then
+    {29}new ssk_I: SecretKey;
+    {30}new n_i: bitstring;
+    {31}let m'_1: bitstring = (n_p,n_i,pk(ssk_I)) in
+    {32}let m_1: bitstring = aenc((m'_1,sig(m'_1,sk_I_1)),spk_P) in
+    {33}out(h, m_1);
+    {34}in(h, m_2: bitstring);
+    {35}let (((n'_i: bitstring,DID'_P: DID,DID'_I: DID,n_h: bitstring),sigVal_P: bitstring),sigVal_2: bitstring) = adec(m_2,ssk_I) in
+    {36}if check(((n'_i,DID'_P,DID'_I,n_h),sigVal_P),sigVal_2,spk_P) then
+    {37}if check((n'_i,DID'_P,DID'_I,n_h),sigVal_P,pk_P) then
+    {38}if ((n'_i,DID'_P,DID'_I) = (n_i,DID_P,DID_I)) then
+    {39}let claims: bitstring = (attr_1,DID_I) in
+    {40}let VC: bitstring = (claims,sig(claims,sk_I_1)) in
+    {41}let m'_3: bitstring = ((VC,DID_P,n_h),sig((VC,DID_P,n_h),sk_I_1)) in
+    {42}let m_3: bitstring = aenc((m'_3,sig(m'_3,ssk_I)),spk_P) in
+    {43}event auth_IssuerSendsLastMessageToHolder(m_0,m_1,m_2,m_3);
+    {44}out(h, m_3);
+    {45}out(h, Issuer_Completes);
+    {46}if talksOnlyToHonest then
+    (
+        {47}event auth_IssuerCompletesProtocol(m_0,m_1,m_2)
+    ) | (
+        {48}out(ch((m'_1,sig(m'_1,sk_I_1))), m'_1_fromIssuer)
+    ) | (
+        {49}out(ch(VC), cred_fromIssuer)
+    ) | (
+        {50}out(ch((m'_3,sig(m'_3,ssk_I))), m'_3_fromIssuer)
+    )
+) | (
+    {51}!
+    {52}let sk_I_2: SecretKey = sk_I in
+    {53}let attr_3: bitstring = attr_2 in
+    {54}let pk_P_1: PublicKey = pk(sk_E) in
+    {55}let talksOnlyToHonest_1: bool = false in
+    {56}in(h, m_0_1: bitstring);
+    {57}let ((n_p_1: bitstring,spk_P_1: PublicKey),sigVal_0_1: bitstring) = adec(m_0_1,sk_I_2) in
+    {58}if check((n_p_1,spk_P_1),sigVal_0_1,spk_P_1) then
+    {59}new ssk_I_1: SecretKey;
+    {60}new n_i_1: bitstring;
+    {61}let m': bitstring = (n_p_1,n_i_1,pk(ssk_I_1)) in
+    {62}let m: bitstring = aenc((m',sig(m',sk_I_2)),spk_P_1) in
+    {63}out(h, m);
+    {64}in(h, m_4: bitstring);
+    {65}let (((n'_i_1: bitstring,DID'_P_1: DID,DID'_I_1: DID,n_h_1: bitstring),sigVal_P_1: bitstring),sigVal: bitstring) = adec(m_4,ssk_I_1) in
+    {66}if check(((n'_i_1,DID'_P_1,DID'_I_1,n_h_1),sigVal_P_1),sigVal,spk_P_1) then
+    {67}if check((n'_i_1,DID'_P_1,DID'_I_1,n_h_1),sigVal_P_1,pk_P_1) then
+    {68}if ((n'_i_1,DID'_P_1,DID'_I_1) = (n_i_1,DID_E,DID_I)) then
+    {69}let claims_1: bitstring = (attr_3,DID_I) in
+    {70}let VC_1: bitstring = (claims_1,sig(claims_1,sk_I_2)) in
+    {71}let m'_2: bitstring = ((VC_1,DID_E,n_h_1),sig((VC_1,DID_E,n_h_1),sk_I_2)) in
+    {72}let m_5: bitstring = aenc((m'_2,sig(m'_2,ssk_I_1)),spk_P_1) in
+    {73}event auth_IssuerSendsLastMessageToHolder(m_0_1,m,m_4,m_5);
+    {74}out(h, m_5);
+    {75}out(h, Issuer_Completes);
+    {76}if talksOnlyToHonest_1 then
+    (
+        {77}event auth_IssuerCompletesProtocol(m_0_1,m,m_4)
+    ) | (
+        {78}out(ch((m',sig(m',sk_I_2))), m'_1_fromIssuer)
+    ) | (
+        {79}out(ch(VC_1), cred_fromIssuer)
+    ) | (
+        {80}out(ch((m'_2,sig(m'_2,ssk_I_1))), m'_3_fromIssuer)
+    )
+) | (
+    {81}!
+    {82}let sk_P_1: SecretKey = sk_P in
+    {83}let pk_I: PublicKey = pk(sk_I) in
+    {84}let pk_V: PublicKey = pk(sk_V) in
+    {85}let talksOnlyToHonest_2: bool = true in
+    {86}new ssk_P: SecretKey;
+    {87}new n_p_2: bitstring;
+    {88}let m'_0: bitstring = (n_p_2,pk(ssk_P)) in
+    {89}let m_0_2: bitstring = aenc((m'_0,sig(m'_0,ssk_P)),pk_I) in
+    {90}out(h, m_0_2);
+    {91}in(h, m_6: bitstring);
+    {92}let ((n'_p: bitstring,n_i_2: bitstring,spk_I: PublicKey),sigVal_1: bitstring) = adec(m_6,ssk_P) in
+    {93}if check((n'_p,n_i_2,spk_I),sigVal_1,pk_I) then
+    {94}if (n'_p = n_p_2) then
+    {95}new n_h_2: bitstring;
+    {96}let m''_2: bitstring = (n_i_2,DID_P,DID_I,n_h_2) in
+    {97}let m'_4: bitstring = (m''_2,sig(m''_2,sk_P_1)) in
+    {98}let m_7: bitstring = aenc((m'_4,sig(m'_4,ssk_P)),spk_I) in
+    {99}event auth_HolderSendsLastMessageToIssuer(m_0_2,m_6,m_7);
+    {100}out(h, m_7);
+    {101}in(h, m_8: bitstring);
+    {102}let (((((attr_4: bitstring,DID'_I_2: DID),sigVal_I: bitstring),DID''_P: DID,n'_h: bitstring),sigVal'_I: bitstring),sigVal_3: bitstring) = adec(m_8,ssk_P) in
+    {103}if check(((((attr_4,DID'_I_2),sigVal_I),DID''_P,n'_h),sigVal'_I),sigVal_3,spk_I) then
+    {104}if check((((attr_4,DID'_I_2),sigVal_I),DID''_P,n'_h),sigVal'_I,pk_I) then
+    {105}if ((DID''_P,n'_h) = (DID_P,n_h_2)) then
+    {106}if check((attr_4,DID'_I_2),sigVal_I,pk_I) then
+    {107}if (DID'_I_2 = DID_I) then
+    {108}out(h, Holder_Completes);
+    (
+        {109}!
+        {110}let VC_2: bitstring = ((attr_4,DID'_I_2),sigVal_I) in
+        {111}new ssk_P_1: SecretKey;
+        {112}new n_p_3: bitstring;
+        {113}let m'_5: bitstring = (n_p_3,pk(ssk_P_1)) in
+        {114}let m_9: bitstring = aenc((m'_5,sig(m'_5,ssk_P_1)),pk_V) in
+        {115}out(h, m_9);
+        {116}in(h, m_10: bitstring);
+        {117}let ((n'_p_1: bitstring,n_v: bitstring,spk_V: PublicKey),sigVal_5: bitstring) = adec(m_10,ssk_P_1) in
+        {118}if check((n'_p_1,n_v,spk_V),sigVal_5,pk_V) then
+        {119}if (n'_p_1 = n_p_3) then
+        {120}let m'_6: bitstring = (n_v,uri) in
+        {121}let m_11: bitstring = aenc((m'_6,sig(m'_6,ssk_P_1)),spk_V) in
+        {122}out(h, m_11);
+        {123}in(h, m_12: bitstring);
+        {124}let ((n_c: bitstring,rule: bitstring),sigVal_7: bitstring) = adec(m_12,ssk_P_1) in
+        {125}if check((n_c,rule),sigVal_7,spk_V) then
+        {126}let (claims_2: bitstring,sigVal_VC: bitstring) = VC_2 in
+        {127}if (claims_2 = rule) then
+        {128}let ph: bitstring = (n_c,DID_V) in
+        {129}new randomness: bitstring;
+        {130}let poks: bitstring = proofGen(VC_2,ph,pk_I,randomness) in
+        {131}let m'_8: bitstring = (claims_2,poks) in
+        {132}let m_13: bitstring = aenc((m'_8,sig(m'_8,ssk_P_1)),spk_V) in
+        {133}event auth_ProverSendsLastMessageToVerifier(m_9,m_10,m_11,m_12,m_13);
+        {134}event auth_ProverSendsLastMessageToVerifierInProtocolFull(m_0_2,m_6,m_7,m_8,m_9,m_10,m_11,m_12,m_13);
+        {135}out(h, m_13);
+        {136}in(h, m_14: bitstring);
+        {137}let ((tkn_access: bitstring,sigVal_tkn: bitstring),sigVal_9: bitstring) = adec(m_14,ssk_P_1) in
+        {138}if check((tkn_access,sigVal_tkn),sigVal_9,spk_V) then
+        {139}if check(tkn_access,sigVal_tkn,pk_V) then
+        {140}out(h, Prover_Completes);
+        {141}if talksOnlyToHonest_2 then
+        (
+            {142}event auth_ProverCompletesProtocol(m_9,m_10,m_11,m_12,m_13,m_14)
+        ) | (
+            {143}out(ch((m'_5,sig(m'_5,ssk_P_1))), m'_4_fromProver)
+        ) | (
+            {144}out(ch((m'_6,sig(m'_6,ssk_P_1))), m'_6_fromProver)
+        ) | (
+            {145}out(ch((m'_8,sig(m'_8,ssk_P_1))), m'_8_fromProver)
+        ) | (
+            {146}out(ch(VC_2), cred_fromProver)
+        ) | (
+            {147}out(ch(tkn_access), access_token_fromProver)
+        )
+    ) | (
+        {148}if talksOnlyToHonest_2 then
+        (
+            {149}event auth_HolderCompletesProtocol(m_0_2,m_6,m_7,m_8)
+        ) | (
+            {150}out(ch((m'_0,sig(m'_0,ssk_P))), m'_0_fromHolder)
+        ) | (
+            {151}out(ch((m'_4,sig(m'_4,ssk_P))), m'_2_fromHolder)
+        ) | (
+            {152}out(ch(((attr_4,DID'_I_2),sigVal_I)), cred_fromHolder)
+        )
+    )
+) | (
+    {153}!
+    {154}let sk_P_2: SecretKey = sk_P in
+    {155}let pk_I_1: PublicKey = pk(sk_I) in
+    {156}let pk_V_1: PublicKey = pk(sk_E) in
+    {157}let talksOnlyToHonest_3: bool = false in
+    {158}new ssk_P_2: SecretKey;
+    {159}new n_p_4: bitstring;
+    {160}let m'_0_1: bitstring = (n_p_4,pk(ssk_P_2)) in
+    {161}let m_0_3: bitstring = aenc((m'_0_1,sig(m'_0_1,ssk_P_2)),pk_I_1) in
+    {162}out(h, m_0_3);
+    {163}in(h, m_15: bitstring);
+    {164}let ((n'_p_2: bitstring,n_i_3: bitstring,spk_I_1: PublicKey),sigVal_4: bitstring) = adec(m_15,ssk_P_2) in
+    {165}if check((n'_p_2,n_i_3,spk_I_1),sigVal_4,pk_I_1) then
+    {166}if (n'_p_2 = n_p_4) then
+    {167}new n_h_3: bitstring;
+    {168}let m'': bitstring = (n_i_3,DID_P,DID_I,n_h_3) in
+    {169}let m'_7: bitstring = (m'',sig(m'',sk_P_2)) in
+    {170}let m_16: bitstring = aenc((m'_7,sig(m'_7,ssk_P_2)),spk_I_1) in
+    {171}event auth_HolderSendsLastMessageToIssuer(m_0_3,m_15,m_16);
+    {172}out(h, m_16);
+    {173}in(h, m_17: bitstring);
+    {174}let (((((attr_5: bitstring,DID'_I_3: DID),sigVal_I_1: bitstring),DID''_P_1: DID,n'_h_1: bitstring),sigVal'_I_1: bitstring),sigVal_6: bitstring) = adec(m_17,ssk_P_2) in
+    {175}if check(((((attr_5,DID'_I_3),sigVal_I_1),DID''_P_1,n'_h_1),sigVal'_I_1),sigVal_6,spk_I_1) then
+    {176}if check((((attr_5,DID'_I_3),sigVal_I_1),DID''_P_1,n'_h_1),sigVal'_I_1,pk_I_1) then
+    {177}if ((DID''_P_1,n'_h_1) = (DID_P,n_h_3)) then
+    {178}if check((attr_5,DID'_I_3),sigVal_I_1,pk_I_1) then
+    {179}if (DID'_I_3 = DID_I) then
+    {180}out(h, Holder_Completes);
+    (
+        {181}!
+        {182}let VC_3: bitstring = ((attr_5,DID'_I_3),sigVal_I_1) in
+        {183}new ssk_P_3: SecretKey;
+        {184}new n_p_5: bitstring;
+        {185}let m'_9: bitstring = (n_p_5,pk(ssk_P_3)) in
+        {186}let m_18: bitstring = aenc((m'_9,sig(m'_9,ssk_P_3)),pk_V_1) in
+        {187}out(h, m_18);
+        {188}in(h, m_19: bitstring);
+        {189}let ((n'_p_3: bitstring,n_v_1: bitstring,spk_V_1: PublicKey),sigVal_8: bitstring) = adec(m_19,ssk_P_3) in
+        {190}if check((n'_p_3,n_v_1,spk_V_1),sigVal_8,pk_V_1) then
+        {191}if (n'_p_3 = n_p_5) then
+        {192}let m'_10: bitstring = (n_v_1,uri) in
+        {193}let m_20: bitstring = aenc((m'_10,sig(m'_10,ssk_P_3)),spk_V_1) in
+        {194}out(h, m_20);
+        {195}in(h, m_21: bitstring);
+        {196}let ((n_c_1: bitstring,rule_1: bitstring),sigVal_10: bitstring) = adec(m_21,ssk_P_3) in
+        {197}if check((n_c_1,rule_1),sigVal_10,spk_V_1) then
+        {198}let (claims_3: bitstring,sigVal_VC_1: bitstring) = VC_3 in
+        {199}if (claims_3 = rule_1) then
+        {200}let ph_1: bitstring = (n_c_1,DID_E) in
+        {201}new randomness_1: bitstring;
+        {202}let poks_1: bitstring = proofGen(VC_3,ph_1,pk_I_1,randomness_1) in
+        {203}let m'_11: bitstring = (claims_3,poks_1) in
+        {204}let m_22: bitstring = aenc((m'_11,sig(m'_11,ssk_P_3)),spk_V_1) in
+        {205}event auth_ProverSendsLastMessageToVerifier(m_18,m_19,m_20,m_21,m_22);
+        {206}event auth_ProverSendsLastMessageToVerifierInProtocolFull(m_0_3,m_15,m_16,m_17,m_18,m_19,m_20,m_21,m_22);
+        {207}out(h, m_22);
+        {208}in(h, m_23: bitstring);
+        {209}let ((tkn_access_1: bitstring,sigVal_tkn_1: bitstring),sigVal_11: bitstring) = adec(m_23,ssk_P_3) in
+        {210}if check((tkn_access_1,sigVal_tkn_1),sigVal_11,spk_V_1) then
+        {211}if check(tkn_access_1,sigVal_tkn_1,pk_V_1) then
+        {212}out(h, Prover_Completes);
+        {213}if talksOnlyToHonest_3 then
+        (
+            {214}event auth_ProverCompletesProtocol(m_18,m_19,m_20,m_21,m_22,m_23)
+        ) | (
+            {215}out(ch((m'_9,sig(m'_9,ssk_P_3))), m'_4_fromProver)
+        ) | (
+            {216}out(ch((m'_10,sig(m'_10,ssk_P_3))), m'_6_fromProver)
+        ) | (
+            {217}out(ch((m'_11,sig(m'_11,ssk_P_3))), m'_8_fromProver)
+        ) | (
+            {218}out(ch(VC_3), cred_fromProver)
+        ) | (
+            {219}out(ch(tkn_access_1), access_token_fromProver)
+        )
+    ) | (
+        {220}if talksOnlyToHonest_3 then
+        (
+            {221}event auth_HolderCompletesProtocol(m_0_3,m_15,m_16,m_17)
+        ) | (
+            {222}out(ch((m'_0_1,sig(m'_0_1,ssk_P_2))), m'_0_fromHolder)
+        ) | (
+            {223}out(ch((m'_7,sig(m'_7,ssk_P_2))), m'_2_fromHolder)
+        ) | (
+            {224}out(ch(((attr_5,DID'_I_3),sigVal_I_1)), cred_fromHolder)
+        )
+    )
+) | (
+    {225}!
+    {226}let sk_P_3: SecretKey = sk_P in
+    {227}let pk_I_2: PublicKey = pk(sk_E) in
+    {228}let pk_V_2: PublicKey = pk(sk_V) in
+    {229}let talksOnlyToHonest_4: bool = false in
+    {230}new ssk_P_4: SecretKey;
+    {231}new n_p_6: bitstring;
+    {232}let m'_0_2: bitstring = (n_p_6,pk(ssk_P_4)) in
+    {233}let m_0_4: bitstring = aenc((m'_0_2,sig(m'_0_2,ssk_P_4)),pk_I_2) in
+    {234}out(h, m_0_4);
+    {235}in(h, m_24: bitstring);
+    {236}let ((n'_p_4: bitstring,n_i_4: bitstring,spk_I_2: PublicKey),sigVal_12: bitstring) = adec(m_24,ssk_P_4) in
+    {237}if check((n'_p_4,n_i_4,spk_I_2),sigVal_12,pk_I_2) then
+    {238}if (n'_p_4 = n_p_6) then
+    {239}new n_h_4: bitstring;
+    {240}let m''_1: bitstring = (n_i_4,DID_P,DID_E,n_h_4) in
+    {241}let m'_12: bitstring = (m''_1,sig(m''_1,sk_P_3)) in
+    {242}let m_25: bitstring = aenc((m'_12,sig(m'_12,ssk_P_4)),spk_I_2) in
+    {243}event auth_HolderSendsLastMessageToIssuer(m_0_4,m_24,m_25);
+    {244}out(h, m_25);
+    {245}in(h, m_26: bitstring);
+    {246}let (((((attr_6: bitstring,DID'_I_4: DID),sigVal_I_2: bitstring),DID''_P_2: DID,n'_h_2: bitstring),sigVal'_I_2: bitstring),sigVal_13: bitstring) = adec(m_26,ssk_P_4) in
+    {247}if check(((((attr_6,DID'_I_4),sigVal_I_2),DID''_P_2,n'_h_2),sigVal'_I_2),sigVal_13,spk_I_2) then
+    {248}if check((((attr_6,DID'_I_4),sigVal_I_2),DID''_P_2,n'_h_2),sigVal'_I_2,pk_I_2) then
+    {249}if ((DID''_P_2,n'_h_2) = (DID_P,n_h_4)) then
+    {250}if check((attr_6,DID'_I_4),sigVal_I_2,pk_I_2) then
+    {251}if (DID'_I_4 = DID_E) then
+    {252}out(h, Holder_Completes);
+    (
+        {253}!
+        {254}let VC_4: bitstring = ((attr_6,DID'_I_4),sigVal_I_2) in
+        {255}new ssk_P_5: SecretKey;
+        {256}new n_p_7: bitstring;
+        {257}let m'_13: bitstring = (n_p_7,pk(ssk_P_5)) in
+        {258}let m_27: bitstring = aenc((m'_13,sig(m'_13,ssk_P_5)),pk_V_2) in
+        {259}out(h, m_27);
+        {260}in(h, m_28: bitstring);
+        {261}let ((n'_p_5: bitstring,n_v_2: bitstring,spk_V_2: PublicKey),sigVal_14: bitstring) = adec(m_28,ssk_P_5) in
+        {262}if check((n'_p_5,n_v_2,spk_V_2),sigVal_14,pk_V_2) then
+        {263}if (n'_p_5 = n_p_7) then
+        {264}let m'_14: bitstring = (n_v_2,uri) in
+        {265}let m_29: bitstring = aenc((m'_14,sig(m'_14,ssk_P_5)),spk_V_2) in
+        {266}out(h, m_29);
+        {267}in(h, m_30: bitstring);
+        {268}let ((n_c_2: bitstring,rule_2: bitstring),sigVal_15: bitstring) = adec(m_30,ssk_P_5) in
+        {269}if check((n_c_2,rule_2),sigVal_15,spk_V_2) then
+        {270}let (claims_4: bitstring,sigVal_VC_2: bitstring) = VC_4 in
+        {271}if (claims_4 = rule_2) then
+        {272}let ph_2: bitstring = (n_c_2,DID_V) in
+        {273}new randomness_2: bitstring;
+        {274}let poks_2: bitstring = proofGen(VC_4,ph_2,pk_I_2,randomness_2) in
+        {275}let m'_15: bitstring = (claims_4,poks_2) in
+        {276}let m_31: bitstring = aenc((m'_15,sig(m'_15,ssk_P_5)),spk_V_2) in
+        {277}event auth_ProverSendsLastMessageToVerifier(m_27,m_28,m_29,m_30,m_31);
+        {278}event auth_ProverSendsLastMessageToVerifierInProtocolFull(m_0_4,m_24,m_25,m_26,m_27,m_28,m_29,m_30,m_31);
+        {279}out(h, m_31);
+        {280}in(h, m_32: bitstring);
+        {281}let ((tkn_access_2: bitstring,sigVal_tkn_2: bitstring),sigVal_16: bitstring) = adec(m_32,ssk_P_5) in
+        {282}if check((tkn_access_2,sigVal_tkn_2),sigVal_16,spk_V_2) then
+        {283}if check(tkn_access_2,sigVal_tkn_2,pk_V_2) then
+        {284}out(h, Prover_Completes);
+        {285}if talksOnlyToHonest_4 then
+        (
+            {286}event auth_ProverCompletesProtocol(m_27,m_28,m_29,m_30,m_31,m_32)
+        ) | (
+            {287}out(ch((m'_13,sig(m'_13,ssk_P_5))), m'_4_fromProver)
+        ) | (
+            {288}out(ch((m'_14,sig(m'_14,ssk_P_5))), m'_6_fromProver)
+        ) | (
+            {289}out(ch((m'_15,sig(m'_15,ssk_P_5))), m'_8_fromProver)
+        ) | (
+            {290}out(ch(VC_4), cred_fromProver)
+        ) | (
+            {291}out(ch(tkn_access_2), access_token_fromProver)
+        )
+    ) | (
+        {292}if talksOnlyToHonest_4 then
+        (
+            {293}event auth_HolderCompletesProtocol(m_0_4,m_24,m_25,m_26)
+        ) | (
+            {294}out(ch((m'_0_2,sig(m'_0_2,ssk_P_4))), m'_0_fromHolder)
+        ) | (
+            {295}out(ch((m'_12,sig(m'_12,ssk_P_4))), m'_2_fromHolder)
+        ) | (
+            {296}out(ch(((attr_6,DID'_I_4),sigVal_I_2)), cred_fromHolder)
+        )
+    )
+) | (
+    {297}!
+    {298}let sk_P_4: SecretKey = sk_P in
+    {299}let pk_I_3: PublicKey = pk(sk_E) in
+    {300}let pk_V_3: PublicKey = pk(sk_E) in
+    {301}let talksOnlyToHonest_5: bool = false in
+    {302}new ssk_P_6: SecretKey;
+    {303}new n_p_8: bitstring;
+    {304}let m'_0_3: bitstring = (n_p_8,pk(ssk_P_6)) in
+    {305}let m_0_5: bitstring = aenc((m'_0_3,sig(m'_0_3,ssk_P_6)),pk_I_3) in
+    {306}out(h, m_0_5);
+    {307}in(h, m_33: bitstring);
+    {308}let ((n'_p_6: bitstring,n_i_5: bitstring,spk_I_3: PublicKey),sigVal_17: bitstring) = adec(m_33,ssk_P_6) in
+    {309}if check((n'_p_6,n_i_5,spk_I_3),sigVal_17,pk_I_3) then
+    {310}if (n'_p_6 = n_p_8) then
+    {311}new n_h_5: bitstring;
+    {312}let m''_3: bitstring = (n_i_5,DID_P,DID_E,n_h_5) in
+    {313}let m'_16: bitstring = (m''_3,sig(m''_3,sk_P_4)) in
+    {314}let m_34: bitstring = aenc((m'_16,sig(m'_16,ssk_P_6)),spk_I_3) in
+    {315}event auth_HolderSendsLastMessageToIssuer(m_0_5,m_33,m_34);
+    {316}out(h, m_34);
+    {317}in(h, m_35: bitstring);
+    {318}let (((((attr_7: bitstring,DID'_I_5: DID),sigVal_I_3: bitstring),DID''_P_3: DID,n'_h_3: bitstring),sigVal'_I_3: bitstring),sigVal_18: bitstring) = adec(m_35,ssk_P_6) in
+    {319}if check(((((attr_7,DID'_I_5),sigVal_I_3),DID''_P_3,n'_h_3),sigVal'_I_3),sigVal_18,spk_I_3) then
+    {320}if check((((attr_7,DID'_I_5),sigVal_I_3),DID''_P_3,n'_h_3),sigVal'_I_3,pk_I_3) then
+    {321}if ((DID''_P_3,n'_h_3) = (DID_P,n_h_5)) then
+    {322}if check((attr_7,DID'_I_5),sigVal_I_3,pk_I_3) then
+    {323}if (DID'_I_5 = DID_E) then
+    {324}out(h, Holder_Completes);
+    (
+        {325}!
+        {326}let VC_5: bitstring = ((attr_7,DID'_I_5),sigVal_I_3) in
+        {327}new ssk_P_7: SecretKey;
+        {328}new n_p_9: bitstring;
+        {329}let m'_17: bitstring = (n_p_9,pk(ssk_P_7)) in
+        {330}let m_36: bitstring = aenc((m'_17,sig(m'_17,ssk_P_7)),pk_V_3) in
+        {331}out(h, m_36);
+        {332}in(h, m_37: bitstring);
+        {333}let ((n'_p_7: bitstring,n_v_3: bitstring,spk_V_3: PublicKey),sigVal_19: bitstring) = adec(m_37,ssk_P_7) in
+        {334}if check((n'_p_7,n_v_3,spk_V_3),sigVal_19,pk_V_3) then
+        {335}if (n'_p_7 = n_p_9) then
+        {336}let m'_18: bitstring = (n_v_3,uri) in
+        {337}let m_38: bitstring = aenc((m'_18,sig(m'_18,ssk_P_7)),spk_V_3) in
+        {338}out(h, m_38);
+        {339}in(h, m_39: bitstring);
+        {340}let ((n_c_3: bitstring,rule_3: bitstring),sigVal_20: bitstring) = adec(m_39,ssk_P_7) in
+        {341}if check((n_c_3,rule_3),sigVal_20,spk_V_3) then
+        {342}let (claims_5: bitstring,sigVal_VC_3: bitstring) = VC_5 in
+        {343}if (claims_5 = rule_3) then
+        {344}let ph_3: bitstring = (n_c_3,DID_E) in
+        {345}new randomness_3: bitstring;
+        {346}let poks_3: bitstring = proofGen(VC_5,ph_3,pk_I_3,randomness_3) in
+        {347}let m'_19: bitstring = (claims_5,poks_3) in
+        {348}let m_40: bitstring = aenc((m'_19,sig(m'_19,ssk_P_7)),spk_V_3) in
+        {349}event auth_ProverSendsLastMessageToVerifier(m_36,m_37,m_38,m_39,m_40);
+        {350}event auth_ProverSendsLastMessageToVerifierInProtocolFull(m_0_5,m_33,m_34,m_35,m_36,m_37,m_38,m_39,m_40);
+        {351}out(h, m_40);
+        {352}in(h, m_41: bitstring);
+        {353}let ((tkn_access_3: bitstring,sigVal_tkn_3: bitstring),sigVal_21: bitstring) = adec(m_41,ssk_P_7) in
+        {354}if check((tkn_access_3,sigVal_tkn_3),sigVal_21,spk_V_3) then
+        {355}if check(tkn_access_3,sigVal_tkn_3,pk_V_3) then
+        {356}out(h, Prover_Completes);
+        {357}if talksOnlyToHonest_5 then
+        (
+            {358}event auth_ProverCompletesProtocol(m_36,m_37,m_38,m_39,m_40,m_41)
+        ) | (
+            {359}out(ch((m'_17,sig(m'_17,ssk_P_7))), m'_4_fromProver)
+        ) | (
+            {360}out(ch((m'_18,sig(m'_18,ssk_P_7))), m'_6_fromProver)
+        ) | (
+            {361}out(ch((m'_19,sig(m'_19,ssk_P_7))), m'_8_fromProver)
+        ) | (
+            {362}out(ch(VC_5), cred_fromProver)
+        ) | (
+            {363}out(ch(tkn_access_3), access_token_fromProver)
+        )
+    ) | (
+        {364}if talksOnlyToHonest_5 then
+        (
+            {365}event auth_HolderCompletesProtocol(m_0_5,m_33,m_34,m_35)
+        ) | (
+            {366}out(ch((m'_0_3,sig(m'_0_3,ssk_P_6))), m'_0_fromHolder)
+        ) | (
+            {367}out(ch((m'_16,sig(m'_16,ssk_P_6))), m'_2_fromHolder)
+        ) | (
+            {368}out(ch(((attr_7,DID'_I_5),sigVal_I_3)), cred_fromHolder)
+        )
+    )
+) | (
+    {369}!
+    {370}let sk_V_1: SecretKey = sk_V in
+    {371}let pk_I_4: PublicKey = pk(sk_I) in
+    {372}let talksOnlyToHonest_6: bool = true in
+    {373}let (attr_8: bitstring,DID_I_1: DID) = rule_I in
+    {374}in(h, m_42: bitstring);
+    {375}let ((n_p_10: bitstring,spk_P_2: PublicKey),sigVal_22: bitstring) = adec(m_42,sk_V_1) in
+    {376}if check((n_p_10,spk_P_2),sigVal_22,spk_P_2) then
+    {377}new ssk_V: SecretKey;
+    {378}new n_v_4: bitstring;
+    {379}let m'_20: bitstring = (n_p_10,n_v_4,pk(ssk_V)) in
+    {380}let m_43: bitstring = aenc((m'_20,sig(m'_20,sk_V_1)),spk_P_2) in
+    {381}out(h, m_43);
+    {382}in(h, m_44: bitstring);
+    {383}let ((n'_v: bitstring,uri': bitstring),sigVal_23: bitstring) = adec(m_44,ssk_V) in
+    {384}if check((n'_v,uri'),sigVal_23,spk_P_2) then
+    {385}if ((n'_v,uri') = (n_v_4,uri)) then
+    {386}new n_c_4: bitstring;
+    {387}let m'_21: bitstring = (n_c_4,rule_I) in
+    {388}let m_45: bitstring = aenc((m'_21,sig(m'_21,ssk_V)),spk_P_2) in
+    {389}out(h, m_45);
+    {390}in(h, m_46: bitstring);
+    {391}let (((attr': bitstring,DID'_I_6: DID),poks_4: bitstring),sigVal_24: bitstring) = adec(m_46,ssk_V) in
+    {392}if check(((attr',DID'_I_6),poks_4),sigVal_24,spk_P_2) then
+    {393}let ph_4: bitstring = (n_c_4,DID_V) in
+    {394}if proofVerify((attr',DID'_I_6),poks_4,ph_4,pk_I_4) then
+    {395}if ((attr',DID'_I_6) = (attr_8,DID_I_1)) then
+    {396}new tkn_access_4: bitstring;
+    {397}let m'_22: bitstring = (tkn_access_4,sig(tkn_access_4,sk_V_1)) in
+    {398}let m_47: bitstring = aenc((m'_22,sig(m'_22,ssk_V)),spk_P_2) in
+    {399}event auth_VerifierSendsLastMessageToProver(m_42,m_43,m_44,m_45,m_46,m_47);
+    {400}out(h, m_47);
+    {401}out(h, Verifier_Completes);
+    {402}if talksOnlyToHonest_6 then
+    (
+        {403}event auth_VerifierCompletesProtocol(m_42,m_43,m_44,m_45,m_46)
+    ) | (
+        {404}out(ch((m'_20,sig(m'_20,sk_V_1))), m'_5_fromVerifier)
+    ) | (
+        {405}out(ch(rule_I), rule_fromVerifier)
+    ) | (
+        {406}out(ch((m'_21,sig(m'_21,ssk_V))), m'_7_fromVerifier)
+    ) | (
+        {407}out(ch((m'_22,sig(m'_22,ssk_V))), m'_9_fromVerifier)
+    ) | (
+        {408}out(ch(tkn_access_4), access_token_fromVerifier)
+    )
+) | (
+    {409}!
+    {410}let sk_V_2: SecretKey = sk_V in
+    {411}let pk_I_5: PublicKey = pk(sk_E) in
+    {412}let talksOnlyToHonest_7: bool = false in
+    {413}let (attr_9: bitstring,DID_I_2: DID) = rule_E in
+    {414}in(h, m_48: bitstring);
+    {415}let ((n_p_11: bitstring,spk_P_3: PublicKey),sigVal_25: bitstring) = adec(m_48,sk_V_2) in
+    {416}if check((n_p_11,spk_P_3),sigVal_25,spk_P_3) then
+    {417}new ssk_V_1: SecretKey;
+    {418}new n_v_5: bitstring;
+    {419}let m'_23: bitstring = (n_p_11,n_v_5,pk(ssk_V_1)) in
+    {420}let m_49: bitstring = aenc((m'_23,sig(m'_23,sk_V_2)),spk_P_3) in
+    {421}out(h, m_49);
+    {422}in(h, m_50: bitstring);
+    {423}let ((n'_v_1: bitstring,uri'_1: bitstring),sigVal_26: bitstring) = adec(m_50,ssk_V_1) in
+    {424}if check((n'_v_1,uri'_1),sigVal_26,spk_P_3) then
+    {425}if ((n'_v_1,uri'_1) = (n_v_5,uri)) then
+    {426}new n_c_5: bitstring;
+    {427}let m'_24: bitstring = (n_c_5,rule_E) in
+    {428}let m_51: bitstring = aenc((m'_24,sig(m'_24,ssk_V_1)),spk_P_3) in
+    {429}out(h, m_51);
+    {430}in(h, m_52: bitstring);
+    {431}let (((attr'_1: bitstring,DID'_I_7: DID),poks_5: bitstring),sigVal_27: bitstring) = adec(m_52,ssk_V_1) in
+    {432}if check(((attr'_1,DID'_I_7),poks_5),sigVal_27,spk_P_3) then
+    {433}let ph_5: bitstring = (n_c_5,DID_V) in
+    {434}if proofVerify((attr'_1,DID'_I_7),poks_5,ph_5,pk_I_5) then
+    {435}if ((attr'_1,DID'_I_7) = (attr_9,DID_I_2)) then
+    {436}new tkn_access_5: bitstring;
+    {437}let m'_25: bitstring = (tkn_access_5,sig(tkn_access_5,sk_V_2)) in
+    {438}let m_53: bitstring = aenc((m'_25,sig(m'_25,ssk_V_1)),spk_P_3) in
+    {439}event auth_VerifierSendsLastMessageToProver(m_48,m_49,m_50,m_51,m_52,m_53);
+    {440}out(h, m_53);
+    {441}out(h, Verifier_Completes);
+    {442}if talksOnlyToHonest_7 then
+    (
+        {443}event auth_VerifierCompletesProtocol(m_48,m_49,m_50,m_51,m_52)
+    ) | (
+        {444}out(ch((m'_23,sig(m'_23,sk_V_2))), m'_5_fromVerifier)
+    ) | (
+        {445}out(ch(rule_E), rule_fromVerifier)
+    ) | (
+        {446}out(ch((m'_24,sig(m'_24,ssk_V_1))), m'_7_fromVerifier)
+    ) | (
+        {447}out(ch((m'_25,sig(m'_25,ssk_V_1))), m'_9_fromVerifier)
+    ) | (
+        {448}out(ch(tkn_access_5), access_token_fromVerifier)
+    )
+) | (
+    {449}!
+    {450}let sk_V_3: SecretKey = sk_V in
+    {451}let pk_I_6: PublicKey = pk(sk_I) in
+    {452}let talksOnlyToHonest_8: bool = false in
+    {453}let (attr_10: bitstring,DID_I_3: DID) = rule_I_2 in
+    {454}in(h, m_54: bitstring);
+    {455}let ((n_p_12: bitstring,spk_P_4: PublicKey),sigVal_28: bitstring) = adec(m_54,sk_V_3) in
+    {456}if check((n_p_12,spk_P_4),sigVal_28,spk_P_4) then
+    {457}new ssk_V_2: SecretKey;
+    {458}new n_v_6: bitstring;
+    {459}let m'_26: bitstring = (n_p_12,n_v_6,pk(ssk_V_2)) in
+    {460}let m_55: bitstring = aenc((m'_26,sig(m'_26,sk_V_3)),spk_P_4) in
+    {461}out(h, m_55);
+    {462}in(h, m_56: bitstring);
+    {463}let ((n'_v_2: bitstring,uri'_2: bitstring),sigVal_29: bitstring) = adec(m_56,ssk_V_2) in
+    {464}if check((n'_v_2,uri'_2),sigVal_29,spk_P_4) then
+    {465}if ((n'_v_2,uri'_2) = (n_v_6,uri)) then
+    {466}new n_c_6: bitstring;
+    {467}let m'_27: bitstring = (n_c_6,rule_I_2) in
+    {468}let m_57: bitstring = aenc((m'_27,sig(m'_27,ssk_V_2)),spk_P_4) in
+    {469}out(h, m_57);
+    {470}in(h, m_58: bitstring);
+    {471}let (((attr'_2: bitstring,DID'_I_8: DID),poks_6: bitstring),sigVal_30: bitstring) = adec(m_58,ssk_V_2) in
+    {472}if check(((attr'_2,DID'_I_8),poks_6),sigVal_30,spk_P_4) then
+    {473}let ph_6: bitstring = (n_c_6,DID_V) in
+    {474}if proofVerify((attr'_2,DID'_I_8),poks_6,ph_6,pk_I_6) then
+    {475}if ((attr'_2,DID'_I_8) = (attr_10,DID_I_3)) then
+    {476}new tkn_access_6: bitstring;
+    {477}let m'_28: bitstring = (tkn_access_6,sig(tkn_access_6,sk_V_3)) in
+    {478}let m_59: bitstring = aenc((m'_28,sig(m'_28,ssk_V_2)),spk_P_4) in
+    {479}event auth_VerifierSendsLastMessageToProver(m_54,m_55,m_56,m_57,m_58,m_59);
+    {480}out(h, m_59);
+    {481}out(h, Verifier_Completes);
+    {482}if talksOnlyToHonest_8 then
+    (
+        {483}event auth_VerifierCompletesProtocol(m_54,m_55,m_56,m_57,m_58)
+    ) | (
+        {484}out(ch((m'_26,sig(m'_26,sk_V_3))), m'_5_fromVerifier)
+    ) | (
+        {485}out(ch(rule_I_2), rule_fromVerifier)
+    ) | (
+        {486}out(ch((m'_27,sig(m'_27,ssk_V_2))), m'_7_fromVerifier)
+    ) | (
+        {487}out(ch((m'_28,sig(m'_28,ssk_V_2))), m'_9_fromVerifier)
+    ) | (
+        {488}out(ch(tkn_access_6), access_token_fromVerifier)
+    )
+) | (
+    {489}!
+    {490}let sk_V_4: SecretKey = sk_V in
+    {491}let pk_I_7: PublicKey = pk(sk_E) in
+    {492}let talksOnlyToHonest_9: bool = false in
+    {493}let (attr_11: bitstring,DID_I_4: DID) = rule_E_2 in
+    {494}in(h, m_60: bitstring);
+    {495}let ((n_p_13: bitstring,spk_P_5: PublicKey),sigVal_31: bitstring) = adec(m_60,sk_V_4) in
+    {496}if check((n_p_13,spk_P_5),sigVal_31,spk_P_5) then
+    {497}new ssk_V_3: SecretKey;
+    {498}new n_v_7: bitstring;
+    {499}let m'_29: bitstring = (n_p_13,n_v_7,pk(ssk_V_3)) in
+    {500}let m_61: bitstring = aenc((m'_29,sig(m'_29,sk_V_4)),spk_P_5) in
+    {501}out(h, m_61);
+    {502}in(h, m_62: bitstring);
+    {503}let ((n'_v_3: bitstring,uri'_3: bitstring),sigVal_32: bitstring) = adec(m_62,ssk_V_3) in
+    {504}if check((n'_v_3,uri'_3),sigVal_32,spk_P_5) then
+    {505}if ((n'_v_3,uri'_3) = (n_v_7,uri)) then
+    {506}new n_c_7: bitstring;
+    {507}let m'_30: bitstring = (n_c_7,rule_E_2) in
+    {508}let m_63: bitstring = aenc((m'_30,sig(m'_30,ssk_V_3)),spk_P_5) in
+    {509}out(h, m_63);
+    {510}in(h, m_64: bitstring);
+    {511}let (((attr'_3: bitstring,DID'_I_9: DID),poks_7: bitstring),sigVal_33: bitstring) = adec(m_64,ssk_V_3) in
+    {512}if check(((attr'_3,DID'_I_9),poks_7),sigVal_33,spk_P_5) then
+    {513}let ph_7: bitstring = (n_c_7,DID_V) in
+    {514}if proofVerify((attr'_3,DID'_I_9),poks_7,ph_7,pk_I_7) then
+    {515}if ((attr'_3,DID'_I_9) = (attr_11,DID_I_4)) then
+    {516}new tkn_access_7: bitstring;
+    {517}let m'_31: bitstring = (tkn_access_7,sig(tkn_access_7,sk_V_4)) in
+    {518}let m_65: bitstring = aenc((m'_31,sig(m'_31,ssk_V_3)),spk_P_5) in
+    {519}event auth_VerifierSendsLastMessageToProver(m_60,m_61,m_62,m_63,m_64,m_65);
+    {520}out(h, m_65);
+    {521}out(h, Verifier_Completes);
+    {522}if talksOnlyToHonest_9 then
+    (
+        {523}event auth_VerifierCompletesProtocol(m_60,m_61,m_62,m_63,m_64)
+    ) | (
+        {524}out(ch((m'_29,sig(m'_29,sk_V_4))), m'_5_fromVerifier)
+    ) | (
+        {525}out(ch(rule_E_2), rule_fromVerifier)
+    ) | (
+        {526}out(ch((m'_30,sig(m'_30,ssk_V_3))), m'_7_fromVerifier)
+    ) | (
+        {527}out(ch((m'_31,sig(m'_31,ssk_V_3))), m'_9_fromVerifier)
+    ) | (
+        {528}out(ch(tkn_access_7), access_token_fromVerifier)
+    )
+)
+
+--  Process 1 (that is, process 0, with let moved downwards):
+{1}new attr_2: bitstring;
+{2}out(h, attr_2);
+{3}new sk_I: SecretKey;
+{4}new sk_V: SecretKey;
+{5}new sk_P: SecretKey;
+{6}out(h, pk(sk_I));
+{7}out(h, pk(sk_V));
+{8}out(h, pk(sk_P));
+{9}let DID_I: DID = genDID(pk(sk_I),sk_I) in
+{13}out(h, DID_I);
+{10}let DID_V: DID = genDID(pk(sk_V),sk_V) in
+{14}out(h, DID_V);
+{11}let DID_P: DID = genDID(pk(sk_P),sk_P) in
+{15}out(h, DID_P);
+{12}let DID_E: DID = genDID(pk(sk_E),sk_E) in
+{16}out(h, DID_E);
+(
+    {21}!
+    {26}in(h, m_0: bitstring);
+    {22}let sk_I_1: SecretKey = sk_I in
+    {27}let ((n_p: bitstring,spk_P: PublicKey),sigVal_0: bitstring) = adec(m_0,sk_I_1) in
+    {28}if check((n_p,spk_P),sigVal_0,spk_P) then
+    {29}new ssk_I: SecretKey;
+    {30}new n_i: bitstring;
+    {31}let m'_1: bitstring = (n_p,n_i,pk(ssk_I)) in
+    {32}let m_1: bitstring = aenc((m'_1,sig(m'_1,sk_I_1)),spk_P) in
+    {33}out(h, m_1);
+    {34}in(h, m_2: bitstring);
+    {35}let (((n'_i: bitstring,DID'_P: DID,DID'_I: DID,n_h: bitstring),sigVal_P: bitstring),sigVal_2: bitstring) = adec(m_2,ssk_I) in
+    {36}if check(((n'_i,DID'_P,DID'_I,n_h),sigVal_P),sigVal_2,spk_P) then
+    {24}let pk_P: PublicKey = pk(sk_P) in
+    {37}if check((n'_i,DID'_P,DID'_I,n_h),sigVal_P,pk_P) then
+    {38}if ((n'_i,DID'_P,DID'_I) = (n_i,DID_P,DID_I)) then
+    {23}let attr_1: bitstring = attr in
+    {39}let claims: bitstring = (attr_1,DID_I) in
+    {40}let VC: bitstring = (claims,sig(claims,sk_I_1)) in
+    {41}let m'_3: bitstring = ((VC,DID_P,n_h),sig((VC,DID_P,n_h),sk_I_1)) in
+    {42}let m_3: bitstring = aenc((m'_3,sig(m'_3,ssk_I)),spk_P) in
+    {43}event auth_IssuerSendsLastMessageToHolder(m_0,m_1,m_2,m_3);
+    {44}out(h, m_3);
+    {45}out(h, Issuer_Completes);
+    {25}let talksOnlyToHonest: bool = true in
+    {46}if talksOnlyToHonest then
+    (
+        {47}event auth_IssuerCompletesProtocol(m_0,m_1,m_2)
+    ) | (
+        {48}out(ch((m'_1,sig(m'_1,sk_I_1))), m'_1_fromIssuer)
+    ) | (
+        {49}out(ch(VC), cred_fromIssuer)
+    ) | (
+        {50}out(ch((m'_3,sig(m'_3,ssk_I))), m'_3_fromIssuer)
+    )
+) | (
+    {51}!
+    {56}in(h, m_0_1: bitstring);
+    {52}let sk_I_2: SecretKey = sk_I in
+    {57}let ((n_p_1: bitstring,spk_P_1: PublicKey),sigVal_0_1: bitstring) = adec(m_0_1,sk_I_2) in
+    {58}if check((n_p_1,spk_P_1),sigVal_0_1,spk_P_1) then
+    {59}new ssk_I_1: SecretKey;
+    {60}new n_i_1: bitstring;
+    {61}let m': bitstring = (n_p_1,n_i_1,pk(ssk_I_1)) in
+    {62}let m: bitstring = aenc((m',sig(m',sk_I_2)),spk_P_1) in
+    {63}out(h, m);
+    {64}in(h, m_4: bitstring);
+    {65}let (((n'_i_1: bitstring,DID'_P_1: DID,DID'_I_1: DID,n_h_1: bitstring),sigVal_P_1: bitstring),sigVal: bitstring) = adec(m_4,ssk_I_1) in
+    {66}if check(((n'_i_1,DID'_P_1,DID'_I_1,n_h_1),sigVal_P_1),sigVal,spk_P_1) then
+    {54}let pk_P_1: PublicKey = pk(sk_E) in
+    {67}if check((n'_i_1,DID'_P_1,DID'_I_1,n_h_1),sigVal_P_1,pk_P_1) then
+    {68}if ((n'_i_1,DID'_P_1,DID'_I_1) = (n_i_1,DID_E,DID_I)) then
+    {53}let attr_3: bitstring = attr_2 in
+    {69}let claims_1: bitstring = (attr_3,DID_I) in
+    {70}let VC_1: bitstring = (claims_1,sig(claims_1,sk_I_2)) in
+    {71}let m'_2: bitstring = ((VC_1,DID_E,n_h_1),sig((VC_1,DID_E,n_h_1),sk_I_2)) in
+    {72}let m_5: bitstring = aenc((m'_2,sig(m'_2,ssk_I_1)),spk_P_1) in
+    {73}event auth_IssuerSendsLastMessageToHolder(m_0_1,m,m_4,m_5);
+    {74}out(h, m_5);
+    {75}out(h, Issuer_Completes);
+    {55}let talksOnlyToHonest_1: bool = false in
+    {76}if talksOnlyToHonest_1 then
+    (
+        {77}event auth_IssuerCompletesProtocol(m_0_1,m,m_4)
+    ) | (
+        {78}out(ch((m',sig(m',sk_I_2))), m'_1_fromIssuer)
+    ) | (
+        {79}out(ch(VC_1), cred_fromIssuer)
+    ) | (
+        {80}out(ch((m'_2,sig(m'_2,ssk_I_1))), m'_3_fromIssuer)
+    )
+) | (
+    {81}!
+    {86}new ssk_P: SecretKey;
+    {87}new n_p_2: bitstring;
+    {88}let m'_0: bitstring = (n_p_2,pk(ssk_P)) in
+    {83}let pk_I: PublicKey = pk(sk_I) in
+    {89}let m_0_2: bitstring = aenc((m'_0,sig(m'_0,ssk_P)),pk_I) in
+    {90}out(h, m_0_2);
+    {91}in(h, m_6: bitstring);
+    {92}let ((n'_p: bitstring,n_i_2: bitstring,spk_I: PublicKey),sigVal_1: bitstring) = adec(m_6,ssk_P) in
+    {93}if check((n'_p,n_i_2,spk_I),sigVal_1,pk_I) then
+    {94}if (n'_p = n_p_2) then
+    {95}new n_h_2: bitstring;
+    {96}let m''_2: bitstring = (n_i_2,DID_P,DID_I,n_h_2) in
+    {82}let sk_P_1: SecretKey = sk_P in
+    {97}let m'_4: bitstring = (m''_2,sig(m''_2,sk_P_1)) in
+    {98}let m_7: bitstring = aenc((m'_4,sig(m'_4,ssk_P)),spk_I) in
+    {99}event auth_HolderSendsLastMessageToIssuer(m_0_2,m_6,m_7);
+    {100}out(h, m_7);
+    {101}in(h, m_8: bitstring);
+    {102}let (((((attr_4: bitstring,DID'_I_2: DID),sigVal_I: bitstring),DID''_P: DID,n'_h: bitstring),sigVal'_I: bitstring),sigVal_3: bitstring) = adec(m_8,ssk_P) in
+    {103}if check(((((attr_4,DID'_I_2),sigVal_I),DID''_P,n'_h),sigVal'_I),sigVal_3,spk_I) then
+    {104}if check((((attr_4,DID'_I_2),sigVal_I),DID''_P,n'_h),sigVal'_I,pk_I) then
+    {105}if ((DID''_P,n'_h) = (DID_P,n_h_2)) then
+    {106}if check((attr_4,DID'_I_2),sigVal_I,pk_I) then
+    {107}if (DID'_I_2 = DID_I) then
+    {108}out(h, Holder_Completes);
+    {85}let talksOnlyToHonest_2: bool = true in
+    (
+        {109}!
+        {111}new ssk_P_1: SecretKey;
+        {112}new n_p_3: bitstring;
+        {113}let m'_5: bitstring = (n_p_3,pk(ssk_P_1)) in
+        {84}let pk_V: PublicKey = pk(sk_V) in
+        {114}let m_9: bitstring = aenc((m'_5,sig(m'_5,ssk_P_1)),pk_V) in
+        {115}out(h, m_9);
+        {116}in(h, m_10: bitstring);
+        {117}let ((n'_p_1: bitstring,n_v: bitstring,spk_V: PublicKey),sigVal_5: bitstring) = adec(m_10,ssk_P_1) in
+        {118}if check((n'_p_1,n_v,spk_V),sigVal_5,pk_V) then
+        {119}if (n'_p_1 = n_p_3) then
+        {120}let m'_6: bitstring = (n_v,uri) in
+        {121}let m_11: bitstring = aenc((m'_6,sig(m'_6,ssk_P_1)),spk_V) in
+        {122}out(h, m_11);
+        {123}in(h, m_12: bitstring);
+        {124}let ((n_c: bitstring,rule: bitstring),sigVal_7: bitstring) = adec(m_12,ssk_P_1) in
+        {125}if check((n_c,rule),sigVal_7,spk_V) then
+        {110}let VC_2: bitstring = ((attr_4,DID'_I_2),sigVal_I) in
+        {126}let (claims_2: bitstring,sigVal_VC: bitstring) = VC_2 in
+        {127}if (claims_2 = rule) then
+        {129}new randomness: bitstring;
+        {128}let ph: bitstring = (n_c,DID_V) in
+        {130}let poks: bitstring = proofGen(VC_2,ph,pk_I,randomness) in
+        {131}let m'_8: bitstring = (claims_2,poks) in
+        {132}let m_13: bitstring = aenc((m'_8,sig(m'_8,ssk_P_1)),spk_V) in
+        {133}event auth_ProverSendsLastMessageToVerifier(m_9,m_10,m_11,m_12,m_13);
+        {134}event auth_ProverSendsLastMessageToVerifierInProtocolFull(m_0_2,m_6,m_7,m_8,m_9,m_10,m_11,m_12,m_13);
+        {135}out(h, m_13);
+        {136}in(h, m_14: bitstring);
+        {137}let ((tkn_access: bitstring,sigVal_tkn: bitstring),sigVal_9: bitstring) = adec(m_14,ssk_P_1) in
+        {138}if check((tkn_access,sigVal_tkn),sigVal_9,spk_V) then
+        {139}if check(tkn_access,sigVal_tkn,pk_V) then
+        {140}out(h, Prover_Completes);
+        {141}if talksOnlyToHonest_2 then
+        (
+            {142}event auth_ProverCompletesProtocol(m_9,m_10,m_11,m_12,m_13,m_14)
+        ) | (
+            {143}out(ch((m'_5,sig(m'_5,ssk_P_1))), m'_4_fromProver)
+        ) | (
+            {144}out(ch((m'_6,sig(m'_6,ssk_P_1))), m'_6_fromProver)
+        ) | (
+            {145}out(ch((m'_8,sig(m'_8,ssk_P_1))), m'_8_fromProver)
+        ) | (
+            {146}out(ch(VC_2), cred_fromProver)
+        ) | (
+            {147}out(ch(tkn_access), access_token_fromProver)
+        )
+    ) | (
+        {148}if talksOnlyToHonest_2 then
+        (
+            {149}event auth_HolderCompletesProtocol(m_0_2,m_6,m_7,m_8)
+        ) | (
+            {150}out(ch((m'_0,sig(m'_0,ssk_P))), m'_0_fromHolder)
+        ) | (
+            {151}out(ch((m'_4,sig(m'_4,ssk_P))), m'_2_fromHolder)
+        ) | (
+            {152}out(ch(((attr_4,DID'_I_2),sigVal_I)), cred_fromHolder)
+        )
+    )
+) | (
+    {153}!
+    {158}new ssk_P_2: SecretKey;
+    {159}new n_p_4: bitstring;
+    {160}let m'_0_1: bitstring = (n_p_4,pk(ssk_P_2)) in
+    {155}let pk_I_1: PublicKey = pk(sk_I) in
+    {161}let m_0_3: bitstring = aenc((m'_0_1,sig(m'_0_1,ssk_P_2)),pk_I_1) in
+    {162}out(h, m_0_3);
+    {163}in(h, m_15: bitstring);
+    {164}let ((n'_p_2: bitstring,n_i_3: bitstring,spk_I_1: PublicKey),sigVal_4: bitstring) = adec(m_15,ssk_P_2) in
+    {165}if check((n'_p_2,n_i_3,spk_I_1),sigVal_4,pk_I_1) then
+    {166}if (n'_p_2 = n_p_4) then
+    {167}new n_h_3: bitstring;
+    {168}let m'': bitstring = (n_i_3,DID_P,DID_I,n_h_3) in
+    {154}let sk_P_2: SecretKey = sk_P in
+    {169}let m'_7: bitstring = (m'',sig(m'',sk_P_2)) in
+    {170}let m_16: bitstring = aenc((m'_7,sig(m'_7,ssk_P_2)),spk_I_1) in
+    {171}event auth_HolderSendsLastMessageToIssuer(m_0_3,m_15,m_16);
+    {172}out(h, m_16);
+    {173}in(h, m_17: bitstring);
+    {174}let (((((attr_5: bitstring,DID'_I_3: DID),sigVal_I_1: bitstring),DID''_P_1: DID,n'_h_1: bitstring),sigVal'_I_1: bitstring),sigVal_6: bitstring) = adec(m_17,ssk_P_2) in
+    {175}if check(((((attr_5,DID'_I_3),sigVal_I_1),DID''_P_1,n'_h_1),sigVal'_I_1),sigVal_6,spk_I_1) then
+    {176}if check((((attr_5,DID'_I_3),sigVal_I_1),DID''_P_1,n'_h_1),sigVal'_I_1,pk_I_1) then
+    {177}if ((DID''_P_1,n'_h_1) = (DID_P,n_h_3)) then
+    {178}if check((attr_5,DID'_I_3),sigVal_I_1,pk_I_1) then
+    {179}if (DID'_I_3 = DID_I) then
+    {180}out(h, Holder_Completes);
+    {157}let talksOnlyToHonest_3: bool = false in
+    (
+        {181}!
+        {183}new ssk_P_3: SecretKey;
+        {184}new n_p_5: bitstring;
+        {185}let m'_9: bitstring = (n_p_5,pk(ssk_P_3)) in
+        {156}let pk_V_1: PublicKey = pk(sk_E) in
+        {186}let m_18: bitstring = aenc((m'_9,sig(m'_9,ssk_P_3)),pk_V_1) in
+        {187}out(h, m_18);
+        {188}in(h, m_19: bitstring);
+        {189}let ((n'_p_3: bitstring,n_v_1: bitstring,spk_V_1: PublicKey),sigVal_8: bitstring) = adec(m_19,ssk_P_3) in
+        {190}if check((n'_p_3,n_v_1,spk_V_1),sigVal_8,pk_V_1) then
+        {191}if (n'_p_3 = n_p_5) then
+        {192}let m'_10: bitstring = (n_v_1,uri) in
+        {193}let m_20: bitstring = aenc((m'_10,sig(m'_10,ssk_P_3)),spk_V_1) in
+        {194}out(h, m_20);
+        {195}in(h, m_21: bitstring);
+        {196}let ((n_c_1: bitstring,rule_1: bitstring),sigVal_10: bitstring) = adec(m_21,ssk_P_3) in
+        {197}if check((n_c_1,rule_1),sigVal_10,spk_V_1) then
+        {182}let VC_3: bitstring = ((attr_5,DID'_I_3),sigVal_I_1) in
+        {198}let (claims_3: bitstring,sigVal_VC_1: bitstring) = VC_3 in
+        {199}if (claims_3 = rule_1) then
+        {201}new randomness_1: bitstring;
+        {200}let ph_1: bitstring = (n_c_1,DID_E) in
+        {202}let poks_1: bitstring = proofGen(VC_3,ph_1,pk_I_1,randomness_1) in
+        {203}let m'_11: bitstring = (claims_3,poks_1) in
+        {204}let m_22: bitstring = aenc((m'_11,sig(m'_11,ssk_P_3)),spk_V_1) in
+        {205}event auth_ProverSendsLastMessageToVerifier(m_18,m_19,m_20,m_21,m_22);
+        {206}event auth_ProverSendsLastMessageToVerifierInProtocolFull(m_0_3,m_15,m_16,m_17,m_18,m_19,m_20,m_21,m_22);
+        {207}out(h, m_22);
+        {208}in(h, m_23: bitstring);
+        {209}let ((tkn_access_1: bitstring,sigVal_tkn_1: bitstring),sigVal_11: bitstring) = adec(m_23,ssk_P_3) in
+        {210}if check((tkn_access_1,sigVal_tkn_1),sigVal_11,spk_V_1) then
+        {211}if check(tkn_access_1,sigVal_tkn_1,pk_V_1) then
+        {212}out(h, Prover_Completes);
+        {213}if talksOnlyToHonest_3 then
+        (
+            {214}event auth_ProverCompletesProtocol(m_18,m_19,m_20,m_21,m_22,m_23)
+        ) | (
+            {215}out(ch((m'_9,sig(m'_9,ssk_P_3))), m'_4_fromProver)
+        ) | (
+            {216}out(ch((m'_10,sig(m'_10,ssk_P_3))), m'_6_fromProver)
+        ) | (
+            {217}out(ch((m'_11,sig(m'_11,ssk_P_3))), m'_8_fromProver)
+        ) | (
+            {218}out(ch(VC_3), cred_fromProver)
+        ) | (
+            {219}out(ch(tkn_access_1), access_token_fromProver)
+        )
+    ) | (
+        {220}if talksOnlyToHonest_3 then
+        (
+            {221}event auth_HolderCompletesProtocol(m_0_3,m_15,m_16,m_17)
+        ) | (
+            {222}out(ch((m'_0_1,sig(m'_0_1,ssk_P_2))), m'_0_fromHolder)
+        ) | (
+            {223}out(ch((m'_7,sig(m'_7,ssk_P_2))), m'_2_fromHolder)
+        ) | (
+            {224}out(ch(((attr_5,DID'_I_3),sigVal_I_1)), cred_fromHolder)
+        )
+    )
+) | (
+    {225}!
+    {230}new ssk_P_4: SecretKey;
+    {231}new n_p_6: bitstring;
+    {232}let m'_0_2: bitstring = (n_p_6,pk(ssk_P_4)) in
+    {227}let pk_I_2: PublicKey = pk(sk_E) in
+    {233}let m_0_4: bitstring = aenc((m'_0_2,sig(m'_0_2,ssk_P_4)),pk_I_2) in
+    {234}out(h, m_0_4);
+    {235}in(h, m_24: bitstring);
+    {236}let ((n'_p_4: bitstring,n_i_4: bitstring,spk_I_2: PublicKey),sigVal_12: bitstring) = adec(m_24,ssk_P_4) in
+    {237}if check((n'_p_4,n_i_4,spk_I_2),sigVal_12,pk_I_2) then
+    {238}if (n'_p_4 = n_p_6) then
+    {239}new n_h_4: bitstring;
+    {240}let m''_1: bitstring = (n_i_4,DID_P,DID_E,n_h_4) in
+    {226}let sk_P_3: SecretKey = sk_P in
+    {241}let m'_12: bitstring = (m''_1,sig(m''_1,sk_P_3)) in
+    {242}let m_25: bitstring = aenc((m'_12,sig(m'_12,ssk_P_4)),spk_I_2) in
+    {243}event auth_HolderSendsLastMessageToIssuer(m_0_4,m_24,m_25);
+    {244}out(h, m_25);
+    {245}in(h, m_26: bitstring);
+    {246}let (((((attr_6: bitstring,DID'_I_4: DID),sigVal_I_2: bitstring),DID''_P_2: DID,n'_h_2: bitstring),sigVal'_I_2: bitstring),sigVal_13: bitstring) = adec(m_26,ssk_P_4) in
+    {247}if check(((((attr_6,DID'_I_4),sigVal_I_2),DID''_P_2,n'_h_2),sigVal'_I_2),sigVal_13,spk_I_2) then
+    {248}if check((((attr_6,DID'_I_4),sigVal_I_2),DID''_P_2,n'_h_2),sigVal'_I_2,pk_I_2) then
+    {249}if ((DID''_P_2,n'_h_2) = (DID_P,n_h_4)) then
+    {250}if check((attr_6,DID'_I_4),sigVal_I_2,pk_I_2) then
+    {251}if (DID'_I_4 = DID_E) then
+    {252}out(h, Holder_Completes);
+    {229}let talksOnlyToHonest_4: bool = false in
+    (
+        {253}!
+        {255}new ssk_P_5: SecretKey;
+        {256}new n_p_7: bitstring;
+        {257}let m'_13: bitstring = (n_p_7,pk(ssk_P_5)) in
+        {228}let pk_V_2: PublicKey = pk(sk_V) in
+        {258}let m_27: bitstring = aenc((m'_13,sig(m'_13,ssk_P_5)),pk_V_2) in
+        {259}out(h, m_27);
+        {260}in(h, m_28: bitstring);
+        {261}let ((n'_p_5: bitstring,n_v_2: bitstring,spk_V_2: PublicKey),sigVal_14: bitstring) = adec(m_28,ssk_P_5) in
+        {262}if check((n'_p_5,n_v_2,spk_V_2),sigVal_14,pk_V_2) then
+        {263}if (n'_p_5 = n_p_7) then
+        {264}let m'_14: bitstring = (n_v_2,uri) in
+        {265}let m_29: bitstring = aenc((m'_14,sig(m'_14,ssk_P_5)),spk_V_2) in
+        {266}out(h, m_29);
+        {267}in(h, m_30: bitstring);
+        {268}let ((n_c_2: bitstring,rule_2: bitstring),sigVal_15: bitstring) = adec(m_30,ssk_P_5) in
+        {269}if check((n_c_2,rule_2),sigVal_15,spk_V_2) then
+        {254}let VC_4: bitstring = ((attr_6,DID'_I_4),sigVal_I_2) in
+        {270}let (claims_4: bitstring,sigVal_VC_2: bitstring) = VC_4 in
+        {271}if (claims_4 = rule_2) then
+        {273}new randomness_2: bitstring;
+        {272}let ph_2: bitstring = (n_c_2,DID_V) in
+        {274}let poks_2: bitstring = proofGen(VC_4,ph_2,pk_I_2,randomness_2) in
+        {275}let m'_15: bitstring = (claims_4,poks_2) in
+        {276}let m_31: bitstring = aenc((m'_15,sig(m'_15,ssk_P_5)),spk_V_2) in
+        {277}event auth_ProverSendsLastMessageToVerifier(m_27,m_28,m_29,m_30,m_31);
+        {278}event auth_ProverSendsLastMessageToVerifierInProtocolFull(m_0_4,m_24,m_25,m_26,m_27,m_28,m_29,m_30,m_31);
+        {279}out(h, m_31);
+        {280}in(h, m_32: bitstring);
+        {281}let ((tkn_access_2: bitstring,sigVal_tkn_2: bitstring),sigVal_16: bitstring) = adec(m_32,ssk_P_5) in
+        {282}if check((tkn_access_2,sigVal_tkn_2),sigVal_16,spk_V_2) then
+        {283}if check(tkn_access_2,sigVal_tkn_2,pk_V_2) then
+        {284}out(h, Prover_Completes);
+        {285}if talksOnlyToHonest_4 then
+        (
+            {286}event auth_ProverCompletesProtocol(m_27,m_28,m_29,m_30,m_31,m_32)
+        ) | (
+            {287}out(ch((m'_13,sig(m'_13,ssk_P_5))), m'_4_fromProver)
+        ) | (
+            {288}out(ch((m'_14,sig(m'_14,ssk_P_5))), m'_6_fromProver)
+        ) | (
+            {289}out(ch((m'_15,sig(m'_15,ssk_P_5))), m'_8_fromProver)
+        ) | (
+            {290}out(ch(VC_4), cred_fromProver)
+        ) | (
+            {291}out(ch(tkn_access_2), access_token_fromProver)
+        )
+    ) | (
+        {292}if talksOnlyToHonest_4 then
+        (
+            {293}event auth_HolderCompletesProtocol(m_0_4,m_24,m_25,m_26)
+        ) | (
+            {294}out(ch((m'_0_2,sig(m'_0_2,ssk_P_4))), m'_0_fromHolder)
+        ) | (
+            {295}out(ch((m'_12,sig(m'_12,ssk_P_4))), m'_2_fromHolder)
+        ) | (
+            {296}out(ch(((attr_6,DID'_I_4),sigVal_I_2)), cred_fromHolder)
+        )
+    )
+) | (
+    {297}!
+    {302}new ssk_P_6: SecretKey;
+    {303}new n_p_8: bitstring;
+    {304}let m'_0_3: bitstring = (n_p_8,pk(ssk_P_6)) in
+    {299}let pk_I_3: PublicKey = pk(sk_E) in
+    {305}let m_0_5: bitstring = aenc((m'_0_3,sig(m'_0_3,ssk_P_6)),pk_I_3) in
+    {306}out(h, m_0_5);
+    {307}in(h, m_33: bitstring);
+    {308}let ((n'_p_6: bitstring,n_i_5: bitstring,spk_I_3: PublicKey),sigVal_17: bitstring) = adec(m_33,ssk_P_6) in
+    {309}if check((n'_p_6,n_i_5,spk_I_3),sigVal_17,pk_I_3) then
+    {310}if (n'_p_6 = n_p_8) then
+    {311}new n_h_5: bitstring;
+    {312}let m''_3: bitstring = (n_i_5,DID_P,DID_E,n_h_5) in
+    {298}let sk_P_4: SecretKey = sk_P in
+    {313}let m'_16: bitstring = (m''_3,sig(m''_3,sk_P_4)) in
+    {314}let m_34: bitstring = aenc((m'_16,sig(m'_16,ssk_P_6)),spk_I_3) in
+    {315}event auth_HolderSendsLastMessageToIssuer(m_0_5,m_33,m_34);
+    {316}out(h, m_34);
+    {317}in(h, m_35: bitstring);
+    {318}let (((((attr_7: bitstring,DID'_I_5: DID),sigVal_I_3: bitstring),DID''_P_3: DID,n'_h_3: bitstring),sigVal'_I_3: bitstring),sigVal_18: bitstring) = adec(m_35,ssk_P_6) in
+    {319}if check(((((attr_7,DID'_I_5),sigVal_I_3),DID''_P_3,n'_h_3),sigVal'_I_3),sigVal_18,spk_I_3) then
+    {320}if check((((attr_7,DID'_I_5),sigVal_I_3),DID''_P_3,n'_h_3),sigVal'_I_3,pk_I_3) then
+    {321}if ((DID''_P_3,n'_h_3) = (DID_P,n_h_5)) then
+    {322}if check((attr_7,DID'_I_5),sigVal_I_3,pk_I_3) then
+    {323}if (DID'_I_5 = DID_E) then
+    {324}out(h, Holder_Completes);
+    {301}let talksOnlyToHonest_5: bool = false in
+    (
+        {325}!
+        {327}new ssk_P_7: SecretKey;
+        {328}new n_p_9: bitstring;
+        {329}let m'_17: bitstring = (n_p_9,pk(ssk_P_7)) in
+        {300}let pk_V_3: PublicKey = pk(sk_E) in
+        {330}let m_36: bitstring = aenc((m'_17,sig(m'_17,ssk_P_7)),pk_V_3) in
+        {331}out(h, m_36);
+        {332}in(h, m_37: bitstring);
+        {333}let ((n'_p_7: bitstring,n_v_3: bitstring,spk_V_3: PublicKey),sigVal_19: bitstring) = adec(m_37,ssk_P_7) in
+        {334}if check((n'_p_7,n_v_3,spk_V_3),sigVal_19,pk_V_3) then
+        {335}if (n'_p_7 = n_p_9) then
+        {336}let m'_18: bitstring = (n_v_3,uri) in
+        {337}let m_38: bitstring = aenc((m'_18,sig(m'_18,ssk_P_7)),spk_V_3) in
+        {338}out(h, m_38);
+        {339}in(h, m_39: bitstring);
+        {340}let ((n_c_3: bitstring,rule_3: bitstring),sigVal_20: bitstring) = adec(m_39,ssk_P_7) in
+        {341}if check((n_c_3,rule_3),sigVal_20,spk_V_3) then
+        {326}let VC_5: bitstring = ((attr_7,DID'_I_5),sigVal_I_3) in
+        {342}let (claims_5: bitstring,sigVal_VC_3: bitstring) = VC_5 in
+        {343}if (claims_5 = rule_3) then
+        {345}new randomness_3: bitstring;
+        {344}let ph_3: bitstring = (n_c_3,DID_E) in
+        {346}let poks_3: bitstring = proofGen(VC_5,ph_3,pk_I_3,randomness_3) in
+        {347}let m'_19: bitstring = (claims_5,poks_3) in
+        {348}let m_40: bitstring = aenc((m'_19,sig(m'_19,ssk_P_7)),spk_V_3) in
+        {349}event auth_ProverSendsLastMessageToVerifier(m_36,m_37,m_38,m_39,m_40);
+        {350}event auth_ProverSendsLastMessageToVerifierInProtocolFull(m_0_5,m_33,m_34,m_35,m_36,m_37,m_38,m_39,m_40);
+        {351}out(h, m_40);
+        {352}in(h, m_41: bitstring);
+        {353}let ((tkn_access_3: bitstring,sigVal_tkn_3: bitstring),sigVal_21: bitstring) = adec(m_41,ssk_P_7) in
+        {354}if check((tkn_access_3,sigVal_tkn_3),sigVal_21,spk_V_3) then
+        {355}if check(tkn_access_3,sigVal_tkn_3,pk_V_3) then
+        {356}out(h, Prover_Completes);
+        {357}if talksOnlyToHonest_5 then
+        (
+            {358}event auth_ProverCompletesProtocol(m_36,m_37,m_38,m_39,m_40,m_41)
+        ) | (
+            {359}out(ch((m'_17,sig(m'_17,ssk_P_7))), m'_4_fromProver)
+        ) | (
+            {360}out(ch((m'_18,sig(m'_18,ssk_P_7))), m'_6_fromProver)
+        ) | (
+            {361}out(ch((m'_19,sig(m'_19,ssk_P_7))), m'_8_fromProver)
+        ) | (
+            {362}out(ch(VC_5), cred_fromProver)
+        ) | (
+            {363}out(ch(tkn_access_3), access_token_fromProver)
+        )
+    ) | (
+        {364}if talksOnlyToHonest_5 then
+        (
+            {365}event auth_HolderCompletesProtocol(m_0_5,m_33,m_34,m_35)
+        ) | (
+            {366}out(ch((m'_0_3,sig(m'_0_3,ssk_P_6))), m'_0_fromHolder)
+        ) | (
+            {367}out(ch((m'_16,sig(m'_16,ssk_P_6))), m'_2_fromHolder)
+        ) | (
+            {368}out(ch(((attr_7,DID'_I_5),sigVal_I_3)), cred_fromHolder)
+        )
+    )
+) | (
+    {369}!
+    {17}let rule_I: bitstring = (attr,DID_I) in
+    {373}let (attr_8: bitstring,DID_I_1: DID) = rule_I in
+    {374}in(h, m_42: bitstring);
+    {370}let sk_V_1: SecretKey = sk_V in
+    {375}let ((n_p_10: bitstring,spk_P_2: PublicKey),sigVal_22: bitstring) = adec(m_42,sk_V_1) in
+    {376}if check((n_p_10,spk_P_2),sigVal_22,spk_P_2) then
+    {377}new ssk_V: SecretKey;
+    {378}new n_v_4: bitstring;
+    {379}let m'_20: bitstring = (n_p_10,n_v_4,pk(ssk_V)) in
+    {380}let m_43: bitstring = aenc((m'_20,sig(m'_20,sk_V_1)),spk_P_2) in
+    {381}out(h, m_43);
+    {382}in(h, m_44: bitstring);
+    {383}let ((n'_v: bitstring,uri': bitstring),sigVal_23: bitstring) = adec(m_44,ssk_V) in
+    {384}if check((n'_v,uri'),sigVal_23,spk_P_2) then
+    {385}if ((n'_v,uri') = (n_v_4,uri)) then
+    {386}new n_c_4: bitstring;
+    {387}let m'_21: bitstring = (n_c_4,rule_I) in
+    {388}let m_45: bitstring = aenc((m'_21,sig(m'_21,ssk_V)),spk_P_2) in
+    {389}out(h, m_45);
+    {390}in(h, m_46: bitstring);
+    {391}let (((attr': bitstring,DID'_I_6: DID),poks_4: bitstring),sigVal_24: bitstring) = adec(m_46,ssk_V) in
+    {392}if check(((attr',DID'_I_6),poks_4),sigVal_24,spk_P_2) then
+    {393}let ph_4: bitstring = (n_c_4,DID_V) in
+    {371}let pk_I_4: PublicKey = pk(sk_I) in
+    {394}if proofVerify((attr',DID'_I_6),poks_4,ph_4,pk_I_4) then
+    {395}if ((attr',DID'_I_6) = (attr_8,DID_I_1)) then
+    {396}new tkn_access_4: bitstring;
+    {397}let m'_22: bitstring = (tkn_access_4,sig(tkn_access_4,sk_V_1)) in
+    {398}let m_47: bitstring = aenc((m'_22,sig(m'_22,ssk_V)),spk_P_2) in
+    {399}event auth_VerifierSendsLastMessageToProver(m_42,m_43,m_44,m_45,m_46,m_47);
+    {400}out(h, m_47);
+    {401}out(h, Verifier_Completes);
+    {372}let talksOnlyToHonest_6: bool = true in
+    {402}if talksOnlyToHonest_6 then
+    (
+        {403}event auth_VerifierCompletesProtocol(m_42,m_43,m_44,m_45,m_46)
+    ) | (
+        {404}out(ch((m'_20,sig(m'_20,sk_V_1))), m'_5_fromVerifier)
+    ) | (
+        {405}out(ch(rule_I), rule_fromVerifier)
+    ) | (
+        {406}out(ch((m'_21,sig(m'_21,ssk_V))), m'_7_fromVerifier)
+    ) | (
+        {407}out(ch((m'_22,sig(m'_22,ssk_V))), m'_9_fromVerifier)
+    ) | (
+        {408}out(ch(tkn_access_4), access_token_fromVerifier)
+    )
+) | (
+    {409}!
+    {18}let rule_E: bitstring = (attr,DID_E) in
+    {413}let (attr_9: bitstring,DID_I_2: DID) = rule_E in
+    {414}in(h, m_48: bitstring);
+    {410}let sk_V_2: SecretKey = sk_V in
+    {415}let ((n_p_11: bitstring,spk_P_3: PublicKey),sigVal_25: bitstring) = adec(m_48,sk_V_2) in
+    {416}if check((n_p_11,spk_P_3),sigVal_25,spk_P_3) then
+    {417}new ssk_V_1: SecretKey;
+    {418}new n_v_5: bitstring;
+    {419}let m'_23: bitstring = (n_p_11,n_v_5,pk(ssk_V_1)) in
+    {420}let m_49: bitstring = aenc((m'_23,sig(m'_23,sk_V_2)),spk_P_3) in
+    {421}out(h, m_49);
+    {422}in(h, m_50: bitstring);
+    {423}let ((n'_v_1: bitstring,uri'_1: bitstring),sigVal_26: bitstring) = adec(m_50,ssk_V_1) in
+    {424}if check((n'_v_1,uri'_1),sigVal_26,spk_P_3) then
+    {425}if ((n'_v_1,uri'_1) = (n_v_5,uri)) then
+    {426}new n_c_5: bitstring;
+    {427}let m'_24: bitstring = (n_c_5,rule_E) in
+    {428}let m_51: bitstring = aenc((m'_24,sig(m'_24,ssk_V_1)),spk_P_3) in
+    {429}out(h, m_51);
+    {430}in(h, m_52: bitstring);
+    {431}let (((attr'_1: bitstring,DID'_I_7: DID),poks_5: bitstring),sigVal_27: bitstring) = adec(m_52,ssk_V_1) in
+    {432}if check(((attr'_1,DID'_I_7),poks_5),sigVal_27,spk_P_3) then
+    {433}let ph_5: bitstring = (n_c_5,DID_V) in
+    {411}let pk_I_5: PublicKey = pk(sk_E) in
+    {434}if proofVerify((attr'_1,DID'_I_7),poks_5,ph_5,pk_I_5) then
+    {435}if ((attr'_1,DID'_I_7) = (attr_9,DID_I_2)) then
+    {436}new tkn_access_5: bitstring;
+    {437}let m'_25: bitstring = (tkn_access_5,sig(tkn_access_5,sk_V_2)) in
+    {438}let m_53: bitstring = aenc((m'_25,sig(m'_25,ssk_V_1)),spk_P_3) in
+    {439}event auth_VerifierSendsLastMessageToProver(m_48,m_49,m_50,m_51,m_52,m_53);
+    {440}out(h, m_53);
+    {441}out(h, Verifier_Completes);
+    {412}let talksOnlyToHonest_7: bool = false in
+    {442}if talksOnlyToHonest_7 then
+    (
+        {443}event auth_VerifierCompletesProtocol(m_48,m_49,m_50,m_51,m_52)
+    ) | (
+        {444}out(ch((m'_23,sig(m'_23,sk_V_2))), m'_5_fromVerifier)
+    ) | (
+        {445}out(ch(rule_E), rule_fromVerifier)
+    ) | (
+        {446}out(ch((m'_24,sig(m'_24,ssk_V_1))), m'_7_fromVerifier)
+    ) | (
+        {447}out(ch((m'_25,sig(m'_25,ssk_V_1))), m'_9_fromVerifier)
+    ) | (
+        {448}out(ch(tkn_access_5), access_token_fromVerifier)
+    )
+) | (
+    {449}!
+    {19}let rule_I_2: bitstring = (attr_2,DID_I) in
+    {453}let (attr_10: bitstring,DID_I_3: DID) = rule_I_2 in
+    {454}in(h, m_54: bitstring);
+    {450}let sk_V_3: SecretKey = sk_V in
+    {455}let ((n_p_12: bitstring,spk_P_4: PublicKey),sigVal_28: bitstring) = adec(m_54,sk_V_3) in
+    {456}if check((n_p_12,spk_P_4),sigVal_28,spk_P_4) then
+    {457}new ssk_V_2: SecretKey;
+    {458}new n_v_6: bitstring;
+    {459}let m'_26: bitstring = (n_p_12,n_v_6,pk(ssk_V_2)) in
+    {460}let m_55: bitstring = aenc((m'_26,sig(m'_26,sk_V_3)),spk_P_4) in
+    {461}out(h, m_55);
+    {462}in(h, m_56: bitstring);
+    {463}let ((n'_v_2: bitstring,uri'_2: bitstring),sigVal_29: bitstring) = adec(m_56,ssk_V_2) in
+    {464}if check((n'_v_2,uri'_2),sigVal_29,spk_P_4) then
+    {465}if ((n'_v_2,uri'_2) = (n_v_6,uri)) then
+    {466}new n_c_6: bitstring;
+    {467}let m'_27: bitstring = (n_c_6,rule_I_2) in
+    {468}let m_57: bitstring = aenc((m'_27,sig(m'_27,ssk_V_2)),spk_P_4) in
+    {469}out(h, m_57);
+    {470}in(h, m_58: bitstring);
+    {471}let (((attr'_2: bitstring,DID'_I_8: DID),poks_6: bitstring),sigVal_30: bitstring) = adec(m_58,ssk_V_2) in
+    {472}if check(((attr'_2,DID'_I_8),poks_6),sigVal_30,spk_P_4) then
+    {473}let ph_6: bitstring = (n_c_6,DID_V) in
+    {451}let pk_I_6: PublicKey = pk(sk_I) in
+    {474}if proofVerify((attr'_2,DID'_I_8),poks_6,ph_6,pk_I_6) then
+    {475}if ((attr'_2,DID'_I_8) = (attr_10,DID_I_3)) then
+    {476}new tkn_access_6: bitstring;
+    {477}let m'_28: bitstring = (tkn_access_6,sig(tkn_access_6,sk_V_3)) in
+    {478}let m_59: bitstring = aenc((m'_28,sig(m'_28,ssk_V_2)),spk_P_4) in
+    {479}event auth_VerifierSendsLastMessageToProver(m_54,m_55,m_56,m_57,m_58,m_59);
+    {480}out(h, m_59);
+    {481}out(h, Verifier_Completes);
+    {452}let talksOnlyToHonest_8: bool = false in
+    {482}if talksOnlyToHonest_8 then
+    (
+        {483}event auth_VerifierCompletesProtocol(m_54,m_55,m_56,m_57,m_58)
+    ) | (
+        {484}out(ch((m'_26,sig(m'_26,sk_V_3))), m'_5_fromVerifier)
+    ) | (
+        {485}out(ch(rule_I_2), rule_fromVerifier)
+    ) | (
+        {486}out(ch((m'_27,sig(m'_27,ssk_V_2))), m'_7_fromVerifier)
+    ) | (
+        {487}out(ch((m'_28,sig(m'_28,ssk_V_2))), m'_9_fromVerifier)
+    ) | (
+        {488}out(ch(tkn_access_6), access_token_fromVerifier)
+    )
+) | (
+    {489}!
+    {20}let rule_E_2: bitstring = (attr_2,DID_E) in
+    {493}let (attr_11: bitstring,DID_I_4: DID) = rule_E_2 in
+    {494}in(h, m_60: bitstring);
+    {490}let sk_V_4: SecretKey = sk_V in
+    {495}let ((n_p_13: bitstring,spk_P_5: PublicKey),sigVal_31: bitstring) = adec(m_60,sk_V_4) in
+    {496}if check((n_p_13,spk_P_5),sigVal_31,spk_P_5) then
+    {497}new ssk_V_3: SecretKey;
+    {498}new n_v_7: bitstring;
+    {499}let m'_29: bitstring = (n_p_13,n_v_7,pk(ssk_V_3)) in
+    {500}let m_61: bitstring = aenc((m'_29,sig(m'_29,sk_V_4)),spk_P_5) in
+    {501}out(h, m_61);
+    {502}in(h, m_62: bitstring);
+    {503}let ((n'_v_3: bitstring,uri'_3: bitstring),sigVal_32: bitstring) = adec(m_62,ssk_V_3) in
+    {504}if check((n'_v_3,uri'_3),sigVal_32,spk_P_5) then
+    {505}if ((n'_v_3,uri'_3) = (n_v_7,uri)) then
+    {506}new n_c_7: bitstring;
+    {507}let m'_30: bitstring = (n_c_7,rule_E_2) in
+    {508}let m_63: bitstring = aenc((m'_30,sig(m'_30,ssk_V_3)),spk_P_5) in
+    {509}out(h, m_63);
+    {510}in(h, m_64: bitstring);
+    {511}let (((attr'_3: bitstring,DID'_I_9: DID),poks_7: bitstring),sigVal_33: bitstring) = adec(m_64,ssk_V_3) in
+    {512}if check(((attr'_3,DID'_I_9),poks_7),sigVal_33,spk_P_5) then
+    {513}let ph_7: bitstring = (n_c_7,DID_V) in
+    {491}let pk_I_7: PublicKey = pk(sk_E) in
+    {514}if proofVerify((attr'_3,DID'_I_9),poks_7,ph_7,pk_I_7) then
+    {515}if ((attr'_3,DID'_I_9) = (attr_11,DID_I_4)) then
+    {516}new tkn_access_7: bitstring;
+    {517}let m'_31: bitstring = (tkn_access_7,sig(tkn_access_7,sk_V_4)) in
+    {518}let m_65: bitstring = aenc((m'_31,sig(m'_31,ssk_V_3)),spk_P_5) in
+    {519}event auth_VerifierSendsLastMessageToProver(m_60,m_61,m_62,m_63,m_64,m_65);
+    {520}out(h, m_65);
+    {521}out(h, Verifier_Completes);
+    {492}let talksOnlyToHonest_9: bool = false in
+    {522}if talksOnlyToHonest_9 then
+    (
+        {523}event auth_VerifierCompletesProtocol(m_60,m_61,m_62,m_63,m_64)
+    ) | (
+        {524}out(ch((m'_29,sig(m'_29,sk_V_4))), m'_5_fromVerifier)
+    ) | (
+        {525}out(ch(rule_E_2), rule_fromVerifier)
+    ) | (
+        {526}out(ch((m'_30,sig(m'_30,ssk_V_3))), m'_7_fromVerifier)
+    ) | (
+        {527}out(ch((m'_31,sig(m'_31,ssk_V_3))), m'_9_fromVerifier)
+    ) | (
+        {528}out(ch(tkn_access_7), access_token_fromVerifier)
+    )
+)
+
+-- Query not attacker(m'_0_fromHolder[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_0_fromHolder[])
+RESULT not attacker(m'_0_fromHolder[]) is true.
+-- Query not attacker(m'_1_fromIssuer[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_1_fromIssuer[])
+RESULT not attacker(m'_1_fromIssuer[]) is true.
+-- Query not attacker(m'_2_fromHolder[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_2_fromHolder[])
+RESULT not attacker(m'_2_fromHolder[]) is true.
+-- Query not attacker(m'_3_fromIssuer[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_3_fromIssuer[])
+RESULT not attacker(m'_3_fromIssuer[]) is true.
+-- Query not attacker(m'_4_fromProver[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_4_fromProver[])
+RESULT not attacker(m'_4_fromProver[]) is true.
+-- Query not attacker(m'_5_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_5_fromVerifier[])
+RESULT not attacker(m'_5_fromVerifier[]) is true.
+-- Query not attacker(m'_6_fromProver[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_6_fromProver[])
+RESULT not attacker(m'_6_fromProver[]) is true.
+-- Query not attacker(m'_7_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_7_fromVerifier[])
+RESULT not attacker(m'_7_fromVerifier[]) is true.
+-- Query not attacker(m'_8_fromProver[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_8_fromProver[])
+RESULT not attacker(m'_8_fromProver[]) is true.
+-- Query not attacker(m'_9_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(m'_9_fromVerifier[])
+RESULT not attacker(m'_9_fromVerifier[]) is true.
+-- Query not attacker(rule_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(rule_fromVerifier[])
+goal reachable: attacker(rule_fromVerifier[])
+
+Derivation:
+Abbreviations:
+n_p_14 = n_p_2[!1 = @sid]
+ssk_P_8 = ssk_P[!1 = @sid]
+n_i_6 = n_i[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+ssk_I_2 = ssk_I[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+n_h_6 = n_h_2[m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+n_p_15 = n_p_3[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+ssk_P_9 = ssk_P_1[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+n_v_8 = n_v_4[m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+ssk_V_4 = ssk_V[m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+n_c_8 = n_c_4[m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+randomness_4 = randomness[m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),m_10 = aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+
+1. The message genDID(pk(sk_I[]),sk_I[]) may be sent to the attacker at output {13}.
+attacker(genDID(pk(sk_I[]),sk_I[])).
+
+2. Using the function attr the attacker may obtain attr.
+attacker(attr).
+
+3. By 2, the attacker may know attr.
+By 1, the attacker may know genDID(pk(sk_I[]),sk_I[]).
+Using the function 2-tuple the attacker may obtain (attr,genDID(pk(sk_I[]),sk_I[])).
+attacker((attr,genDID(pk(sk_I[]),sk_I[]))).
+
+4. By 3, the attacker may know (attr,genDID(pk(sk_I[]),sk_I[])).
+Using the function ch the attacker may obtain ch((attr,genDID(pk(sk_I[]),sk_I[]))).
+attacker(ch((attr,genDID(pk(sk_I[]),sk_I[])))).
+
+5. The message aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])) may be sent to the attacker at output {90}.
+attacker(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[]))).
+
+6. The message aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])) that the attacker may have by 5 may be received at input {26}.
+So the message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) may be sent to the attacker at output {33}.
+attacker(aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8))).
+
+7. The message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) that the attacker may have by 6 may be received at input {91}.
+So the message aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)) may be sent to the attacker at output {100}.
+attacker(aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2))).
+
+8. The message aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])) that the attacker may have by 5 may be received at input {26}.
+The message aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)) that the attacker may have by 7 may be received at input {34}.
+So the message aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)) may be sent to the attacker at output {44}.
+attacker(aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8))).
+
+9. The message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) that the attacker may have by 6 may be received at input {91}.
+The message aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)) that the attacker may have by 8 may be received at input {101}.
+So the message aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])) may be sent to the attacker at output {115}.
+attacker(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[]))).
+
+10. The message aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])) that the attacker may have by 9 may be received at input {374}.
+So the message aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)) may be sent to the attacker at output {381}.
+attacker(aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9))).
+
+11. The message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) that the attacker may have by 6 may be received at input {91}.
+The message aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)) that the attacker may have by 8 may be received at input {101}.
+The message aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)) that the attacker may have by 10 may be received at input {116}.
+So the message aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) may be sent to the attacker at output {122}.
+attacker(aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4))).
+
+12. The message aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])) that the attacker may have by 9 may be received at input {374}.
+The message aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) that the attacker may have by 11 may be received at input {382}.
+So the message aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)) may be sent to the attacker at output {389}.
+attacker(aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9))).
+
+13. The message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) that the attacker may have by 6 may be received at input {91}.
+The message aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)) that the attacker may have by 8 may be received at input {101}.
+The message aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)) that the attacker may have by 10 may be received at input {116}.
+The message aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)) that the attacker may have by 12 may be received at input {123}.
+So the message aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4)) may be sent to the attacker at output {135}.
+attacker(aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4))).
+
+14. The message aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])) that the attacker may have by 9 may be received at input {374}.
+The message aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) that the attacker may have by 11 may be received at input {382}.
+The message aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4)) that the attacker may have by 13 may be received at input {390}.
+So the message rule_fromVerifier[] may be sent on channel ch((attr,genDID(pk(sk_I[]),sk_I[]))) at output {405}.
+mess(ch((attr,genDID(pk(sk_I[]),sk_I[]))),rule_fromVerifier[]).
+
+15. By 4, the attacker may have the channel ch((attr,genDID(pk(sk_I[]),sk_I[]))).
+By 14, the message rule_fromVerifier[] may be sent on this channel.
+So the attacker may obtain the message rule_fromVerifier[] by listening on this channel.
+attacker(rule_fromVerifier[]).
+
+16. By 15, attacker(rule_fromVerifier[]).
+The goal is reached, represented in the following fact:
+attacker(rule_fromVerifier[]).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new attr_2: bitstring creating attr_12 at {1}
+
+out(h, ~M) with ~M = attr_12 at {2}
+
+new sk_I: SecretKey creating sk_I_3 at {3}
+
+new sk_V: SecretKey creating sk_V_5 at {4}
+
+new sk_P: SecretKey creating sk_P_5 at {5}
+
+out(h, ~M_1) with ~M_1 = pk(sk_I_3) at {6}
+
+out(h, ~M_2) with ~M_2 = pk(sk_V_5) at {7}
+
+out(h, ~M_3) with ~M_3 = pk(sk_P_5) at {8}
+
+out(h, ~M_4) with ~M_4 = genDID(pk(sk_I_3),sk_I_3) at {13}
+
+out(h, ~M_5) with ~M_5 = genDID(pk(sk_V_5),sk_V_5) at {14}
+
+out(h, ~M_6) with ~M_6 = genDID(pk(sk_P_5),sk_P_5) at {15}
+
+out(h, ~M_7) with ~M_7 = genDID(pk(sk_E),sk_E) at {16}
+
+new ssk_P: SecretKey creating ssk_P_8 at {86} in copy a
+
+new n_p_2: bitstring creating n_p_14 at {87} in copy a
+
+out(h, ~M_8) with ~M_8 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)) at {90} in copy a
+
+in(h, ~M_8) with ~M_8 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)) at {26} in copy a_1
+
+new ssk_I: SecretKey creating ssk_I_2 at {29} in copy a_1
+
+new n_i: bitstring creating n_i_6 at {30} in copy a_1
+
+out(h, ~M_9) with ~M_9 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)) at {33} in copy a_1
+
+in(h, ~M_9) with ~M_9 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)) at {91} in copy a
+
+new n_h_2: bitstring creating n_h_6 at {95} in copy a
+
+event auth_HolderSendsLastMessageToIssuer(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2))) at {99} in copy a
+
+out(h, ~M_10) with ~M_10 = aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2)) at {100} in copy a
+
+in(h, ~M_10) with ~M_10 = aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2)) at {34} in copy a_1
+
+event auth_IssuerSendsLastMessageToHolder(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),sig(((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),ssk_I_2)),pk(ssk_P_8))) at {43} in copy a_1
+
+out(h, ~M_11) with ~M_11 = aenc((((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),sig(((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),ssk_I_2)),pk(ssk_P_8)) at {44} in copy a_1
+
+out(h, ~M_12) with ~M_12 = Issuer_Completes at {45} in copy a_1
+
+event auth_IssuerCompletesProtocol(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2))) at {47} in copy a_1
+
+in(h, ~M_11) with ~M_11 = aenc((((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),sig(((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),ssk_I_2)),pk(ssk_P_8)) at {101} in copy a
+
+out(h, ~M_13) with ~M_13 = Holder_Completes at {108} in copy a
+
+event auth_HolderCompletesProtocol(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),sig(((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),ssk_I_2)),pk(ssk_P_8))) at {149} in copy a
+
+new ssk_P_1: SecretKey creating ssk_P_9 at {111} in copy a, a_2
+
+new n_p_3: bitstring creating n_p_15 at {112} in copy a, a_2
+
+out(h, ~M_14) with ~M_14 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)) at {115} in copy a, a_2
+
+in(h, ~M_14) with ~M_14 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)) at {374} in copy a_3
+
+new ssk_V: SecretKey creating ssk_V_4 at {377} in copy a_3
+
+new n_v_4: bitstring creating n_v_8 at {378} in copy a_3
+
+out(h, ~M_15) with ~M_15 = aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)) at {381} in copy a_3
+
+in(h, ~M_15) with ~M_15 = aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)) at {116} in copy a, a_2
+
+out(h, ~M_16) with ~M_16 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) at {122} in copy a, a_2
+
+in(h, ~M_16) with ~M_16 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) at {382} in copy a_3
+
+new n_c_4: bitstring creating n_c_8 at {386} in copy a_3
+
+out(h, ~M_17) with ~M_17 = aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)) at {389} in copy a_3
+
+in(h, ~M_17) with ~M_17 = aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)) at {123} in copy a, a_2
+
+new randomness: bitstring creating randomness_4 at {129} in copy a, a_2
+
+event auth_ProverSendsLastMessageToVerifier(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4))) at {133} in copy a, a_2
+
+event auth_ProverSendsLastMessageToVerifierInProtocolFull(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),sig(((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),ssk_I_2)),pk(ssk_P_8)),aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4))) at {134} in copy a, a_2
+
+out(h, ~M_18) with ~M_18 = aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4)) at {135} in copy a, a_2
+
+in(h, ~M_18) with ~M_18 = aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4)) at {390} in copy a_3
+
+new tkn_access_4: bitstring creating tkn_access_8 at {396} in copy a_3
+
+event auth_VerifierSendsLastMessageToProver(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4)),aenc(((tkn_access_8,sig(tkn_access_8,sk_V_5)),sig((tkn_access_8,sig(tkn_access_8,sk_V_5)),ssk_V_4)),pk(ssk_P_9))) at {399} in copy a_3
+
+out(h, ~M_19) with ~M_19 = aenc(((tkn_access_8,sig(tkn_access_8,sk_V_5)),sig((tkn_access_8,sig(tkn_access_8,sk_V_5)),ssk_V_4)),pk(ssk_P_9)) at {400} in copy a_3
+
+out(h, ~M_20) with ~M_20 = Verifier_Completes at {401} in copy a_3
+
+out(ch((attr,genDID(pk(sk_I_3),sk_I_3))), ~M_21) with ~M_21 = rule_fromVerifier at {405} in copy a_3
+
+event auth_VerifierCompletesProtocol(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4))) at {403} in copy a_3
+
+The attacker has the message ~M_21 = rule_fromVerifier.
+A trace has been found.
+RESULT not attacker(rule_fromVerifier[]) is false.
+-- Query not attacker(cred_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(cred_fromVerifier[])
+RESULT not attacker(cred_fromVerifier[]) is true.
+-- Query not attacker(vp_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(vp_fromVerifier[])
+RESULT not attacker(vp_fromVerifier[]) is true.
+-- Query not attacker(access_token_fromVerifier[]) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 91 rules.
+400 rules inserted. Base: 326 rules (57 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 469 rules (105 with conclusion selected). Queue: 134 rules.
+800 rules inserted. Base: 603 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 823 rules (124 with conclusion selected). Queue: 80 rules.
+1400 rules inserted. Base: 972 rules (144 with conclusion selected). Queue: 105 rules.
+1600 rules inserted. Base: 937 rules (157 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 967 rules (166 with conclusion selected). Queue: 45 rules.
+2000 rules inserted. Base: 1045 rules (182 with conclusion selected). Queue: 20 rules.
+2200 rules inserted. Base: 1108 rules (202 with conclusion selected). Queue: 17 rules.
+Starting query not attacker(access_token_fromVerifier[])
+RESULT not attacker(access_token_fromVerifier[]) is true.
+-- Query inj-event(auth_ProverCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) ==> inj-event(auth_VerifierSendsLastMessageToProver(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 94 rules.
+400 rules inserted. Base: 327 rules (55 with conclusion selected). Queue: 52 rules.
+600 rules inserted. Base: 471 rules (105 with conclusion selected). Queue: 143 rules.
+800 rules inserted. Base: 614 rules (112 with conclusion selected). Queue: 176 rules.
+1000 rules inserted. Base: 702 rules (112 with conclusion selected). Queue: 142 rules.
+1200 rules inserted. Base: 854 rules (116 with conclusion selected). Queue: 59 rules.
+1400 rules inserted. Base: 980 rules (143 with conclusion selected). Queue: 102 rules.
+1600 rules inserted. Base: 1045 rules (148 with conclusion selected). Queue: 104 rules.
+1800 rules inserted. Base: 1055 rules (159 with conclusion selected). Queue: 59 rules.
+2000 rules inserted. Base: 1155 rules (172 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1252 rules (186 with conclusion selected). Queue: 40 rules.
+2400 rules inserted. Base: 1361 rules (203 with conclusion selected). Queue: 39 rules.
+Starting query inj-event(auth_ProverCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) ==> inj-event(auth_VerifierSendsLastMessageToProver(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken))
+goal reachable: begin(auth_VerifierSendsLastMessageToProver(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4)),aenc(((tkn_access_8,sig(tkn_access_8,sk_V[])),sig((tkn_access_8,sig(tkn_access_8,sk_V[])),ssk_V_4)),pk(ssk_P_8))),@occ399_1) -> end(@occ142_1,auth_ProverCompletesProtocol(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4)),aenc(((tkn_access_8,sig(tkn_access_8,sk_V[])),sig((tkn_access_8,sig(tkn_access_8,sk_V[])),ssk_V_4)),pk(ssk_P_8))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_15 = n_p_2[!1 = @sid]
+ssk_P_9 = ssk_P[!1 = @sid]
+n_i_6 = n_i[m_0 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_I[])),!1 = @sid_1]
+ssk_I_2 = ssk_I[m_0 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_I[])),!1 = @sid_1]
+n_h_6 = n_h_2[m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+n_p_14 = n_p_3[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+ssk_P_8 = ssk_P_1[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+n_v_8 = n_v_4[m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+ssk_V_4 = ssk_V[m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+n_c_8 = n_c_4[m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+randomness_4 = randomness[m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),m_10 = aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+tkn_access_8 = tkn_access_4[m_46 = aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4)),m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+@occ142_1 = @occ142[m_14 = aenc(((tkn_access_8,sig(tkn_access_8,sk_V[])),sig((tkn_access_8,sig(tkn_access_8,sk_V[])),ssk_V_4)),pk(ssk_P_8)),m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),m_10 = aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+@occ399_1 = @occ399[m_46 = aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4)),m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+RESULT inj-event(auth_ProverCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) ==> inj-event(auth_VerifierSendsLastMessageToProver(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) is true.
+-- Query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 94 rules.
+400 rules inserted. Base: 327 rules (56 with conclusion selected). Queue: 51 rules.
+600 rules inserted. Base: 470 rules (105 with conclusion selected). Queue: 135 rules.
+800 rules inserted. Base: 607 rules (112 with conclusion selected). Queue: 163 rules.
+1000 rules inserted. Base: 704 rules (112 with conclusion selected). Queue: 123 rules.
+1200 rules inserted. Base: 825 rules (122 with conclusion selected). Queue: 61 rules.
+1400 rules inserted. Base: 988 rules (144 with conclusion selected). Queue: 112 rules.
+1600 rules inserted. Base: 1091 rules (157 with conclusion selected). Queue: 139 rules.
+1800 rules inserted. Base: 1170 rules (159 with conclusion selected). Queue: 57 rules.
+2000 rules inserted. Base: 1282 rules (173 with conclusion selected). Queue: 49 rules.
+2200 rules inserted. Base: 1364 rules (185 with conclusion selected). Queue: 46 rules.
+2400 rules inserted. Base: 1487 rules (201 with conclusion selected). Queue: 47 rules.
+2600 rules inserted. Base: 1586 rules (213 with conclusion selected). Queue: 1 rules.
+Starting query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp))
+goal reachable: begin(auth_ProverSendsLastMessageToVerifier(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4))),@occ133_1) -> end(@occ403_1,auth_VerifierCompletesProtocol(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_15 = n_p_2[!1 = @sid]
+ssk_P_9 = ssk_P[!1 = @sid]
+n_i_6 = n_i[m_0 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_I[])),!1 = @sid_1]
+ssk_I_2 = ssk_I[m_0 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_I[])),!1 = @sid_1]
+n_h_6 = n_h_2[m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+n_p_14 = n_p_3[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+ssk_P_8 = ssk_P_1[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+n_v_8 = n_v_4[m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+ssk_V_4 = ssk_V[m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+n_c_8 = n_c_4[m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+randomness_4 = randomness[m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),m_10 = aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+@occ403_1 = @occ403[m_46 = aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4)),m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+@occ133_1 = @occ133[m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),m_10 = aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+RESULT inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) is true.
+-- Query inj-event(auth_HolderCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did,m_cred)) ==> inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq,m_handshakeResp,m_did,m_cred)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 94 rules.
+400 rules inserted. Base: 336 rules (54 with conclusion selected). Queue: 54 rules.
+600 rules inserted. Base: 492 rules (109 with conclusion selected). Queue: 142 rules.
+800 rules inserted. Base: 640 rules (116 with conclusion selected). Queue: 178 rules.
+1000 rules inserted. Base: 722 rules (116 with conclusion selected). Queue: 144 rules.
+1200 rules inserted. Base: 872 rules (120 with conclusion selected). Queue: 60 rules.
+1400 rules inserted. Base: 982 rules (148 with conclusion selected). Queue: 95 rules.
+1600 rules inserted. Base: 1068 rules (151 with conclusion selected). Queue: 100 rules.
+1800 rules inserted. Base: 1144 rules (163 with conclusion selected). Queue: 68 rules.
+2000 rules inserted. Base: 1184 rules (176 with conclusion selected). Queue: 58 rules.
+2200 rules inserted. Base: 1228 rules (188 with conclusion selected). Queue: 43 rules.
+2400 rules inserted. Base: 1328 rules (204 with conclusion selected). Queue: 41 rules.
+Starting query inj-event(auth_HolderCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did,m_cred)) ==> inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq,m_handshakeResp,m_did,m_cred))
+goal reachable: begin(auth_IssuerSendsLastMessageToHolder(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8))),@occ43_1) -> end(@occ149_1,auth_HolderCompletesProtocol(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_14 = n_p_2[!1 = @sid]
+ssk_P_8 = ssk_P[!1 = @sid]
+n_i_6 = n_i[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+ssk_I_2 = ssk_I[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+n_h_6 = n_h_2[m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+@occ149_1 = @occ149[m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+@occ43_1 = @occ43[m_2 = aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)),m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+RESULT inj-event(auth_HolderCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did,m_cred)) ==> inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq,m_handshakeResp,m_did,m_cred)) is true.
+-- Query inj-event(auth_IssuerCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did)) ==> inj-event(auth_HolderSendsLastMessageToIssuer(m_handshakeReq,m_handshakeResp,m_did)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 95 rules.
+400 rules inserted. Base: 334 rules (55 with conclusion selected). Queue: 55 rules.
+600 rules inserted. Base: 489 rules (110 with conclusion selected). Queue: 148 rules.
+800 rules inserted. Base: 643 rules (117 with conclusion selected). Queue: 178 rules.
+1000 rules inserted. Base: 724 rules (117 with conclusion selected). Queue: 144 rules.
+1200 rules inserted. Base: 871 rules (120 with conclusion selected). Queue: 59 rules.
+1400 rules inserted. Base: 966 rules (146 with conclusion selected). Queue: 103 rules.
+1600 rules inserted. Base: 1069 rules (153 with conclusion selected). Queue: 104 rules.
+1800 rules inserted. Base: 1151 rules (165 with conclusion selected). Queue: 75 rules.
+2000 rules inserted. Base: 1190 rules (178 with conclusion selected). Queue: 54 rules.
+2200 rules inserted. Base: 1232 rules (190 with conclusion selected). Queue: 45 rules.
+2400 rules inserted. Base: 1279 rules (206 with conclusion selected). Queue: 41 rules.
+Starting query inj-event(auth_IssuerCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did)) ==> inj-event(auth_HolderSendsLastMessageToIssuer(m_handshakeReq,m_handshakeResp,m_did))
+goal reachable: begin(auth_HolderSendsLastMessageToIssuer(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2))),@occ171_1) -> end(@occ47_1,auth_IssuerCompletesProtocol(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_14 = n_p_4[!1 = @sid]
+ssk_P_8 = ssk_P_2[!1 = @sid]
+n_i_6 = n_i[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+ssk_I_2 = ssk_I[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+n_h_6 = n_h_3[m_15 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+@occ47_1 = @occ47[m_2 = aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)),m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+@occ171_1 = @occ171[m_15 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+goal reachable: begin(auth_HolderSendsLastMessageToIssuer(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2))),@occ99_1) -> end(@occ47_1,auth_IssuerCompletesProtocol(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2))))
+The hypothesis occurs strictly before the conclusion.
+Abbreviations:
+n_p_14 = n_p_2[!1 = @sid]
+ssk_P_8 = ssk_P[!1 = @sid]
+n_i_6 = n_i[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+ssk_I_2 = ssk_I[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+n_h_6 = n_h_2[m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+@occ47_1 = @occ47[m_2 = aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)),m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+@occ99_1 = @occ99[m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+RESULT inj-event(auth_IssuerCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did)) ==> inj-event(auth_HolderSendsLastMessageToIssuer(m_handshakeReq,m_handshakeResp,m_did)) is true.
+-- Query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && inj-event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 94 rules.
+400 rules inserted. Base: 336 rules (54 with conclusion selected). Queue: 53 rules.
+600 rules inserted. Base: 493 rules (108 with conclusion selected). Queue: 142 rules.
+800 rules inserted. Base: 639 rules (115 with conclusion selected). Queue: 178 rules.
+1000 rules inserted. Base: 722 rules (115 with conclusion selected). Queue: 143 rules.
+1200 rules inserted. Base: 871 rules (119 with conclusion selected). Queue: 60 rules.
+1400 rules inserted. Base: 992 rules (147 with conclusion selected). Queue: 100 rules.
+1600 rules inserted. Base: 1088 rules (150 with conclusion selected). Queue: 114 rules.
+1800 rules inserted. Base: 1168 rules (161 with conclusion selected). Queue: 100 rules.
+2000 rules inserted. Base: 1278 rules (170 with conclusion selected). Queue: 57 rules.
+2200 rules inserted. Base: 1351 rules (184 with conclusion selected). Queue: 49 rules.
+2400 rules inserted. Base: 1480 rules (196 with conclusion selected). Queue: 56 rules.
+2600 rules inserted. Base: 1596 rules (211 with conclusion selected). Queue: 17 rules.
+Starting query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && inj-event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred))
+goal reachable: begin(auth_ProverSendsLastMessageToVerifier(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4))),@occ133_2) && begin(auth_IssuerSendsLastMessageToHolder(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_I[])),aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_9)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9))),@occ43_2) -> end(@occ403_2,auth_VerifierCompletesProtocol(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4))))
+Abbreviations:
+n_p_15 = n_p_2[!1 = @sid]
+ssk_P_9 = ssk_P[!1 = @sid]
+n_i_6 = n_i[m_0 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_I[])),!1 = @sid_1]
+ssk_I_2 = ssk_I[m_0 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_I[])),!1 = @sid_1]
+n_h_6 = n_h_2[m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+n_p_14 = n_p_3[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+ssk_P_8 = ssk_P_1[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+n_v_8 = n_v_4[m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+ssk_V_4 = ssk_V[m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+n_c_8 = n_c_4[m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+randomness_4 = randomness[m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),m_10 = aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+@occ403_2 = @occ403_1[m_46 = aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_8)),pk(ssk_V_4)),m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_8)),pk(ssk_V_4)),m_42 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_V[])),!1 = @sid_3]
+@occ133_2 = @occ133_1[m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_8)),m_10 = aenc(((n_p_14,n_v_8,pk(ssk_V_4)),sig((n_p_14,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_8)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_9)),m_6 = aenc(((n_p_15,n_i_6,pk(ssk_I_2)),sig((n_p_15,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_9)),!1 = @sid]
+@occ43_2 = @occ43_1[m_2 = aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_9)),pk(ssk_I_2)),m_0 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_I[])),!1 = @sid_1]
+
+Derivation:
+Abbreviations:
+n_p_14 = n_p_2[!1 = @sid]
+ssk_P_8 = ssk_P[!1 = @sid]
+n_i_6 = n_i[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+ssk_I_2 = ssk_I[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+n_h_6 = n_h_2[m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+n_p_15 = n_p_3[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+ssk_P_9 = ssk_P_1[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+n_v_8 = n_v_4[m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+ssk_V_4 = ssk_V[m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+n_c_8 = n_c_4[m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+randomness_4 = randomness[m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),m_10 = aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+@occ403_2 = @occ403_1[m_46 = aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4)),m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+@occ133_2 = @occ133_1[m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),m_10 = aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+@occ43_2 = @occ43_1[m_2 = aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)),m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+
+1. The message aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])) may be sent to the attacker at output {90}.
+attacker(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[]))).
+
+2. The message aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])) that the attacker may have by 1 may be received at input {26}.
+So the message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) may be sent to the attacker at output {33}.
+attacker(aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8))).
+
+3. The message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) that the attacker may have by 2 may be received at input {91}.
+So the message aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)) may be sent to the attacker at output {100}.
+attacker(aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2))).
+
+4. The message aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])) that the attacker may have by 1 may be received at input {26}.
+The message aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)) that the attacker may have by 3 may be received at input {34}.
+The event auth_IssuerSendsLastMessageToHolder(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8))) (with occurrence name @occ43_2) may be executed at {43}.
+So the message aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)) may be sent to the attacker at output {44}.
+attacker(aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8))).
+
+5. The message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) that the attacker may have by 2 may be received at input {91}.
+The message aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)) that the attacker may have by 4 may be received at input {101}.
+So the message aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])) may be sent to the attacker at output {115}.
+attacker(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[]))).
+
+6. The message aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])) that the attacker may have by 5 may be received at input {374}.
+So the message aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)) may be sent to the attacker at output {381}.
+attacker(aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9))).
+
+7. The message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) that the attacker may have by 2 may be received at input {91}.
+The message aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)) that the attacker may have by 4 may be received at input {101}.
+The message aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)) that the attacker may have by 6 may be received at input {116}.
+So the message aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) may be sent to the attacker at output {122}.
+attacker(aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4))).
+
+8. The message aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])) that the attacker may have by 5 may be received at input {374}.
+The message aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) that the attacker may have by 7 may be received at input {382}.
+So the message aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)) may be sent to the attacker at output {389}.
+attacker(aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9))).
+
+9. The message aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)) that the attacker may have by 2 may be received at input {91}.
+The message aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)) that the attacker may have by 4 may be received at input {101}.
+The message aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)) that the attacker may have by 6 may be received at input {116}.
+The message aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)) that the attacker may have by 8 may be received at input {123}.
+The event auth_ProverSendsLastMessageToVerifier(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4))) (with occurrence name @occ133_2) may be executed at {133}.
+So the message aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4)) may be sent to the attacker at output {135}.
+attacker(aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4))).
+
+10. The message aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])) that the attacker may have by 5 may be received at input {374}.
+The message aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) that the attacker may have by 7 may be received at input {382}.
+The message aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4)) that the attacker may have by 9 may be received at input {390}.
+So event auth_VerifierCompletesProtocol(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4))) may be executed at {403} in session @sid_3.
+end(@occ403_2,auth_VerifierCompletesProtocol(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4)))).
+
+11. By 10, end(@occ403_2,auth_VerifierCompletesProtocol(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4)))).
+The goal is reached, represented in the following fact:
+end(@occ403_2,auth_VerifierCompletesProtocol(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4)))).
+
+
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new attr_2: bitstring creating attr_12 at {1}
+
+out(h, ~M) with ~M = attr_12 at {2}
+
+new sk_I: SecretKey creating sk_I_3 at {3}
+
+new sk_V: SecretKey creating sk_V_5 at {4}
+
+new sk_P: SecretKey creating sk_P_5 at {5}
+
+out(h, ~M_1) with ~M_1 = pk(sk_I_3) at {6}
+
+out(h, ~M_2) with ~M_2 = pk(sk_V_5) at {7}
+
+out(h, ~M_3) with ~M_3 = pk(sk_P_5) at {8}
+
+out(h, ~M_4) with ~M_4 = genDID(pk(sk_I_3),sk_I_3) at {13}
+
+out(h, ~M_5) with ~M_5 = genDID(pk(sk_V_5),sk_V_5) at {14}
+
+out(h, ~M_6) with ~M_6 = genDID(pk(sk_P_5),sk_P_5) at {15}
+
+out(h, ~M_7) with ~M_7 = genDID(pk(sk_E),sk_E) at {16}
+
+new ssk_P: SecretKey creating ssk_P_8 at {86} in copy a
+
+new n_p_2: bitstring creating n_p_14 at {87} in copy a
+
+out(h, ~M_8) with ~M_8 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)) at {90} in copy a
+
+in(h, ~M_8) with ~M_8 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)) at {26} in copy a_1
+
+new ssk_I: SecretKey creating ssk_I_2 at {29} in copy a_1
+
+new n_i: bitstring creating n_i_6 at {30} in copy a_1
+
+out(h, ~M_9) with ~M_9 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)) at {33} in copy a_1
+
+in(h, ~M_9) with ~M_9 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)) at {91} in copy a
+
+new n_h_2: bitstring creating n_h_6 at {95} in copy a
+
+event auth_HolderSendsLastMessageToIssuer(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2))) at {99} in copy a
+
+out(h, ~M_10) with ~M_10 = aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2)) at {100} in copy a
+
+in(h, ~M_10) with ~M_10 = aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2)) at {34} in copy a_1
+
+event auth_IssuerSendsLastMessageToHolder(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),sig(((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),ssk_I_2)),pk(ssk_P_8))) at {43} in copy a_1
+
+out(h, ~M_11) with ~M_11 = aenc((((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),sig(((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),ssk_I_2)),pk(ssk_P_8)) at {44} in copy a_1
+
+out(h, ~M_12) with ~M_12 = Issuer_Completes at {45} in copy a_1
+
+event auth_IssuerCompletesProtocol(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2))) at {47} in copy a_1
+
+in(h, ~M_11) with ~M_11 = aenc((((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),sig(((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),ssk_I_2)),pk(ssk_P_8)) at {101} in copy a
+
+out(h, ~M_13) with ~M_13 = Holder_Completes at {108} in copy a
+
+new ssk_P_1: SecretKey creating ssk_P_9 at {111} in copy a, a_2
+
+new n_p_3: bitstring creating n_p_15 at {112} in copy a, a_2
+
+out(h, ~M_14) with ~M_14 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)) at {115} in copy a, a_2
+
+in(h, ~M_14) with ~M_14 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)) at {374} in copy a_3
+
+new ssk_V: SecretKey creating ssk_V_4 at {377} in copy a_3
+
+new n_v_4: bitstring creating n_v_8 at {378} in copy a_3
+
+out(h, ~M_15) with ~M_15 = aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)) at {381} in copy a_3
+
+in(h, ~M_15) with ~M_15 = aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)) at {116} in copy a, a_2
+
+out(h, ~M_16) with ~M_16 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) at {122} in copy a, a_2
+
+in(h, ~M_16) with ~M_16 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)) at {382} in copy a_3
+
+new n_c_4: bitstring creating n_c_8 at {386} in copy a_3
+
+out(h, ~M_17) with ~M_17 = aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)) at {389} in copy a_3
+
+in(h, ~M_17) with ~M_17 = aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)) at {123} in copy a, a_2
+
+new randomness: bitstring creating randomness_4 at {129} in copy a, a_2
+
+event auth_ProverSendsLastMessageToVerifier(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4))) at {133} in copy a, a_2
+
+event auth_ProverSendsLastMessageToVerifierInProtocolFull(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I_3)),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I_3)),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),sig(((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sig((n_i_6,genDID(pk(sk_P_5),sk_P_5),genDID(pk(sk_I_3),sk_I_3),n_h_6),sk_P_5)),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),sig(((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sig((((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),genDID(pk(sk_P_5),sk_P_5),n_h_6),sk_I_3)),ssk_I_2)),pk(ssk_P_8)),aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4))) at {134} in copy a, a_2
+
+out(h, ~M_18) with ~M_18 = aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4)) at {135} in copy a, a_2
+
+in(h, ~M_18) with ~M_18 = aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4)) at {390} in copy a_3
+
+new tkn_access_4: bitstring creating tkn_access_8 at {396} in copy a_3
+
+event auth_VerifierSendsLastMessageToProver(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4)),aenc(((tkn_access_8,sig(tkn_access_8,sk_V_5)),sig((tkn_access_8,sig(tkn_access_8,sk_V_5)),ssk_V_4)),pk(ssk_P_9))) at {399} in copy a_3
+
+out(h, ~M_19) with ~M_19 = aenc(((tkn_access_8,sig(tkn_access_8,sk_V_5)),sig((tkn_access_8,sig(tkn_access_8,sk_V_5)),ssk_V_4)),pk(ssk_P_9)) at {400} in copy a_3
+
+out(h, ~M_20) with ~M_20 = Verifier_Completes at {401} in copy a_3
+
+event auth_VerifierCompletesProtocol(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4))) at {403} in copy a_3 (goal)
+
+The event auth_VerifierCompletesProtocol(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V_5)),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V_5)),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),sig((n_c_8,(attr,genDID(pk(sk_I_3),sk_I_3))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),sig(((attr,genDID(pk(sk_I_3),sk_I_3)),proofGen(((attr,genDID(pk(sk_I_3),sk_I_3)),sig((attr,genDID(pk(sk_I_3),sk_I_3)),sk_I_3)),(n_c_8,genDID(pk(sk_V_5),sk_V_5)),pk(sk_I_3),randomness_4)),ssk_P_9)),pk(ssk_V_4))) is executed at {403} in copy a_3.
+A trace has been found.
+RESULT inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && inj-event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) is false.
+RESULT (even event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) is false.)
+-- Query event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_ProverSendsLastMessageToVerifierInProtocolFull(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred,m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 192 rules (44 with conclusion selected). Queue: 94 rules.
+400 rules inserted. Base: 336 rules (54 with conclusion selected). Queue: 53 rules.
+600 rules inserted. Base: 493 rules (108 with conclusion selected). Queue: 142 rules.
+800 rules inserted. Base: 639 rules (115 with conclusion selected). Queue: 178 rules.
+1000 rules inserted. Base: 722 rules (115 with conclusion selected). Queue: 143 rules.
+1200 rules inserted. Base: 871 rules (119 with conclusion selected). Queue: 60 rules.
+1400 rules inserted. Base: 992 rules (147 with conclusion selected). Queue: 100 rules.
+1600 rules inserted. Base: 1088 rules (150 with conclusion selected). Queue: 114 rules.
+1800 rules inserted. Base: 1168 rules (161 with conclusion selected). Queue: 100 rules.
+2000 rules inserted. Base: 1263 rules (170 with conclusion selected). Queue: 57 rules.
+2200 rules inserted. Base: 1317 rules (184 with conclusion selected). Queue: 49 rules.
+2400 rules inserted. Base: 1413 rules (196 with conclusion selected). Queue: 56 rules.
+2600 rules inserted. Base: 1527 rules (211 with conclusion selected). Queue: 17 rules.
+Starting query event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_ProverSendsLastMessageToVerifierInProtocolFull(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred,m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp))
+goal reachable: begin(auth_ProverSendsLastMessageToVerifierInProtocolFull(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4)))) && begin(auth_IssuerSendsLastMessageToHolder(aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),aenc((((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),sig(((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sig((n_i_6,genDID(pk(sk_P[]),sk_P[]),genDID(pk(sk_I[]),sk_I[]),n_h_6),sk_P[])),ssk_P_8)),pk(ssk_I_2)),aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)))) -> end(auth_VerifierCompletesProtocol(aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),aenc((((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),sig(((attr,genDID(pk(sk_I[]),sk_I[])),proofGen(((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),(n_c_8,genDID(pk(sk_V[]),sk_V[])),pk(sk_I[]),randomness_4)),ssk_P_9)),pk(ssk_V_4))))
+Abbreviations:
+n_p_14 = n_p_2[!1 = @sid]
+ssk_P_8 = ssk_P[!1 = @sid]
+n_i_6 = n_i[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+ssk_I_2 = ssk_I[m_0 = aenc(((n_p_14,pk(ssk_P_8)),sig((n_p_14,pk(ssk_P_8)),ssk_P_8)),pk(sk_I[])),!1 = @sid_1]
+n_h_6 = n_h_2[m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+n_p_15 = n_p_3[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+ssk_P_9 = ssk_P_1[!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+n_v_8 = n_v_4[m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+ssk_V_4 = ssk_V[m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+n_c_8 = n_c_4[m_44 = aenc(((n_v_8,uri),sig((n_v_8,uri),ssk_P_9)),pk(ssk_V_4)),m_42 = aenc(((n_p_15,pk(ssk_P_9)),sig((n_p_15,pk(ssk_P_9)),ssk_P_9)),pk(sk_V[])),!1 = @sid_3]
+randomness_4 = randomness[m_12 = aenc(((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),sig((n_c_8,(attr,genDID(pk(sk_I[]),sk_I[]))),ssk_V_4)),pk(ssk_P_9)),m_10 = aenc(((n_p_15,n_v_8,pk(ssk_V_4)),sig((n_p_15,n_v_8,pk(ssk_V_4)),sk_V[])),pk(ssk_P_9)),!2 = @sid_2,m_8 = aenc((((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),sig(((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sig((((attr,genDID(pk(sk_I[]),sk_I[])),sig((attr,genDID(pk(sk_I[]),sk_I[])),sk_I[])),genDID(pk(sk_P[]),sk_P[]),n_h_6),sk_I[])),ssk_I_2)),pk(ssk_P_8)),m_6 = aenc(((n_p_14,n_i_6,pk(ssk_I_2)),sig((n_p_14,n_i_6,pk(ssk_I_2)),sk_I[])),pk(ssk_P_8)),!1 = @sid]
+RESULT event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_ProverSendsLastMessageToVerifierInProtocolFull(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred,m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) is true.
+
+--------------------------------------------------------------
+Verification summary:
+
+Query not attacker(m'_0_fromHolder[]) is true.
+
+Query not attacker(m'_1_fromIssuer[]) is true.
+
+Query not attacker(m'_2_fromHolder[]) is true.
+
+Query not attacker(m'_3_fromIssuer[]) is true.
+
+Query not attacker(m'_4_fromProver[]) is true.
+
+Query not attacker(m'_5_fromVerifier[]) is true.
+
+Query not attacker(m'_6_fromProver[]) is true.
+
+Query not attacker(m'_7_fromVerifier[]) is true.
+
+Query not attacker(m'_8_fromProver[]) is true.
+
+Query not attacker(m'_9_fromVerifier[]) is true.
+
+Query not attacker(rule_fromVerifier[]) is false.
+
+Query not attacker(cred_fromVerifier[]) is true.
+
+Query not attacker(vp_fromVerifier[]) is true.
+
+Query not attacker(access_token_fromVerifier[]) is true.
+
+Query inj-event(auth_ProverCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) ==> inj-event(auth_VerifierSendsLastMessageToProver(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp,m_accessToken)) is true.
+
+Query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) is true.
+
+Query inj-event(auth_HolderCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did,m_cred)) ==> inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq,m_handshakeResp,m_did,m_cred)) is true.
+
+Query inj-event(auth_IssuerCompletesProtocol(m_handshakeReq,m_handshakeResp,m_did)) ==> inj-event(auth_HolderSendsLastMessageToIssuer(m_handshakeReq,m_handshakeResp,m_did)) is true.
+
+Query inj-event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> inj-event(auth_ProverSendsLastMessageToVerifier(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) && inj-event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && inj-event(auth_HolderCompletesProtocol(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) is false.
+
+Query event(auth_VerifierCompletesProtocol(m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) ==> event(auth_IssuerSendsLastMessageToHolder(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred)) && event(auth_ProverSendsLastMessageToVerifierInProtocolFull(m_handshakeReq_2,m_handshakeResp_2,m_did,m_cred,m_handshakeReq,m_handshakeResp,m_uri,m_rule,m_vp)) is true.
+
+--------------------------------------------------------------
+
