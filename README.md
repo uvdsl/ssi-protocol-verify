@@ -1,3 +1,9 @@
+<p align="left"> 
+ <a href="https://zenodo.org/doi/10.5281/zenodo.10654423">
+ <img src="https://zenodo.org/badge/696197962.svg">
+ </a>
+</p>
+
 # SSI Authentication and Authorization Protocol for Web Resource Access; verified using ProVerif (and DeepSec)
 
 This repository contains the formal verification of security properties of the protocol flow for authentication and authorization for Web resource access.
