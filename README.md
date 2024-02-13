@@ -85,6 +85,10 @@ Possible implementations e.g. via certification using DNS, in government registr
 The verifier assumes the issuer to have due diligence on validating the assertions they make, e.g. that Holder is actually a student (which may be out-of-band).
 The verifier thus assumes that the issuer behaves honestly according to the protocol (given the context of the use case).
 
+## Interesting: The holder must check the credential after issuance
+
+An interesting observation is that, the holder checking the signature of an anonymous credential after issuance and before usage in a provenance session is not as critical for authentication as it is for regular VCs (in short, because zero-knowledge proofs never reveal the anonymous credential itself, only a proof-of-possession of the anonymous credential). Yet, the holder checking the signature and contents of an anonymous credential after issuance and before usage is critical for unlinkability (in short, because an issuer may attempt to inject unsolicited identifying information into the attributes).
+
 ## The Protocol with Plain VCs (not anonymous)
 
 Find a Message Sequence Chart (MSC) of the plain model [here](https://github.com/uvdsl/ssi-protocol-verify/tree/main/PlainVCs/doc/msc-full-protocol.pdf).
